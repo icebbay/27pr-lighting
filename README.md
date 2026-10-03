@@ -4,6 +4,10 @@
 
 **在线打开（不用安装）：https://icebbay.github.io/27pr-lighting/**
 
+另外两页（照明页不变）：
+- **插座 / 动力**：https://icebbay.github.io/27pr-lighting/lighting_tool/power.html （每个插座、电器属于哪一路，点一路只看这一路）
+- **配电箱 AL1**：https://icebbay.github.io/27pr-lighting/lighting_tool/board.html （全部 20 路：照明 7 + 插座 6 + 专线 7，单线图、回路表、配电箱模块数）
+
 3D 漫游（可以在房子里走、开门；与本照明图同一版户型 v38）：https://icebbay.github.io/27pr-cgi/walkthrough/
 
 > 状态：Rev F（2026-10-03）。回路划分（一层 WL1/WL2/WL6/WL3，二层 WL7/WL4/WL5）和配电箱 AL1 的位置是暂定的，需要电工按 BS 7671 / Part P 复核。
@@ -84,6 +88,8 @@ FLOOR=GF LIGHTING_JSON=lighting_tool/lighting_GF.json DST_OVERRIDE=out.pptx pyth
 | `lighting_tool/ref_RevB/`、`ref_RevC/`、`ref_RevD/` | 历史数据；`apply_revC/D/E.py` 依次由上一版生成下一版 |
 | `lighting_tool/walls_*.svg` | 墙体（Blender 1.2 m 剖切，来自 `source_pptx/`） |
 | `make_lighting_drawings.py` / `_cn.py` | 英式 / 国标出图脚本 |
+| `lighting_tool/build_power.py` | 从 v6 PPT 插座页读插座点位（按两页共有的墙体换算坐标），按 20 路方案分回路 → `power_*.json`、`power_data.js` |
+| `lighting_tool/power.html`、`board.html` | 插座 / 动力页、配电箱页（`circuits.js` 合并照明 WL + 插座 WX + 专线 WP） |
 | `source_pptx/` | 用户标注的户型 PPT（墙体、灯位、开关位置点） |
 | `照明施工图_工作流程.md` | 规则、标注约定、出图规范、测试计划 T1–T6 |
 | `lighting_tool/screenshots/` | 测试截图（T1–T5、试灯、追踪、电路图） |
