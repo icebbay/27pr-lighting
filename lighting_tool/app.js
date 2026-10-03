@@ -479,7 +479,11 @@ class Pane {
   constructor(F, host) {
     this.F = F; const J = S[F]; this.vb = [...J.units.view_box];
     this.el = document.createElement('div'); this.el.className = 'pane'; host.appendChild(this.el);
-    this.el.innerHTML = `<div class="ttl">${FCN[F]}平面</div>`;
+    this.el.innerHTML = `<div class="ttl">${FCN[F]}平面</div><div class="zb"><button data-z="in" title="放大">＋</button><button data-z="out" title="缩小">－</button><button data-z="fit" title="全图" style="width:44px;font-size:12px">复位</button></div>`;
+    this.el.querySelector('.zb').addEventListener('click', e => { const z = e.target.dataset.z; if (!z) return;
+      if (z === 'fit') { this.vb = [...S[F].units.view_box]; this.setVB(); return; }
+      const k = z === 'in' ? 1 / 1.4 : 1.4, c = [this.vb[0] + this.vb[2] / 2, this.vb[1] + this.vb[3] / 2];
+      this.vb = [c[0] - this.vb[2] * k / 2, c[1] - this.vb[3] * k / 2, this.vb[2] * k, this.vb[3] * k]; this.setVB(); });
     const ns = 'http://www.w3.org/2000/svg';
     this.svg = document.createElementNS(ns, 'svg'); this.svg.setAttribute('class', 'plan p-' + F); this.el.appendChild(this.svg);
     const m = M(F);
@@ -499,8 +503,22 @@ class Pane {
       ev.preventDefault(); const p = this.pt(ev), k = ev.deltaY > 0 ? 1.15 : 1 / 1.15;
       this.vb = [p[0] - (p[0] - this.vb[0]) * k, p[1] - (p[1] - this.vb[1]) * k, this.vb[2] * k, this.vb[3] * k]; this.setVB();
     }, { passive: false });
+    const touches = new Map();
+    svg.addEventListener('pointerdown', ev => { if (ev.pointerType === 'touch') touches.set(ev.pointerId, [ev.clientX, ev.clientY]); }, true);
+    svg.addEventListener('pointermove', ev => {
+      if (!touches.has(ev.pointerId)) return;
+      const prev = [...touches.values()]; touches.set(ev.pointerId, [ev.clientX, ev.clientY]);
+      if (touches.size !== 2) return;
+      const now = [...touches.values()], d0 = Math.hypot(prev[0][0] - prev[1][0], prev[0][1] - prev[1][1]), d1 = Math.hypot(now[0][0] - now[1][0], now[0][1] - now[1][1]);
+      if (!d0 || !d1) return;
+      const mid = this.pt({ clientX: (now[0][0] + now[1][0]) / 2, clientY: (now[0][1] + now[1][1]) / 2 }), k = d0 / d1;
+      this.vb = [mid[0] - (mid[0] - this.vb[0]) * k, mid[1] - (mid[1] - this.vb[1]) * k, this.vb[2] * k, this.vb[3] * k]; this.setVB(); this.pinching = true;
+    }, true);
+    const lift = ev => { touches.delete(ev.pointerId); if (!touches.size) this.pinching = false; };
+    svg.addEventListener('pointerup', lift, true); svg.addEventListener('pointercancel', lift, true);
     svg.addEventListener('pointerdown', ev => {
       if (ev.button === 1 || ev.button === 2) return this.startPan(ev);
+      if (touches.size > 1) return;
       const t = ev.target.closest('[data-k]'), p = this.pt(ev);
       const k = t?.dataset.k, id = t?.dataset.id;
       if (ui.mode === 'sim') {
@@ -536,7 +554,7 @@ class Pane {
   }
   startPan(ev) {
     const x0 = ev.clientX, y0 = ev.clientY, vb0 = [...this.vb], r = this.svg.getBoundingClientRect(), k = Math.max(vb0[2] / r.width, vb0[3] / r.height);
-    this.capture(ev, e => { this.vb = [vb0[0] - (e.clientX - x0) * k, vb0[1] - (e.clientY - y0) * k, vb0[2], vb0[3]]; this.setVB(); });
+    this.capture(ev, e => { if (this.pinching) return; this.vb = [vb0[0] - (e.clientX - x0) * k, vb0[1] - (e.clientY - y0) * k, vb0[2], vb0[3]]; this.setVB(); });
   }
   startDrag(ev, kind, id, p0) {
     const F = this.F, J = S[F];
@@ -983,7 +1001,7 @@ function render() {
   side.innerHTML = { info: sideInfo, circ: sideCirc, wl: sideWL, chk: sideChk, out: sideOut }[ui.tab]();
   side.scrollTop = st;
   const lit = FLOORS.reduce((a, F) => a + S[F].lights.filter(l => lightOn(F, l.id)).length, 0);
-  foot(ui.mode === 'sim' ? `试灯：点开关面板上的键 · 点灯看线路 · 滚轮缩放、拖动平移　|　亮灯 ${lit} / ${S.GF.lights.length + S.FF.lights.length}`
+  foot(ui.mode === 'sim' ? `试灯：点开关面板上的键 · 点灯看线路 · 滚轮 / 双指 / ＋－ 缩放、拖动平移　|　亮灯 ${lit} / ${S.GF.lights.length + S.FF.lights.length}`
     : ui.ak ? `已选 ${ui.ak.mk ? ui.ak.mk : `${FCN[ui.ak.F]} ${ui.ak.plate} 键 ${S[ui.ak.F].plates.find(p => p.id === ui.ak.plate)?.keys.indexOf(ui.ak.key) + 1}`} → 点灯建立 / 取消控制（Shift 拖框多选；可切到另一层点灯 = 跨层）· Esc 取消`
     : ui.tool === 'place' ? '放开关：在墙边点一下（自动贴墙 / 门锁侧），类型在工具栏选' : '编辑：点面板上的键选中 → 点灯；拖动面板移动；Delete 删除；Ctrl+Z 撤销');
 }

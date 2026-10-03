@@ -69,6 +69,16 @@ svg .live { animation-timing-function: linear; animation-iteration-count: infini
 svg .dim { opacity: .12; }
 svg [data-k] { cursor: pointer; }
 @keyframes spin { to { transform: rotate(360deg); } }
+.zb { position: absolute; right: 8px; top: 6px; z-index: 3; display: flex; gap: 4px; }
+.zb button { width: 34px; height: 30px; padding: 0; font-size: 16px; background: rgba(255,255,255,.92); }
+@media (max-width: 820px) {
+  body { grid-template-columns: 100%; grid-template-rows: auto 62vh auto auto; grid-template-areas: "top" "main" "foot" "side"; height: auto; min-height: 100%; }
+  main { flex-direction: column; padding: 4px; }
+  aside { border-left: 0; border-top: 1px solid var(--line); }
+  #side { overflow: visible; }
+  header { gap: 4px 8px; }
+  footer { white-space: normal; }
+}
 </style>
 </head>
 <body>
