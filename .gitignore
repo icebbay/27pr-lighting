@@ -1,0 +1,14 @@
+# This folder holds much more than the lighting project; only the files below go to GitHub (icebbay/27pr-lighting).
+/*
+!/.gitignore
+!/README.md
+!/index.html
+!/make_lighting_plan.py
+!/make_lighting_drawings.py
+!/make_lighting_drawings_cn.py
+!/照明施工图_工作流程.md
+!/source_pptx/
+!/lighting_tool/
+/lighting_tool/out/
+__pycache__/
+*.pyc

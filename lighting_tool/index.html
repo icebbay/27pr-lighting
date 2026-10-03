@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>27PR 照明 workflow</title>
+<style>
+:root {
+  --bg: #f3f4f6; --panel: #ffffff; --ink: #1f2328; --mute: #6b7280; --line: #d9dde3; --accent: #1f4e79;
+  --err: #c62828; --warn: #b7791f; --info: #2b6cb0; --ok: #2e7d32; --on: #ffd54a;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { font: 13px/1.45 "Microsoft YaHei", "PingFang SC", system-ui, sans-serif; color: var(--ink); background: var(--bg);
+  display: grid; grid-template-rows: auto 1fr auto; grid-template-columns: minmax(0, 1fr) 380px; grid-template-areas: "top top" "main side" "foot side"; }
+header { grid-area: top; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; padding: 7px 12px; background: var(--panel); border-bottom: 1px solid var(--line); }
+header h1 { font-size: 15px; margin: 0 6px 0 0; white-space: nowrap; }
+.grp { display: flex; gap: 2px; align-items: center; }
+.grp > span.lab { color: var(--mute); margin-right: 4px; font-size: 12px; }
+button, select, input[type=text] { font: inherit; }
+button { border: 1px solid var(--line); background: #fff; padding: 3px 9px; border-radius: 5px; cursor: pointer; color: var(--ink); }
+button:hover { border-color: #9aa4b2; }
+button.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+button.prim { background: var(--accent); color: #fff; border-color: var(--accent); }
+button:disabled { opacity: .45; cursor: default; }
+select { border: 1px solid var(--line); border-radius: 5px; padding: 2px 4px; background: #fff; }
+label.chk { display: inline-flex; gap: 3px; align-items: center; cursor: pointer; color: var(--mute); }
+main { grid-area: main; position: relative; min-height: 0; display: flex; gap: 6px; padding: 6px; }
+.pane { flex: 1; min-width: 0; position: relative; background: #fff; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.pane .ttl { position: absolute; left: 8px; top: 6px; font-weight: bold; color: var(--accent); pointer-events: none; z-index: 2; background: rgba(255,255,255,.85); padding: 1px 6px; border-radius: 4px; }
+.pane svg.plan { width: 100%; height: 100%; display: block; touch-action: none; user-select: none; }
+.pane.schem { overflow: auto; }
+.pane.schem svg { display: block; }
+aside { grid-area: side; background: var(--panel); border-left: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
+.tabs { display: flex; border-bottom: 1px solid var(--line); }
+.tabs button { flex: 1; border: 0; border-radius: 0; padding: 8px 0; background: none; border-bottom: 2px solid transparent; }
+.tabs button.on { color: var(--accent); background: none; border-bottom-color: var(--accent); font-weight: bold; }
+.badge { display: inline-block; min-width: 16px; padding: 0 4px; border-radius: 8px; font-size: 11px; color: #fff; background: var(--err); margin-left: 3px; }
+.badge.w { background: var(--warn); }
+#side { overflow: auto; padding: 10px 12px 30px; flex: 1; }
+#side h3 { font-size: 13px; margin: 14px 0 6px; color: var(--accent); }
+#side h3:first-child { margin-top: 2px; }
+.muted { color: var(--mute); }
+.kv { display: grid; grid-template-columns: 64px 1fr; gap: 3px 8px; }
+.kv > div:nth-child(odd) { color: var(--mute); }
+.chip { display: inline-block; min-width: 20px; text-align: center; padding: 0 5px; border-radius: 4px; color: #fff; font-weight: bold; margin: 1px; cursor: pointer; }
+.mode { display: inline-block; padding: 0 5px; border-radius: 4px; font-size: 11px; border: 1px solid currentColor; }
+table.lst { width: 100%; border-collapse: collapse; }
+table.lst td, table.lst th { border-bottom: 1px solid #eef0f3; padding: 3px 3px; text-align: left; vertical-align: top; }
+table.lst th { color: var(--mute); font-weight: normal; font-size: 12px; }
+table.lst tr.cur { background: #fff6d6; }
+table.lst tr:hover td { background: #f6f8fb; cursor: pointer; }
+.iss { padding: 5px 7px; border-left: 3px solid; margin: 4px 0; background: #fafafa; cursor: pointer; border-radius: 3px; }
+.iss.error { border-color: var(--err); } .iss.warn { border-color: var(--warn); } .iss.info { border-color: var(--info); }
+.iss b { font-weight: normal; font-size: 11px; color: var(--mute); margin-right: 4px; }
+.keyrow { display: grid; grid-template-columns: 44px 1fr auto; gap: 4px; align-items: center; padding: 4px 0; border-bottom: 1px solid #eef0f3; }
+.keyrow.act { background: #fff3c4; }
+.trace { border-left: 3px solid var(--accent); padding-left: 9px; }
+.trace .step { margin: 4px 0; }
+.trace .arrow { color: var(--mute); margin-left: 10px; }
+footer { grid-area: foot; padding: 4px 12px; color: var(--mute); background: var(--panel); border-top: 1px solid var(--line); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#toast { position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%); background: #1f2328; color: #fff; padding: 7px 14px; border-radius: 6px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 9; }
+#toast.show { opacity: .93; }
+input[type=text] { border: 1px solid var(--line); border-radius: 4px; padding: 2px 5px; width: 100%; }
+.res a { color: var(--accent); }
+.res img { width: 100%; border: 1px solid var(--line); margin: 4px 0; }
+/* plan svg */
+svg .live { animation-timing-function: linear; animation-iteration-count: infinite; }
+svg .dim { opacity: .12; }
+svg [data-k] { cursor: pointer; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<header>
+  <h1>27PR 照明 workflow</h1>
+  <div class="grp"><span class="lab">视图</span>
+    <button data-view="GF">一层</button><button data-view="FF">二层</button><button data-view="both">两层</button><button data-view="schem">电路图</button>
+  </div>
+  <div class="grp"><span class="lab">模式</span>
+    <button data-mode="sim">试灯</button><button data-mode="edit">编辑</button>
+  </div>
+  <div class="grp" id="simtools"><button id="alloff">全部关</button><button id="allon">全部开</button><button id="demo">逐个回路演示</button></div>
+  <div class="grp" id="edittools"><button data-tool="select">选择 / 移动</button><button data-tool="place">放开关</button>
+    <select id="placetype"><option value="1">单联</option><option value="2" selected>双联</option><option value="3">三联</option><option value="4">四联</option><option value="FI">FI 排气扇隔离</option><option value="MK">MK 门控</option></select>
+  </div>
+  <div class="grp"><label class="chk"><input type="checkbox" id="showwires" checked>线路</label><label class="chk"><input type="checkbox" id="showiss" checked>检查标记</label></div>
+  <div class="grp"><button id="undo" title="Ctrl+Z">撤销</button><button id="redo" title="Ctrl+Y">重做</button></div>
+</header>
+<main id="main"></main>
+<aside>
+  <div class="tabs"><button data-tab="info">属性 / 追踪</button><button data-tab="circ">回路</button><button data-tab="wl">配电 WL</button><button data-tab="chk">检查<span id="nbad"></span></button><button data-tab="out">导出</button></div>
+  <div id="side"></div>
+</aside>
+<footer id="foot"></footer>
+<div id="toast"></div>
+<input type="file" id="openfile" accept=".json" multiple hidden>
+<script src="lighting_data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
