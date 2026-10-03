@@ -383,14 +383,15 @@ for z, d in ZONES.items():
 # ================= 电施-06 AL1 系统图 =================
 s6 = new_slide(); pen = Pen(s6)
 frame_cn(pen, "AL1 照明配电箱系统图（一、二层）", SN(3 + NZ), "—")
-bx = 2000000; top, bot = 1300000, 4600000
+WL_ALL = dict(WL_GF_DEF); WL_ALL.update(WL_FF)
+step = min(700000, 3700000 // (len(WL_ALL) + 1))   # breaker rows + 1 spare must fit above the notes
+bx = 2000000; top = 1300000; bot = top + 450000 + len(WL_ALL) * step
 pen.line(bx, top, bx, bot, w=3.0)
 pen.text(400000, 1450000, 3000000, 300000, "进线：引自总配电箱 / 电表箱\n（英国：Consumer Unit 内主开关 + RCBO）", 8)
 pen.line(1000000, 1300000, bx, 1300000, w=1.5)
 pen.text(bx + 100000, top - 260000, 1500000, 200000, "AL1  暗装，底边距地 1.5 m", 8, True)
-WL_ALL = dict(WL_GF_DEF); WL_ALL.update(WL_FF)
 for i, (w, d) in enumerate(WL_ALL.items()):
-    y = top + 450000 + i * 700000
+    y = top + 450000 + i * step
     pen.line(bx, y, bx + 900000, y, w=1.0)
     pen.shape(MSO_SHAPE.RECTANGLE, bx + 1100000, y, 400000, 220000, fill=WHITE, lw=1.0)
     pen.line(bx + 1300000, y, bx + 4200000, y, w=1.0)
@@ -400,11 +401,11 @@ for i, (w, d) in enumerate(WL_ALL.items()):
     fl = "二层" if w in WL_FF else "一层"
     lets = ' '.join(CL[c] for c in d['circ']) if w in WL else "见" + fl + "图"
     pen.text(bx + 4300000, y - 150000, 3500000, 330000, f"{w}  {d['name']}\n灯 {n_l} 盏（{fl}，字母 {lets}）", 7)
-y = top + 450000 + 5 * 700000
+y = bot
 pen.line(bx, y, bx + 900000, y, w=1.0, dash=MSO_LINE_DASH_STYLE.DASH)
 pen.text(bx + 1000000, y - 150000, 5000000, 300000, "备用 1 路（C16 RCBO）", 7.5)
 pen.text(400000, 5550000, 7900000, 1100000,
-         "说明：\n1. 回路划分按区域：前区 / 后区 / 户外，单回路灯具数量与功率均在 C16 允许范围内（灯具多为 LED）。\n"
+         "说明：\n1. 回路划分按区域，每区一个断路器（一层前厅 / 侧厅 / 厨房 / 户外，二层西区 / 东区），单回路灯具数量与功率均在 C16 允许范围内（灯具多为 LED）。\n"
          "2. 英国规范（BS 7671）照明回路常用 1.5 mm² 双芯加地线 + B6 RCBO；国内常用 BV-2.5 + C16。施工由电工按当地规范定。\n" +
          ("3. 排气扇（FI）接所在区的照明回路；" if HAS_FI else "3. 卫生间排气扇无单独开关，接所在卫生间灯回路；") + "楼梯吊灯 F06 属 WL5，一层 S6 只做三控开关点。\n4. WL4、WL5 沿楼梯井暗管引上至二层。", 7.5)
 

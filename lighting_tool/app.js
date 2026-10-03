@@ -197,12 +197,14 @@ function orthoClear(a, b, avoid) {
 function wires(F) {
   const d = D[F], J = S[F], W = d.wires = [], LP = id => [d.L[id].x, d.L[id].y];
   const al = [J.board.x, J.board.y];
-  for (const w of Object.keys(J.wl)) {
+  const WLS = Object.keys(J.wl);
+  for (const w of WLS) {
     const plates = J.plates.filter(p => p.keys.some(k => d.C[d.keyCirc[k]]?.wl === w));
     if (!plates.length) continue;
     const nodes = plates.map(p => ({ id: p.id, p: [p.x, p.y] }));
     const E = mst(nodes), first = nodes.reduce((a, n) => dist(n.p, al) < dist(a.p, al) ? n : a);
-    W.push({ kind: 'feed', wl: w, a: 'AL1', b: first.id, pts: ortho(al, first.p) });
+    const out = [al[0] + (WLS.indexOf(w) - (WLS.length - 1) / 2) * 0.16 * M(F), al[1]];   // each WL leaves AL1 on its own track, side by side
+    W.push({ kind: 'feed', wl: w, a: 'AL1', b: first.id, pts: [al, ...ortho(out, first.p)] });
     E.forEach(([a, b]) => W.push({ kind: 'feed', wl: w, a: a.id, b: b.id, pts: ortho(a.p, b.p) }));
   }
   for (const c of J.circuits) {
@@ -647,6 +649,13 @@ function layoutPanels(F) {   // panel boxes beside their mounting dots, slid alo
 function planOverlay(F) {
   const J = S[F], d = D[F], m = M(F), r = 0.11 * m, out = [], tr = traceSet(), dimW = i => tr && !tr.wires[F].has(i);
   const editing = ui.mode === 'edit';
+  // feed stretches that carry current: AL1 -> each plate whose circuit is on (not the whole WL)
+  const liveFeed = new Set();
+  for (const wl of Object.keys(J.wl)) {
+    const tg = new Set();
+    for (const c of J.circuits) if (c.wl === wl && circuitOn(F, c)) d.ctrls[c.id].filter(x => x.F === F).forEach(x => tg.add(x.plate));
+    if (tg.size) feedPath(F, wl, [...tg]).forEach(i => liveFeed.add(i));
+  }
   // wires
   if (ui.wires) for (const w of d.wires) {
     const c = w.c && d.C[w.c], col = wlColor(w.wl), pts = w.pts.map(p => p.join(' ')).join(' L');
@@ -655,7 +664,7 @@ function planOverlay(F) {
     else if (w.kind === 'chain' || w.kind === 'drop' || w.kind === 'mk') { live = c && circuitOn(F, c); wd = w.kind === 'chain' ? 0.028 * m : 0.02 * m; if (w.kind !== 'chain') dash = `stroke-dasharray="${0.05 * m} ${0.05 * m}"`; if (!live) { stroke = '#8a8f98'; op = .75; } }
     else if (w.kind === 'strap') { live = c && breakerOn(F, c); stroke = live ? '#c62828' : '#999'; wd = 0.03 * m; dash = `stroke-dasharray="${0.2 * m} ${0.08 * m}"`; }
     else if (w.kind === 'riser') { const lc = S[w.link.floor]?.circuits.find(x => x.id === w.link.circuit); live = lc && circuitOn(w.link.floor, lc); stroke = live ? wlColor(w.wl) : '#8a8f98'; wd = 0.025 * m; }
-    const flowing = w.kind === 'feed' && live && J.circuits.some(x => x.wl === w.wl && circuitOn(F, x));
+    const flowing = w.kind === 'feed' && live && liveFeed.has(w.i);
     const cls = [(live && w.kind !== 'feed' && w.kind !== 'strap') || flowing ? 'live' : '', dimW(w.i) ? 'dim' : ''].join(' ');
     out.push(`<path d="M${pts}" fill="none" stroke="${stroke}" stroke-width="${tr && tr.wires[F].has(w.i) ? wd * 1.8 : wd}" stroke-opacity="${op}" ${cls.includes('live') ? '' : dash} class="${cls}" stroke-linejoin="round"/>`);
     if (w.kind === 'riser') { const [x, y] = w.pts[1]; const lc = S[w.link.floor]?.circuits.find(x => x.id === w.link.circuit);
