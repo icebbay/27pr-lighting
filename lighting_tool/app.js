@@ -1123,6 +1123,7 @@ async function start() {
   for (const F of FLOORS) { S[F] = clone(ORIG[F].json); SVGSRC[F] = ORIG[F].svg; }
   for (const F of FLOORS) GEO[F] = buildGeo(F);
   derive(); bind(); render();
+  { const v = document.getElementById('ver'), m = S.GF?.meta || S.FF?.meta; if (v && m) v.textContent = (m.rev_cn || '').split(' ')[0] + ' ' + (m.rev_cn || '').split(' ')[1]; }
   window.APP = { get S() { return S; }, get D() { return D; }, zoom: (F, x, y, w) => panes.find(p => p.F === F)?.zoomTo([x, y], w * M(F)), panes, sim, ui, ISS: () => ISS, exportFloor, GEO, derive, render };
 }
 start();
