@@ -6,22 +6,27 @@
 
 另外两页（照明页不变）：
 - **插座 / 动力**：https://icebbay.github.io/27pr-lighting/lighting_tool/power.html （每个插座、电器属于哪一路，点一路只看这一路）
-- **配电箱 AL1**：https://icebbay.github.io/27pr-lighting/lighting_tool/board.html （全部 20 路：照明 7 + 插座 6 + 专线 7，单线图、回路表、配电箱模块数）
+- **配电箱 AL1**：https://icebbay.github.io/27pr-lighting/lighting_tool/board.html （全部 18 路：照明 4 + 插座 9 + 专线 5，单线图、回路表、配电箱模块数）
 
 3D 漫游（可以在房子里走、开门；与本照明图同一版户型 v38）：https://icebbay.github.io/27pr-cgi/walkthrough/
 
-> 状态：Rev F（2026-10-03）。回路划分（一层 WL1/WL2/WL6/WL3，二层 WL7/WL4/WL5）和配电箱 AL1 的位置是暂定的，需要电工按 BS 7671 / Part P 复核。
+> 状态：Rev G（2026-10-03）。全屋 18 路：照明 4（WL1 一层前区 / WL2 一层后区 / WL3 户外 / WL4 二层）+ 插座 9 + 专线 5，配电箱建议 BG CF236MS31（31 位）。规格为建议值，需要电工按 BS 7671 / Part P 复核。
 
-## 施工图（Rev F）
+## 施工图（Rev G）
 
 | 文件 | 内容 |
 |---|---|
-| [一层 · 英式](lighting_tool/drawings/27PR_一层照明施工图_RevF_英式.pptx) | E-GF-00 索引 → 01–03 分区放大 → 04 开关面板表（逐键）→ 05 回路表 |
-| [一层 · 国标](lighting_tool/drawings/27PR_一层照明施工图_RevF_国标.pptx) | 电施-01 说明 / 图例 / 灯具表 → 02 全层平面 → 03–05 放大 → 06 AL1 系统图 → 07 面板表 + 回路表 |
-| [二层 · 英式](lighting_tool/drawings/27PR_二层照明施工图_RevF_英式.pptx) | E-FF-00–04 |
-| [二层 · 国标](lighting_tool/drawings/27PR_二层照明施工图_RevF_国标.pptx) | 电施-11–16 |
+| [一层 · 英式](lighting_tool/drawings/27PR_一层照明施工图_RevG_英式.pptx) | E-GF-00 索引 → 01–03 分区放大 → 04 开关面板表（逐键）→ 05 回路表 |
+| [一层 · 国标](lighting_tool/drawings/27PR_一层照明施工图_RevG_国标.pptx) | 电施-01 说明 / 图例 / 灯具表 → 02 全层平面 → 03–05 放大 → 06 AL1 系统图 → 07 面板表 + 回路表 |
+| [二层 · 英式](lighting_tool/drawings/27PR_二层照明施工图_RevG_英式.pptx) | E-FF-00–04 |
+| [二层 · 国标](lighting_tool/drawings/27PR_二层照明施工图_RevG_国标.pptx) | 电施-11–16 |
 
 不想下载 PPT 的话，每一页的图片在 [`lighting_tool/drawings/png/`](lighting_tool/drawings/png/)。
+
+**Rev G：全屋按专业方案定为 18 路，照明合为 4 路**
+- 照明：一层前区 WL1（22 盏）、一层后区 WL2（14 盏，原 WL2 + WL6）、户外 WL3（7 盏）、二层 WL4（16 盏，原 WL4/5/7）。按已购灯具估算一层室内约 680 W、二层约 320 W，LED 负载很小；分路是为了跳闸时不整屋黑（BS 7671 314.1），楼梯壁灯和吊灯在不同回路。
+- 插座 9 路：一路最多一个「电脑 + 电视」房间（每台对地漏电 1–5 mA，30 mA RCBO 平时不超过 9 mA）；厨房、洗衣、户外（32A，可用花园工具）各自一路。
+- 专线 5 路：烤箱、电梯、空调 ×2、充电桩。配电箱预留 1 位给大功率工具。
 
 **Rev F 相对 Rev E 的改动：二层照明也按区域分，3 路**
 
@@ -84,7 +89,7 @@ FLOOR=GF LIGHTING_JSON=lighting_tool/lighting_GF.json DST_OVERRIDE=out.pptx pyth
 
 | 路径 | 说明 |
 |---|---|
-| `lighting_tool/lighting_GF.json`、`lighting_FF.json` | 当前数据（Rev F）：灯、开关面板、逐键、回路、WL、配电箱 |
+| `lighting_tool/lighting_GF.json`、`lighting_FF.json` | 当前数据（Rev G）：灯、开关面板、逐键、回路、WL、配电箱 |
 | `lighting_tool/ref_RevB/`、`ref_RevC/`、`ref_RevD/` | 历史数据；`apply_revC/D/E.py` 依次由上一版生成下一版 |
 | `lighting_tool/walls_*.svg` | 墙体（Blender 1.2 m 剖切，来自 `source_pptx/`） |
 | `make_lighting_drawings.py` / `_cn.py` | 英式 / 国标出图脚本 |

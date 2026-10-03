@@ -20,6 +20,6 @@
   P.circuits.WP.forEach((c, i) => out.push({ ...c, kind: 'WP', group: '专线', color: PPAL[i % PPAL.length],
     floor: ['GF', 'FF'].find(F => P[F].items.some(t => t.c === c.id)) || null,
     count: ['GF', 'FF'].flatMap(F => P[F].items.filter(t => t.c === c.id).map(t => t.label)).join('、') || '位置待定' }));
-  window.CIRCUITS = { list: out, byId: Object.fromEntries(out.map(c => [c.id, c])), FCN, spare: P.circuits.spare, rev: P.circuits.rev,
+  window.CIRCUITS = { list: out, byId: Object.fromEntries(out.map(c => [c.id, c])), FCN, board: P.circuits.board, rev: P.circuits.rev,
     lightRev: (L.GF.json.meta.rev_cn || '').split(' ')[0] + ' ' + ((L.GF.json.meta.rev_cn || '').split(' ')[1] || '') };
 })();
