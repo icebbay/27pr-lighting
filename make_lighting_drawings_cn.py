@@ -233,6 +233,7 @@ def draw_plan(sl, pen, V, zone=None, r=None):
     for fid, pn, k in FCUS:
         if FLOOR == "FF" or zone not in (None, 3): continue
         x, y = V.T(MOUNT[pn]); pen.box(x, y, "FCU", 0.8 * r, 5)
+    draw_ghosts(pen, V, r, swz, 7 if zone else 6)
 
 
 # ---------------- 图签 (Chinese title block) ----------------

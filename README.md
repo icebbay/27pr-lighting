@@ -6,18 +6,23 @@
 
 3D 漫游（可以在房子里走、开门；与本照明图同一版户型 v38）：https://icebbay.github.io/27pr-cgi/walkthrough/
 
-> 状态：Rev C（2026-10-03）。回路划分（WL1–WL5）和配电箱 AL1 的位置是暂定的，需要电工按 BS 7671 / Part P 复核。
+> 状态：Rev D（2026-10-03）。回路划分（WL1–WL5）和配电箱 AL1 的位置是暂定的，需要电工按 BS 7671 / Part P 复核。
 
-## 施工图（Rev C）
+## 施工图（Rev D）
 
 | 文件 | 内容 |
 |---|---|
-| [一层 · 英式](lighting_tool/drawings/27PR_一层照明施工图_RevC_英式.pptx) | E-GF-00 索引 → 01–03 分区放大 → 04 开关面板表（逐键）→ 05 回路表 |
-| [一层 · 国标](lighting_tool/drawings/27PR_一层照明施工图_RevC_国标.pptx) | 电施-01 说明 / 图例 / 灯具表 → 02 全层平面 → 03–05 放大 → 06 AL1 系统图 → 07 面板表 + 回路表 |
-| [二层 · 英式](lighting_tool/drawings/27PR_二层照明施工图_RevC_英式.pptx) | E-FF-00–04 |
-| [二层 · 国标](lighting_tool/drawings/27PR_二层照明施工图_RevC_国标.pptx) | 电施-11–16 |
+| [一层 · 英式](lighting_tool/drawings/27PR_一层照明施工图_RevD_英式.pptx) | E-GF-00 索引 → 01–03 分区放大 → 04 开关面板表（逐键）→ 05 回路表 |
+| [一层 · 国标](lighting_tool/drawings/27PR_一层照明施工图_RevD_国标.pptx) | 电施-01 说明 / 图例 / 灯具表 → 02 全层平面 → 03–05 放大 → 06 AL1 系统图 → 07 面板表 + 回路表 |
+| [二层 · 英式](lighting_tool/drawings/27PR_二层照明施工图_RevD_英式.pptx) | E-FF-00–04 |
+| [二层 · 国标](lighting_tool/drawings/27PR_二层照明施工图_RevD_国标.pptx) | 电施-11–16 |
 
 不想下载 PPT 的话，每一页的图片在 [`lighting_tool/drawings/png/`](lighting_tool/drawings/png/)。
+
+**Rev D 相对 Rev C 的改动**
+1. 一层 S7 改为双联中途开关，控后花园壁灯 p 和围栏地灯 q：p、q 三控 = S11、S12（两路）+ S7（中途）。G15 区筒灯 l 改回 S8、S9 双控。
+2. 一层 S6（楼梯底）控制的是二层楼梯吊灯 F06（在楼上）。现在一层平面上也在 F06 的对应位置画了虚线灯，标“二层楼梯吊灯 F06（在楼上，S6 控）”，网页里按 S6 它也会亮。
+3. 网页工具：开关面板贴近自己的安装点，不再被挤到远处（原来 S2 的面板画在 MK 旁边，容易看错）；面板到安装点的引线改成红色。
 
 **Rev C 相对 Rev B 的改动**
 1. 门廊壁灯 G25（回路 c）改由 WL1（一层前区）供电，不再从后面的 WL3 户外回路拉线到前门。门厅开关 S1 只接一路 WL。
@@ -54,8 +59,8 @@ FLOOR=GF LIGHTING_JSON=lighting_tool/lighting_GF.json DST_OVERRIDE=out.pptx pyth
 
 | 路径 | 说明 |
 |---|---|
-| `lighting_tool/lighting_GF.json`、`lighting_FF.json` | 当前数据（Rev C）：灯、开关面板、逐键、回路、WL、配电箱 |
-| `lighting_tool/ref_RevB/` | Rev B 原始数据（测试标准答案）；`apply_revC.py` 由它生成 Rev C |
+| `lighting_tool/lighting_GF.json`、`lighting_FF.json` | 当前数据（Rev D）：灯、开关面板、逐键、回路、WL、配电箱 |
+| `lighting_tool/ref_RevB/`、`ref_RevC/` | Rev B / Rev C 数据；`apply_revC.py` 由 Rev B 生成 Rev C，`apply_revD.py` 由 Rev C 生成 Rev D |
 | `lighting_tool/walls_*.svg` | 墙体（Blender 1.2 m 剖切，来自 `source_pptx/`） |
 | `make_lighting_drawings.py` / `_cn.py` | 英式 / 国标出图脚本 |
 | `source_pptx/` | 用户标注的户型 PPT（墙体、灯位、开关位置点） |

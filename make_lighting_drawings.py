@@ -104,6 +104,7 @@ MIDDLE_KEYS = {("S12", "17")} if FLOOR == "FF" else {("S7", "28")}    # (plate, 
 MIDDLE = {sid for sid, _ in MIDDLE_KEYS}
 REV_CN = "Rev B 2026-10-03"                                         # revision in the 国标 title block
 RISER = {} if FLOOR == "FF" else {"30": "↑ 引至二层楼梯吊灯 F06"}       # keys whose switch leg rises to the other floor
+GHOSTS = []   # [(key, {light, x, y, label})]: other-floor lamp switched from here, drawn dashed at its plan position (from JSON)
 DOORSW = [] if FLOOR == "FF" else [dict(id="MK", x=500 * U, y=968 * U, sheet=1, circuit="L2", location="前储物间门框锁侧",
                                         label="前储物间门控开关", parallel="S2 键 2", schedule="b 前储物间筒灯（与 S2 键 2 并联）")]
 
@@ -312,6 +313,18 @@ def gang_letters(pn):
     return out
 
 
+def draw_ghosts(pen, V, r, keep=lambda pn: True, size=6.5):
+    """other-floor lamps switched from this floor: dashed red pendant at the same plan position + dotted link to the plate"""
+    for k, g in GHOSTS:
+        pns = [pn for pn in KEY2PANEL.get(k, []) if keep(pn)]
+        x, y = V.T((g["x"], g["y"]))
+        if not pns or not V.inside((x, y)): continue
+        for pn in pns: pen.line(*V.T(MOUNT[pn]), x, y, w=0.75, color=RED, dash=MSO_LINE_DASH_STYLE.ROUND_DOT)
+        pen.shape(MSO_SHAPE.OVAL, x, y, 2.4 * r, 2.4 * r, fill=WHITE, color=RED, dash=MSO_LINE_DASH_STYLE.DASH)
+        d = 1.2 * r * 0.707; pen.line(x - d, y - d, x + d, y + d, color=RED); pen.line(x - d, y + d, x + d, y - d, color=RED)
+        pen.text(x + 1.5 * r, y - 75000, 2200000, 150000, g["label"], size, True, color=RED)
+
+
 # ---------------- key plan ----------------
 s0 = new_slide(); pen = Pen(s0)
 V0 = View((40, 120, 1990, 1110), (300000, 900000, RIGHT - 250000, 6650000))
@@ -329,6 +342,7 @@ for sid, pn, loc, sh in PLATES:
     if PANEL[pn][0] == 0: pen.box(x, y, "FI", r0)
     else: pen.switch(x, y, PANEL[pn][0], r0)
     pen.text(x - 250000, y + 30000, 240000, 120000, sid, 6.5, True, align=PP_ALIGN.RIGHT)
+draw_ghosts(pen, V0, r0, size=5.5)
 for fid, pn, k in FCUS:
     x, y = V0.T(MOUNT[pn]); pen.box(x, y, "FCU", r0, 4)
 legend(pen, RIGHT + 80000, 400000, 60000)
@@ -402,6 +416,7 @@ for z, d in ZONES.items():
         cid = next((c[0] for c in CIRC if n in c[3]), None)
         if cid:
             pen.text(x + 1.2 * r, y - 2.4 * r, 2 * r, 1.6 * r, CL[cid], 9, True, color=RED if cid in TBC else WIRE)
+    draw_ghosts(pen, V, r, lambda pn: PSHEET.get(pn) == z, 7)
     # switches
     for sid, pn in my_plates:
         x, y = V.T(MOUNT[pn])

@@ -621,6 +621,7 @@ function traceSet() {   // wires / lamps / plates belonging to the traced circui
 function layoutPanels(F) {   // panel boxes beside their mounting dots, slid along the wall / flipped so they do not overlap
   const J = S[F], m = M(F), r = 0.11 * m, out = {}, placed = [];
   const lampBox = J.lights.map(l => [l.x - 1.3 * r, l.y - 1.3 * r, l.x + 1.3 * r, l.y + 1.3 * r]);
+  for (const ds of J.door_switches) placed.push([ds.x - 0.24 * m, ds.y - 0.15 * m, ds.x + 0.24 * m, ds.y + 0.4 * m]);   // MK box + 门开/门关 text
   const hit = (a, b) => a[0] < b[2] && a[2] > b[0] && a[1] < b[3] && a[3] > b[1];
   for (const p of J.plates) {
     const pt = [p.x, p.y], w = wallNear(GEO[F], pt);
@@ -633,7 +634,7 @@ function layoutPanels(F) {   // panel boxes beside their mounting dots, slid alo
       const gap = 0.2 * m + 0.04 * m * Math.abs(k);
       const cx = p.x + d[0] * (pw / 2 + gap) + along[0] * k * 0.45 * m, cy = p.y + d[1] * (ph / 2 + gap) + along[1] * k * 0.45 * m;
       const box = [cx - pw / 2 - 0.02 * m, cy - ph / 2 - 0.02 * m, cx + pw / 2 + 0.02 * m, cy + ph / 2 + 0.02 * m];
-      const cost = placed.filter(b => hit(b, box)).length * 10 + lampBox.filter(b => hit(b, box)).length + Math.abs(k) * 0.3 + (side < 0 ? 0.5 : 0);
+      const cost = placed.filter(b => hit(b, box)).length * 10 + lampBox.filter(b => hit(b, box)).length + Math.abs(k) * 0.8 +(side < 0 ? 0.5 : 0);
       if (!best || cost < best.cost) best = { cost, cx, cy, box, dir: d };
       if (cost < 0.01) break;
     }
@@ -673,6 +674,16 @@ function planOverlay(F) {
     if (ui.sel?.k === 'lamp' && ui.sel.F === F && ui.sel.id === l.id) out.push(`<circle cx="${l.x}" cy="${l.y}" r="${r * 2.2}" fill="none" stroke="#1f4e79" stroke-width="${0.03 * m}"/>`);
     out.push('</g>');
   }
+  // upstairs / downstairs lamps switched from this floor: ghost at the matching plan position, dashed link to the plate
+  for (const [k, sk] of Object.entries(J.special_keys)) if (sk.ghost && sk.link) {
+    const g = sk.ghost, lc = S[sk.link.floor]?.circuits.find(x => x.id === sk.link.circuit), on = lc && circuitOn(sk.link.floor, lc);
+    const p = J.plates.find(q => q.keys.includes(k)), col = lc ? wlColor(lc.wl) : '#888';
+    out.push(`<g data-k="ghost" opacity="${on ? 1 : 0.7}">`);
+    if (p) out.push(`<path d="M${p.x} ${p.y}L${g.x} ${g.y}" fill="none" stroke="${col}" stroke-width="${0.015 * m}" stroke-dasharray="${0.03 * m} ${0.06 * m}"/>`);
+    if (on) out.push(`<circle cx="${g.x}" cy="${g.y}" r="${r * 4.2}" fill="url(#glow${F})" pointer-events="none"/>`);
+    out.push(`<circle cx="${g.x}" cy="${g.y}" r="${r * 1.9}" fill="none" stroke="${col}" stroke-width="${0.02 * m}" stroke-dasharray="${0.05 * m} ${0.04 * m}"/>` + lampSym({ id: g.light, kind: g.kind || '主灯', x: g.x, y: g.y }, r, on, F));
+    out.push(txt(g.x + 2.1 * r, g.y + 0.06 * m, `${lc ? lc.letter : '?'}↑ ${g.label}`, 0.15 * m, `fill="${col}" font-weight="bold"`) + '</g>');
+  }
   // board
   const b = J.board;
   out.push(`<g data-k="board"><rect x="${b.x - 0.28 * m}" y="${b.y - 0.13 * m}" width="${0.56 * m}" height="${0.26 * m}" fill="#fff" stroke="#111" stroke-width="${0.025 * m}"/><path d="M${b.x - 0.28 * m} ${b.y + 0.13 * m}L${b.x + 0.28 * m} ${b.y - 0.13 * m}L${b.x + 0.28 * m} ${b.y + 0.13 * m}Z" fill="#111"/>${txt(b.x, b.y + 0.36 * m, F === 'GF' ? 'AL1' : '↑ AL1 引上', 0.2 * m, 'text-anchor="middle" font-weight="bold"')}</g>`);
@@ -686,7 +697,7 @@ function planOverlay(F) {
     const dim = tr && !tr.plates.has(F + '|' + p.id), sel = ui.sel?.k === 'plate' && ui.sel.F === F && ui.sel.id === p.id;
     out.push(`<g class="${dim ? 'dim' : ''}">`);
     const ex = Math.max(cx - pw / 2, Math.min(p.x, cx + pw / 2)), ey = Math.max(cy - ph / 2, Math.min(p.y, cy + ph / 2));
-    out.push(`<path d="M${p.x} ${p.y}L${ex} ${ey}" stroke="#333" stroke-width="${0.012 * m}"/>`);
+    out.push(`<path d="M${p.x} ${p.y}L${ex} ${ey}" stroke="#c00000" stroke-width="${0.025 * m}"/>`);
     if (sel) out.push(`<rect x="${cx - pw / 2 - 0.06 * m}" y="${cy - ph / 2 - 0.06 * m}" width="${pw + 0.12 * m}" height="${ph + 0.12 * m}" rx="${0.06 * m}" fill="none" stroke="#1f4e79" stroke-width="${0.025 * m}" stroke-dasharray="${0.06 * m} ${0.04 * m}"/>`);
     out.push(`<circle cx="${p.x}" cy="${p.y}" r="${0.06 * m}" fill="#111" data-k="plate" data-id="${p.id}"/>`);
     out.push(`<rect x="${cx - pw / 2}" y="${cy - ph / 2}" width="${pw}" height="${ph}" rx="${0.04 * m}" fill="#5a4632" stroke="${issueAt.has('plate|' + p.id) && ui.issues ? '#e0a800' : '#3b2e22'}" stroke-width="${issueAt.has('plate|' + p.id) && ui.issues ? 0.03 * m : 0.015 * m}" data-k="plate" data-id="${p.id}"/>`);
@@ -701,7 +712,7 @@ function planOverlay(F) {
         <rect x="${x + 0.015 * m}" y="${y}" width="${kw - 0.03 * m}" height="${kh}" rx="${0.03 * m}" fill="${act ? '#ffe08a' : on ? '#fff3bf' : '#efe9e1'}" stroke="${act ? '#1f4e79' : bad && ui.issues ? '#b7791f' : '#2b2118'}" stroke-width="${act ? 0.035 * m : 0.012 * m}"/>
         <rect x="${x + 0.04 * m}" y="${on ? y + kh * 0.55 : y + 0.03 * m}" width="${kw - 0.08 * m}" height="${kh * 0.4}" rx="${0.02 * m}" fill="${on ? '#e0a800' : '#b9ad9f'}"/>
         ${txt(x + kw / 2, on ? y + kh * 0.36 : y + kh * 0.8, lab, 0.24 * m, `text-anchor="middle" font-weight="bold" fill="${c ? wlColor(c.wl) : '#555'}"`)}
-        ${mid ? txt(x + kw / 2, y - 0.05 * m, '中途', 0.16 * m, 'text-anchor="middle" fill="#c62828"') : ''}</g>`);
+        ${mid ? txt(x + kw / 2, y - 0.05 * m, '中途', 0.13 * m, 'text-anchor="middle" fill="#c62828"') : ''}</g>`);
     });
     out.push(txt(cx, cy - dir[1] * 0 + (dir[1] > 0 ? ph / 2 + 0.28 * m : -ph / 2 - 0.1 * m), p.id, 0.26 * m, `text-anchor="middle" font-weight="bold" fill="#c00000" data-k="plate" data-id="${p.id}"`));
     if (p.gangs === 0 && d.fan[p.id]) {

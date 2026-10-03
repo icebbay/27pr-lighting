@@ -40,6 +40,7 @@ def apply_en(G):
     G["EXTRA_KEYS"] = {k: v["text"] for k, v in sk.items()}
     G["EXTRA_TAG"] = {k: v.get("tag", "?") for k, v in sk.items()}
     G["RISER"] = {k: v["riser"] for k, v in sk.items() if v.get("riser")}
+    G["GHOSTS"] = [(k, v["ghost"]) for k, v in sk.items() if v.get("ghost")]
     G["MIDDLE_KEYS"] = {(p["id"], k) for p in d["plates"] for k in p.get("middle_keys", [])}
     G["MIDDLE"] = {s for s, _ in G["MIDDLE_KEYS"]}
     G["DOORSW"] = [dict(x) for x in d.get("door_switches", [])]
