@@ -4,6 +4,8 @@
 
 **在线打开（不用安装）：https://icebbay.github.io/27pr-lighting/**
 
+3D 漫游（可以在房子里走、开门；与本照明图同一版户型 v38）：https://icebbay.github.io/27pr-cgi/walkthrough/
+
 > 状态：Rev C（2026-10-03）。回路划分（WL1–WL5）和配电箱 AL1 的位置是暂定的，需要电工按 BS 7671 / Part P 复核。
 
 ## 施工图（Rev C）
