@@ -1,8 +1,9 @@
 /* 插座 / 动力 page: sockets and dedicated points on the plan, coloured by circuit, simple AL1 -> points wiring per circuit */
 const L = window.LIGHTING_DEFAULT, P = window.POWER_DEFAULT, CC = window.CIRCUITS;
+let C = CC.build(CC.pick());   // circuits of the plan in the URL hash (#A / #B)
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const ui = { view: 'GF', sel: null, wires: true };
+const ui = { view: 'GF', sel: null, wires: true, plan: C.pid };
 const M = F => L[F].json.units.emu_per_m;
 const KIND = { double: ['双联插座', '2'], single: ['单联插座', '1'], outdoor: ['户外防水插座', '外'], high: ['高位插座', '高'] };
 
@@ -18,11 +19,11 @@ function mst(nodes) {
 const ortho = (a, b) => (Math.abs(a[0] - b[0]) < 1 || Math.abs(a[1] - b[1]) < 1) ? [a, b] : [a, Math.abs(b[0] - a[0]) >= Math.abs(b[1] - a[1]) ? [b[0], a[1]] : [a[0], b[1]], b];
 
 function pointsOf(F, cid) {
-  return [...P[F].sockets.filter(s => s.c === cid).map(s => [s.x, s.y]), ...P[F].items.filter(t => t.c === cid).map(t => [t.x, t.y])];
+  return [...P[F].sockets.filter(s => s.c[ui.plan] === cid).map(s => [s.x, s.y]), ...P[F].items.filter(t => t.c === cid).map(t => [t.x, t.y])];
 }
 function wires(F) {   // per circuit: AL1 (or the riser on FF) -> nearest point, then a tree through its points; each circuit leaves on its own track
   const b = L[F].json.board, al = [b.x, b.y], m = M(F), out = [];
-  const cs = CC.list.filter(c => c.kind !== 'WL' && pointsOf(F, c.id).length);
+  const cs = C.list.filter(c => c.kind !== 'WL' && pointsOf(F, c.id).length);
   cs.forEach((c, i) => {
     const pts = pointsOf(F, c.id), start = [al[0] + (i - (cs.length - 1) / 2) * 0.12 * m, al[1]];
     const first = pts.reduce((a, p) => dist(p, al) < dist(a, al) ? p : a);
@@ -87,12 +88,12 @@ class Pane {
   }
   draw() {
     const F = this.F, m = M(F), o = [], dim = c => ui.sel && ui.sel !== c ? 'dim' : '';
-    if (ui.wires) for (const w of wires(F)) { const c = CC.byId[w.c];
+    if (ui.wires) for (const w of wires(F)) { const c = C.byId[w.c];
       o.push(`<path d="M${w.pts.map(p => p.join(' ')).join('L')}" fill="none" stroke="${c.color}" stroke-width="${(w.feed ? 0.045 : 0.025) * m}" stroke-linejoin="round" ${w.feed ? '' : `stroke-dasharray="${0.08 * m} ${0.05 * m}"`} class="${dim(w.c)}" data-c="${w.c}"/>`); }
     const b = L[F].json.board;
     o.push(`<g><rect x="${b.x - 0.28 * m}" y="${b.y - 0.13 * m}" width="${0.56 * m}" height="${0.26 * m}" fill="#fff" stroke="#111" stroke-width="${0.025 * m}"/><path d="M${b.x - 0.28 * m} ${b.y + 0.13 * m}L${b.x + 0.28 * m} ${b.y - 0.13 * m}L${b.x + 0.28 * m} ${b.y + 0.13 * m}Z" fill="#111"/>${txt(b.x, b.y + 0.4 * m, F === 'GF' ? 'AL1' : '↑ AL1 引上', 0.2 * m, 'text-anchor="middle" font-weight="bold"')}</g>`);
-    for (const s of P[F].sockets) { const c = CC.byId[s.c]; o.push(`<g data-c="${s.c}" class="${dim(s.c)}"><title>${esc(KIND[s.kind][0])} · ${esc(s.room)} · ${s.c}</title>${sym(F, s.x, s.y, s.kind, c.color, m)}</g>`); }
-    for (const t of P[F].items) { const c = CC.byId[t.c]; o.push(`<g data-c="${t.c}" class="${dim(t.c)}"><title>${esc(t.label)} · ${t.c}${t.tbc ? ' · ' + esc(t.tbc) : ''}</title>${itemSym(t, c.color, m)}</g>`); }
+    for (const s of P[F].sockets) { const sc = s.c[ui.plan], c = C.byId[sc]; o.push(`<g data-c="${sc}" class="${dim(sc)}"><title>${esc(KIND[s.kind][0])} · ${esc(s.room)} · ${sc}</title>${sym(F, s.x, s.y, s.kind, c.color, m)}</g>`); }
+    for (const t of P[F].items) { const c = C.byId[t.c]; o.push(`<g data-c="${t.c}" class="${dim(t.c)}"><title>${esc(t.label)} · ${t.c}${t.tbc ? ' · ' + esc(t.tbc) : ''}</title>${itemSym(t, c.color, m)}</g>`); }
     this.ov.innerHTML = o.join('');
   }
 }
@@ -114,7 +115,8 @@ function side() {
       <div>${esc(c.name)}<div class="br">${esc(c.br)} · ${esc(c.cable)}</div>${c.note ? `<div class="br">${esc(c.note)}</div>` : ''}${pts.filter(t => t.tbc).map(t => `<div class="br tbc">${esc(t.label)}：${esc(t.tbc)}</div>`).join('')}</div>
       <span class="n">${esc(c.count)}</span></div>`;
   };
-  const xs = CC.list.filter(c => c.kind === 'WX'), ps = CC.list.filter(c => c.kind === 'WP');
+  const xs = C.list.filter(c => c.kind === 'WX'), ps = C.list.filter(c => c.kind === 'WP'), pl = C.plan;
+  h.push(`<h3>${esc(pl.name)}</h3><div class="muted">共 ${C.list.length} 路：照明 ${C.list.filter(c => c.kind === 'WL').length} + 插座 ${xs.length} + 专线 ${ps.length} · 配电箱 ${esc(pl.board.model)}（${pl.board.ways} 位）· <a href="board.html#${ui.plan}">看 A / B 对比</a></div>`);
   h.push(`<h3>插座回路（${xs.length} 路）</h3>`, ...xs.map(row));
   h.push(`<h3>专线（${ps.length} 路，一样电器一路）</h3>`, ...ps.map(row));
   h.push(`<h3>图例</h3><div class="legend">`,
@@ -122,7 +124,7 @@ function side() {
     `<svg viewBox="-14 -9 28 18" width="24" height="16"><rect x="-13" y="-8" width="26" height="16" rx="3" fill="#fff" stroke="#666" stroke-width="2"/></svg><div>专线电器 / FCU 带保险开关</div>`,
     `<svg viewBox="0 -4 28 8" width="24" height="8"><path d="M0 0H28" stroke="#666" stroke-width="4"/></svg><div>粗线 = AL1 引出（每路一根）</div>`,
     `<svg viewBox="0 -4 28 8" width="24" height="8"><path d="M0 0H28" stroke="#666" stroke-width="2" stroke-dasharray="5 3"/></svg><div>虚线 = 同一路的插座串在一起</div></div>`);
-  h.push(`<p class="muted">插座点位来自 v6 PPT 插座页（你标的圆点）。线路只表示属于哪一路，实际走线现场定。照明的 7 路见「照明」页，全部 20 路见「配电箱」页。</p>`);
+  h.push(`<p class="muted">插座点位来自 v6 PPT 插座页（你标的圆点），两个方案点位相同，只是分路不同。线路只表示属于哪一路，实际走线现场定。照明见「照明」页（显示方案 A 的 4 路），全部回路和两个方案的对比见「配电箱」页。</p>`);
   $('#side').innerHTML = h.join('');
   $('#side').querySelectorAll('[data-sel]').forEach(e => e.onclick = () => select(e.dataset.sel));
 }
@@ -130,6 +132,13 @@ function side() {
 document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => { ui.view = b.dataset.view; layout(); });
 $('#showwires').onchange = e => { ui.wires = e.target.checked; draw(); };
 $('#clear').onclick = () => { ui.sel = null; draw(); };
-$('#ver').textContent = CC.lightRev + ' · 20 路';
-layout();
+function setPlan(pid) {
+  ui.plan = pid; C = CC.build(pid); ui.sel = null;
+  if (location.hash.replace('#', '').toUpperCase() !== pid) history.replaceState(null, '', '#' + pid);
+  document.querySelectorAll('[data-plan]').forEach(b => b.classList.toggle('on', b.dataset.plan === pid));
+  $('#ver').textContent = C.plan.short; draw();
+}
+document.querySelectorAll('[data-plan]').forEach(b => b.onclick = () => setPlan(b.dataset.plan));
+window.addEventListener('hashchange', () => setPlan(CC.pick()));
+layout(); setPlan(ui.plan);
 window.POWER = { ui, select, layout, panes: () => panes };

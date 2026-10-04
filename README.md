@@ -4,13 +4,13 @@
 
 **在线打开（不用安装）：https://icebbay.github.io/27pr-lighting/**
 
-另外两页（照明页不变）：
-- **插座 / 动力**：https://icebbay.github.io/27pr-lighting/lighting_tool/power.html （每个插座、电器属于哪一路，点一路只看这一路）
-- **配电箱 AL1**：https://icebbay.github.io/27pr-lighting/lighting_tool/board.html （全部 18 路：照明 4 + 插座 9 + 专线 5，单线图、回路表、配电箱模块数）
+另外两页（照明页不变），都有 **方案 A / 方案 B** 切换，链接末尾加 `#A` 或 `#B` 可以直接打开某个方案，方便发给别人讨论：
+- **配电箱 AL1（两个方案对比）**：https://icebbay.github.io/27pr-lighting/lighting_tool/board.html （A 专业 18 路 vs B 精简 15 路：路数、配电箱、备用位、材料估算、优缺点，以及各自的单线图和回路表）
+- **插座 / 动力**：https://icebbay.github.io/27pr-lighting/lighting_tool/power.html#A 、[#B](https://icebbay.github.io/27pr-lighting/lighting_tool/power.html#B) （每个插座、电器属于哪一路，点一路只看这一路）
 
 3D 漫游（可以在房子里走、开门；与本照明图同一版户型 v38）：https://icebbay.github.io/27pr-cgi/walkthrough/
 
-> 状态：Rev G（2026-10-03）。全屋 18 路：照明 4（WL1 一层前区 / WL2 一层后区 / WL3 户外 / WL4 二层）+ 插座 9 + 专线 5，配电箱建议 BG CF236MS31（31 位）。规格为建议值，需要电工按 BS 7671 / Part P 复核。
+> 状态：照明 Rev G（4 路）。全屋回路还在 A / B 两个方案之间讨论：A 专业 18 路（照明 4 + 插座 9 + 专线 5，BG CF236MS31 31 位），B 精简 15 路（照明 2 + 插座 8 + 专线 5，BG CF22MS19-01 19 位）。规格为建议值，需要电工按 BS 7671 / Part P 复核。
 
 ## 施工图（Rev G）
 
@@ -93,8 +93,8 @@ FLOOR=GF LIGHTING_JSON=lighting_tool/lighting_GF.json DST_OVERRIDE=out.pptx pyth
 | `lighting_tool/ref_RevB/`、`ref_RevC/`、`ref_RevD/` | 历史数据；`apply_revC/D/E.py` 依次由上一版生成下一版 |
 | `lighting_tool/walls_*.svg` | 墙体（Blender 1.2 m 剖切，来自 `source_pptx/`） |
 | `make_lighting_drawings.py` / `_cn.py` | 英式 / 国标出图脚本 |
-| `lighting_tool/build_power.py` | 从 v6 PPT 插座页读插座点位（按两页共有的墙体换算坐标），按 20 路方案分回路 → `power_*.json`、`power_data.js` |
-| `lighting_tool/power.html`、`board.html` | 插座 / 动力页、配电箱页（`circuits.js` 合并照明 WL + 插座 WX + 专线 WP） |
+| `lighting_tool/build_power.py` | 从 v6 PPT 插座页读插座点位（按两页共有的墙体换算坐标），按方案 A / B 分回路 → `power_*.json`、`power_plans.json`、`power_data.js` |
+| `lighting_tool/power.html`、`board.html` | 插座 / 动力页、配电箱页（`circuits.js` 按方案合并照明 WL + 插座 WX + 专线 WP；方案取自链接 `#A` / `#B`） |
 | `source_pptx/` | 用户标注的户型 PPT（墙体、灯位、开关位置点） |
 | `照明施工图_工作流程.md` | 规则、标注约定、出图规范、测试计划 T1–T6 |
 | `lighting_tool/screenshots/` | 测试截图（T1–T5、试灯、追踪、电路图） |

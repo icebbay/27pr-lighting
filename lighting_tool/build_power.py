@@ -1,6 +1,8 @@
-"""Sockets + dedicated circuits (20-way plan agreed 2026-10-03) -> power_GF/FF.json + power_data.js for power.html / board.html.
+"""Sockets + dedicated circuits for two candidate plans -> power_GF/FF.json + power_plans.json + power_data.js (power.html / board.html).
 
-Board AL1 = 7 lighting (WL, from lighting_<F>.json) + 6 socket circuits (WX) + 7 dedicated circuits (WP) + 3 spare.
+Plans (2026-10-03/04, still being discussed — the lighting page itself shows plan A's 4 lighting circuits, Rev G):
+  A  专业 18 路: lighting 4 (from lighting_<F>.json) + sockets 9 (one computer+TV room per circuit) + dedicated 5
+  B  精简 15 路: lighting 2 (downstairs incl. outdoor / upstairs) + sockets 8 (two studies + corridor share one) + dedicated 5
 Socket points: the user's coloured dots on the socket pages of the v6 PPT (slide 3 GF, slide 7 FF; olive = double,
 blue = single, yellow = outdoor, "高" = high level). Those pages show the plan rotated 90° and scaled; the transform into the
 lighting tool's frame (slide EMU of walls_<F>.svg) is fitted on the wall shapes both pages share (error <= 1 EMU).
@@ -18,33 +20,72 @@ _src = open(os.path.join(HERE, "export_lighting_json.py"), encoding="utf-8").rea
 _ns = {"math": math, "A": A}
 exec(_src[_src.index("def xf(el):"):_src.index("def shape_paths")], _ns)   # xf / placer / walk: group transforms
 LJ = {F: json.load(open(os.path.join(HERE, f"lighting_{F}.json"), encoding="utf-8")) for F in ("GF", "FF")}
-REV = "2026-10-03 · 18 路专业方案"
-# one "computer + TV" room per socket circuit: each PC / TV leaks 1–5 mA to earth, and BS 7671 keeps the standing leakage
-# on a 30 mA RCBO under 30 % (9 mA); a ring serves <= 100 m²; kitchen and laundry on their own (IET On-Site Guide)
-RING = "2.5 mm² 环路（ring，≤ 100 m²）"
-BOARD = dict(model="British General CF236MS31", ways=31, spd="40kA Type 2 SPD（自带）", size="宽 387 × 高 483 × 深 116 mm（双排，先量楼梯下位置）",
-             main="100A 总闸", rcbo="BG 单模块 RCBO（Type A 30 mA），约 £11–17 / 个", reserve="预留 1 位：大功率工具 32A 径向（位置待定）")
 
-# ---------------- circuits ----------------
+# PC / TV leak ~0.5–1.5 mA each in practice (limit 3.5–5 mA); BS 7671 keeps the standing leakage on a 30 mA RCBO under 9 mA.
+# IET On-Site Guide: 32 A ring 2.5 mm² <= 100 m²; 20 A radial 2.5 mm² <= 50 m²; 32 A radial 4 mm² <= 75 m².
+RING = "2.5 mm² 环路（ring，≤ 100 m²）"
+RAD20 = "2.5 mm² 径向 20A（≤ 50 m²，约 4.6 kW）"
+RCBO = "BG 单模块 RCBO（Type A 30 mA），约 £11–16 / 个"
 # rooms are matched by label index in lighting_<F>.json["rooms"] (names repeat: 储物间 ×3, 卫生间 ×3)
-WX = [
-    dict(id="WX1", floor="GF", name="一层前区插座（起居室 / 餐厅 / 门厅 / 楼梯）", rooms=["起居室", "餐厅", "储物间#4", "储物间#6", "楼梯"], br="B32 RCBO 30mA", cable=RING, note="起居室电视"),
+GF_X = [
+    dict(id="WX1", floor="GF", name="一层前区插座（起居室 / 餐厅 / 门厅 / 楼梯）", rooms=["起居室", "餐厅", "储物间#4", "储物间#6", "楼梯"], br="B32 RCBO 30mA", cable=RING, note="起居室电视、吸尘器、电暖器"),
     dict(id="WX2", floor="GF", name="一层客厅插座（客厅 / 卫生间）", rooms=["客厅", "卫生间", "储物间#12"], br="B32 RCBO 30mA", cable=RING, note="客厅电视"),
-    dict(id="WX3", floor="GF", name="厨房插座（厨房 / 吧台区，含冰箱、洗碗机、燃气灶点火）", rooms=["厨房", "厨房（吧台区）"], br="B32 RCBO 30mA", cable="4 mm² 径向 32A（或 2.5 mm² 环路）", note="电水壶等集中在这里，单独一路"),
-    dict(id="WX4", floor="GF", name="洗衣房（洗衣机 + 烘干机 + 洗衣房插座）", rooms=["洗衣房"], br="B32 RCBO 30mA", cable="4 mm² 径向", note="两台同时用约 4–5 kW，不和厨房合用"),
-    dict(id="WX5", floor="FF", name="主卧插座（主卧 / 北卫 / 走廊 / 楼梯 / 电梯旁）", rooms=["主卧", "卫生间#0", "走廊", "楼梯", "电梯"], br="B32 RCBO 30mA", cable=RING, note="一个电脑 + 电视房间"),
-    dict(id="WX6", floor="FF", name="卧室 2 插座（卧室 2 / 衣帽间 / 盥洗室 / 西卫）", rooms=["卧室 2", "衣帽间", "盥洗室", "卫生间#2"], br="B32 RCBO 30mA", cable=RING, note="一个电脑 + 电视房间；电热毛巾架接这里"),
-    dict(id="WX7", floor="FF", name="书房 1 插座（卧室 3）", rooms=["卧室 3"], br="B32 RCBO 30mA", cable=RING, note="电脑 + 电视，单独一路防漏电累加误跳"),
-    dict(id="WX8", floor="FF", name="书房 2 插座（书房 / 后卫）", rooms=["书房", "卫生间#10"], br="B32 RCBO 30mA", cable=RING, note="电脑 + 电视，单独一路防漏电累加误跳"),
-    dict(id="WX9", floor="GF", name="户外插座（前院 + 后花园）", rooms=[], br="B32 RCBO 30mA", cable="4 mm² 径向 32A，出户段 SWA 铠装电缆", note="户外易进水，单独一路；32A 够用花园电动工具"),
+    dict(id="WX3", floor="GF", name="厨房插座（厨房 / 吧台区，含冰箱、洗碗机、燃气灶点火）", rooms=["厨房", "厨房（吧台区）"], br="B32 RCBO 30mA", cable=RING, note="电水壶等集中，用量接近满载"),
+    dict(id="WX4", floor="GF", name="洗衣房（洗衣机 + 烘干机 + 洗衣房插座）", rooms=["洗衣房"], br="B32 RCBO 30mA", cable="4 mm² 径向 32A", note="两台同时用约 4.5 kW"),
 ]
 WP = [
-    dict(id="WP1", name="烤箱", br="B20 RCBO 30mA", cable="4 mm² 径向（按烤箱功率复核）"),
+    dict(id="WP1", name="烤箱", br="B20 RCBO 30mA", cable="2.5 mm² 径向（> 4.6 kW 的烤箱改 4 mm² / 32A）"),
     dict(id="WP2", name="电梯", br="按电梯厂家要求（常见 B16–B20）", cable="按厂家", note="厂家通常要求独立隔离开关"),
-    dict(id="WP3", name="空调 1", br="按空调型号（常见 B16–B20）", cable="2.5 mm²（按型号复核）", note="位置待定"),
-    dict(id="WP4", name="空调 2", br="按空调型号（常见 B16–B20）", cable="2.5 mm²（按型号复核）", note="位置待定"),
+    dict(id="WP3", name="空调 1", br="按空调型号（常见 B16）", cable="2.5 mm²（按型号复核）", note="位置待定"),
+    dict(id="WP4", name="空调 2", br="按空调型号（常见 B16）", cable="2.5 mm²（按型号复核）", note="位置待定"),
     dict(id="WP5", name="充电桩（门口）", br="B32/B40 RCBO Type A + 直流漏电保护（或充电桩自带）", cable="6–10 mm²（按距离复核）", note="7 kW；安装前通知供电公司 DNO；建议加负载管理"),
 ]
+ALL_GF = [c["id"] for c in LJ["GF"]["circuits"]]
+ALL_FF = [c["id"] for c in LJ["FF"]["circuits"]]
+PLANS = {
+    "A": dict(name="方案 A · 专业 18 路", short="专业 18 路",
+        lighting=None,   # = the lighting page (Rev G): WL1 一层前区 / WL2 一层后区 / WL3 户外 / WL4 二层
+        WX=GF_X + [
+            dict(id="WX5", floor="FF", name="主卧插座（主卧 / 北卫 / 走廊 / 楼梯 / 电梯旁）", rooms=["主卧", "卫生间#0", "走廊", "楼梯", "电梯"], br="B32 RCBO 30mA", cable=RING, note="一个电脑 + 电视房间"),
+            dict(id="WX6", floor="FF", name="卧室 2 插座（卧室 2 / 衣帽间 / 盥洗室 / 西卫）", rooms=["卧室 2", "衣帽间", "盥洗室", "卫生间#2"], br="B32 RCBO 30mA", cable=RING, note="一个电脑 + 电视房间；电热毛巾架接这里"),
+            dict(id="WX7", floor="FF", name="书房 1 插座（卧室 3）", rooms=["卧室 3"], br="B32 RCBO 30mA", cable=RING, note="电脑 + 电视，单独一路"),
+            dict(id="WX8", floor="FF", name="书房 2 插座（书房 / 后卫）", rooms=["书房", "卫生间#10"], br="B32 RCBO 30mA", cable=RING, note="电脑 + 电视，单独一路"),
+            dict(id="WX9", floor="GF", name="户外插座（前院 + 后花园）", rooms=[], br="B32 RCBO 30mA", cable="4 mm² 径向 32A，出户段 SWA 铠装电缆", note="户外易进水，单独一路；32A 留给花园大功率工具"),
+        ], outdoor="WX9", WP=WP,
+        board=dict(model="British General CF236MS31", ways=31, price=155, spd="40kA Type 2 SPD（自带）", size="宽 387 × 高 483 × 深 116 mm（双排，先量楼梯下位置）",
+                   main="100A 总闸", rcbo=RCBO, reserve="预留 1 位：大功率工具 32A 径向（位置待定）",
+                   alt="单排替代 MK Sentry 21 位（YS5721SMET，518 × 261 mm）：装完只剩 2 个备用"),
+        pros=["每个「电脑 + 电视」房间独立：不会因漏电累加误跳，哪里出事只断哪里",
+              "照明 4 路：一层分前后两路，户外单独，一路跳闸不会整层黑",
+              "户外 32A、烤箱和两台空调都单独，以后换大功率电器不用改线",
+              "31 位箱还剩 12 个备用：加太阳能、电池、热泵、第 3 台空调都不用换箱"],
+        cons=["配电箱高 483 mm（双排），先确认楼梯下放得下",
+              "材料比 B 多约 £200（箱子 + 3 个 RCBO + 几根回配电箱的线）",
+              "进箱的线多，接线整理和 EICR 检测项目略多",
+              "部分回路功率上「大材小用」（书房、卧室 32A 环路，实际约 1 kW）"]),
+    "B": dict(name="方案 B · 精简 15 路", short="精简 15 路",
+        lighting=[dict(id="WL1", floor="GF", name="一层照明（含门廊、后花园壁灯、围栏地灯）+ 卫生间排气扇", br="B10 1P+N RCBO 30mA", circ=ALL_GF,
+                       note="估算约 740 W；B10 防几十个 LED 同时开灯误跳"),
+                  dict(id="WL2", floor="FF", name="二层照明 + 卫生间排气扇", br="B6 1P+N RCBO 30mA", circ=ALL_FF, note="估算约 320 W")],
+        WX=GF_X + [
+            dict(id="WX5", floor="GF", name="户外插座（前院 + 后花园）", rooms=[], br="B20 RCBO 30mA", cable="2.5 mm² 径向 20A，出户段 SWA 铠装电缆", note="插头式电动工具最大 13A，20A 够用"),
+            dict(id="WX6", floor="FF", name="两个书房 + 走廊插座（卧室 3 / 书房 / 走廊 / 后卫）", rooms=["卧室 3", "书房", "走廊", "卫生间#10"], br="B20 RCBO 30mA",
+                 cable=RAD20 + "；两个书房各拉一根线回配电箱，现在接同一个 RCBO", note="两台电脑 + 电视实际约 3–7 mA（上限 9 mA）；误跳时把一根线挪到预留位即可拆开"),
+            dict(id="WX7", floor="FF", name="主卧插座（主卧 / 北卫 / 楼梯 / 电梯旁）", rooms=["主卧", "卫生间#0", "楼梯", "电梯"], br="B20 RCBO 30mA", cable=RAD20, note="电脑 + 电视"),
+            dict(id="WX8", floor="FF", name="次卧插座（卧室 2 / 衣帽间 / 盥洗室 / 西卫）", rooms=["卧室 2", "衣帽间", "盥洗室", "卫生间#2"], br="B20 RCBO 30mA", cable=RAD20, note="电脑 + 电视；电热毛巾架经带保险开关接这里"),
+        ], outdoor="WX5", WP=WP,
+        board=dict(model="British General CF22MS19-01", ways=19, price=62, spd="40kA Type 2 SPD（自带）", size="宽 496 × 高 231 × 深 116 mm（单排）",
+                   main="100A 总闸", rcbo=RCBO, reserve="预留 1 位：两个书房以后拆成两路（两个书房现在各拉一根线，接在同一个 RCBO 上）",
+                   alt="想多留位就换 British General CF236MS31（31 位双排，约贵 £93）"),
+        pros=["按实际用量配：有电脑的房间用 20A 径向，线只拉单程，不「大材小用」",
+              "配电箱小一半（单排 496 × 231 mm），材料约省 £200",
+              "回路少，配电箱和图纸都简单，检测也快",
+              "两个书房已各拉一根线，以后误跳挪一根线就能拆开，不用开墙"],
+        cons=["照明楼下只有一路：一层或户外任何一盏灯出问题，整层灯（含户外）一起灭",
+              "两个书房合一路：两边同时开电脑、电视，漏电余量变小，偶尔可能误跳",
+              "户外 20A：以后要固定接线的大型工具，需要另拉专线",
+              "19 位箱只剩 3 个备用（1 个已留给书房拆分），以后加太阳能 / 电池等会比较紧"]),
+}
 
 
 # ---------------- socket points from the PPT ----------------
@@ -85,18 +126,22 @@ for F, si in (("GF", 3), ("FF", 7)):
         pts.append(dict(kind="high" if txt == "高" else KIND.get(fill_of(s), "double"), x=round(x), y=round(y)))
     OUT[F] = dict(pts=pts, T=T, slide=sl)
 
-# room of each socket = nearest room label (labels sit mid-room); outdoor dots go to WX9
+# room of each socket = nearest room label (labels sit mid-room); its circuit in each plan (outdoor dots -> the plan's outdoor circuit)
 for F in ("GF", "FF"):
     rooms = LJ[F]["rooms"]
     keyof = lambda i: rooms[i]["name"] if sum(r["name"] == rooms[i]["name"] for r in rooms) == 1 else f"{rooms[i]['name']}#{i}"
-    circ_of = {r: c["id"] for c in WX if c["floor"] == F for r in c["rooms"]}
     for p in OUT[F]["pts"]:
-        if p["kind"] == "outdoor": p["room"], p["c"] = "户外", "WX9"; continue
-        i = min(range(len(rooms)), key=lambda i: math.dist((rooms[i]["x"], rooms[i]["y"]), (p["x"], p["y"])))
-        p["room"] = rooms[i]["name"]; p["c"] = circ_of.get(keyof(i))
-        assert p["c"], f"{F}: no socket circuit for room {keyof(i)}"
+        if p["kind"] == "outdoor":
+            p["room"], k = "户外", None
+        else:
+            i = min(range(len(rooms)), key=lambda i: math.dist((rooms[i]["x"], rooms[i]["y"]), (p["x"], p["y"])))
+            p["room"], k = rooms[i]["name"], keyof(i)
+        p["c"] = {}
+        for pid, pl in PLANS.items():
+            p["c"][pid] = pl["outdoor"] if k is None else {r: c["id"] for c in pl["WX"] if c["floor"] == F for r in c["rooms"]}.get(k)
+            assert p["c"][pid], f"{pid} {F}: no socket circuit for room {k}"
 
-# ---------------- dedicated points ----------------
+# ---------------- dedicated points (same circuit ids in both plans) ----------------
 # dishwasher = the kitchen FCU nearest the 洗碗机 label of the water page (slide 4, same rotated layout as slide 3)
 sl4 = pr.slides[3]; T4 = fit(sl4, "GF"); dw = None
 for x, T, par in _ns["walk"](sl4.shapes, lambda a, b: (a, b)):
@@ -117,16 +162,15 @@ door = [d for d in LJ["GF"]["doors"] if "Front Entrance Door_UpperPanel" in d["n
 dx, dy = min(p[0] for p in door), sum(p[1] for p in door) / len(door)
 DED.append(dict(c="WP5", label="充电桩（门口，位置示意）", x=round(dx - 0.9 * LJ["GF"]["units"]["emu_per_m"]), y=round(dy), floor="GF"))
 
-data = {}
-for F in ("GF", "FF"):
-    data[F] = dict(sockets=OUT[F]["pts"], items=[d for d in DED if d["floor"] == F])
-data["circuits"] = dict(WX=WX, WP=WP, spare=BOARD["ways"], board=BOARD, rev=REV)
+data = {F: dict(sockets=OUT[F]["pts"], items=[d for d in DED if d["floor"] == F]) for F in ("GF", "FF")}
+data["plans"] = PLANS; data["default"] = "A"; data["rev"] = "2026-10-04 · 方案 A / B 对比"
 for F in ("GF", "FF"):
     json.dump(data[F], open(os.path.join(HERE, f"power_{F}.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-json.dump(data["circuits"], open(os.path.join(HERE, "power_circuits.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+json.dump(PLANS, open(os.path.join(HERE, "power_plans.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+if os.path.exists(os.path.join(HERE, "power_circuits.json")):
+    os.remove(os.path.join(HERE, "power_circuits.json"))
 open(os.path.join(HERE, "power_data.js"), "w", encoding="utf-8").write(
-    "// generated by build_power.py (sockets from v6 PPT slides 3 / 7 + 20-way circuit plan)\nwindow.POWER_DEFAULT = " + json.dumps(data, ensure_ascii=False) + ";\n")
-for F in ("GF", "FF"):
-    c = collections.Counter((p["c"], p["room"]) for p in OUT[F]["pts"])
-    print(F, len(OUT[F]["pts"]), "sockets:", dict(sorted(c.items())))
-print("dedicated:", [(d["c"], d["label"], d.get("fcu")) for d in DED])
+    "// generated by build_power.py (sockets from v6 PPT slides 3 / 7 + plans A / B)\nwindow.POWER_DEFAULT = " + json.dumps(data, ensure_ascii=False) + ";\n")
+for pid in PLANS:
+    for F in ("GF", "FF"):
+        print(pid, F, dict(sorted(collections.Counter(p["c"][pid] for p in OUT[F]["pts"]).items())))
