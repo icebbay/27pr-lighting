@@ -1,5 +1,73 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>27PR 照明 workflow</title>
-<meta http-equiv="refresh" content="0; url=lighting_tool/index.html">
-<style>body{font:15px "Microsoft YaHei",sans-serif;padding:40px;background:#fff;color:#222}a{color:#1f4e79}</style></head>
-<body>正在打开 <a href="lighting_tool/index.html">27PR 平面图照明 workflow 工具</a>…</body></html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache">
+<title>27PR 电气总览</title>
+<link rel="stylesheet" href="lighting_tool/pages.css?v=p5">
+<style>
+  .hub { max-width: 1180px; margin: 0 auto; padding: 12px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 10px; margin-bottom: 12px; }
+  .tile { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+  .tile h3 { margin: 0; font-size: 15px; color: var(--accent); }
+  .tile p { margin: 0; color: var(--mute); }
+  .tile .links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 4px; }
+  .tile .links a { padding: 4px 10px; border-radius: 5px; border: 1px solid var(--accent); color: var(--accent); text-decoration: none; }
+  .tile .links a.prim { background: var(--accent); color: #fff; }
+  .tile img { width: 100%; border: 1px solid var(--line); border-radius: 4px; }
+  .status { background: #fff8e1; border: 1px solid #f0d58a; border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; }
+  ul.dl { margin: 4px 0 0; padding-left: 18px; } ul.dl li { margin: 2px 0; }
+</style>
+</head>
+<body class="board-page">
+<header>
+  <h1>27PR 电气总览 <small class="ver" id="ver"></small></h1>
+  <nav class="nav"><a class="on" href="index.html">总览</a><a href="lighting_tool/index.html">照明</a><a href="lighting_tool/power.html">插座 / 动力</a><a href="lighting_tool/board.html">配电箱</a></nav>
+</header>
+<main class="hub">
+  <div class="status" id="status"></div>
+  <div class="grid">
+    <div class="tile"><h3>照明</h3>
+      <p>灯、开关、联动、照明回路。点开关试灯，点灯看它从配电箱到开关再到灯的整条线路。显示方案 A 的 4 路照明。</p>
+      <img src="lighting_tool/drawings/png/27PR_一层照明施工图_RevG_国标/slide02.png" alt="一层照明平面">
+      <div class="links"><a class="prim" href="lighting_tool/index.html">打开照明工具</a></div></div>
+    <div class="tile"><h3>插座 / 动力</h3>
+      <p>每个插座、电器（烤箱、冰箱、洗碗机、洗衣烘干、电梯、充电桩）属于哪一路。勾「灯」可以同时看照明分路。点一路只看这一路。</p>
+      <div class="links"><a class="prim" href="lighting_tool/power.html#A">方案 A</a><a href="lighting_tool/power.html#B">方案 B</a></div></div>
+    <div class="tile"><h3>配电箱 AL1 · 方案对比</h3>
+      <p>两个方案并排：路数、配电箱型号、备用位、材料估算、优缺点；下面是所选方案的单线图和回路表。</p>
+      <div class="links"><a class="prim" href="lighting_tool/board.html#A">对比（看 A）</a><a href="lighting_tool/board.html#B">对比（看 B）</a></div></div>
+    <div class="tile"><h3>照明施工图（PPT）</h3>
+      <p>英式 / 国标两套，按方案 A 的照明出图。</p>
+      <ul class="dl">
+        <li>一层：<a href="lighting_tool/drawings/27PR_一层照明施工图_RevG_英式.pptx">英式</a> · <a href="lighting_tool/drawings/27PR_一层照明施工图_RevG_国标.pptx">国标</a></li>
+        <li>二层：<a href="lighting_tool/drawings/27PR_二层照明施工图_RevG_英式.pptx">英式</a> · <a href="lighting_tool/drawings/27PR_二层照明施工图_RevG_国标.pptx">国标</a></li>
+        <li>不想下载：<a href="https://github.com/icebbay/27pr-lighting/tree/main/lighting_tool/drawings/png">每页图片</a></li>
+      </ul></div>
+    <div class="tile"><h3>3D 漫游</h3>
+      <p>在房子里走、开门，和这些图纸是同一版户型。</p>
+      <div class="links"><a class="prim" href="https://icebbay.github.io/27pr-cgi/walkthrough/">打开 3D 漫游</a></div></div>
+    <div class="tile"><h3>资料 / 源文件</h3>
+      <p>数据、出图脚本、修改记录（README、工作流程说明）。</p>
+      <div class="links"><a href="https://github.com/icebbay/27pr-lighting">GitHub 仓库</a><a href="https://github.com/icebbay/27pr-lighting/blob/main/README.md">README</a></div></div>
+  </div>
+  <div class="box" id="plans"></div>
+  <p class="muted">规格为建议值，回路划分、配电箱位置需要电工按 BS 7671 / Part P 复核。</p>
+</main>
+<script src="lighting_tool/lighting_data.js?v=p5"></script>
+<script src="lighting_tool/power_data.js?v=p5"></script>
+<script src="lighting_tool/circuits.js?v=p5"></script>
+<script>
+(function () {
+  const CC = window.CIRCUITS, esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  document.getElementById('ver').textContent = CC.lightRev;
+  document.getElementById('status').innerHTML = `<b>现在的状态</b>：照明已定（${esc(CC.lightRev)}）。全屋回路还在 <b>方案 A</b> 和 <b>方案 B</b> 之间讨论，下面是两个方案的摘要，详细对比点「配电箱」。`;
+  const rows = CC.plans.map(p => { const C = CC.build(p), n = k => C.list.filter(c => c.kind === k).length;
+    return `<tr><td><a href="lighting_tool/board.html#${p}"><b>${esc(C.plan.name)}</b></a></td><td>${C.list.length}</td><td>${n('WL')}</td><td>${n('WX')}</td><td>${n('WP')}</td><td>${esc(C.board.model)}（${C.board.ways} 位）</td>
+      <td><a href="lighting_tool/power.html#${p}">插座 / 动力</a> · <a href="lighting_tool/board.html#${p}">配电箱</a></td></tr>`; }).join('');
+  document.getElementById('plans').innerHTML = `<h2>两个方案摘要</h2><table class="sch" style="min-width:0"><tr><th>方案</th><th>合计</th><th>照明</th><th>插座</th><th>专线</th><th>配电箱</th><th>打开</th></tr>${rows}</table>`;
+})();
+</script>
+</body>
+</html>
