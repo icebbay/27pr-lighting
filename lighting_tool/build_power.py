@@ -1,8 +1,8 @@
 """Sockets + dedicated circuits for two candidate plans -> power_GF/FF.json + power_plans.json + power_data.js (power.html / board.html).
 
-Plans (2026-10-03/04, still being discussed — the lighting page itself shows plan A's 4 lighting circuits, Rev G):
+Plans (2026-10-03/04, still being discussed — the lighting page switches between them too, #A / #B):
   A  专业 18 路: lighting 4 (from lighting_<F>.json) + sockets 9 (one computer+TV room per circuit) + dedicated 5
-  B  精简 15 路: lighting 2 (downstairs incl. outdoor / upstairs) + sockets 8 (two studies + corridor share one) + dedicated 5
+  B  精简 17 路: lighting 3 (downstairs / outdoor / upstairs) + sockets 8 (two studies + corridor share one) + dedicated 6 (fridge on its own)
 Socket points: the user's coloured dots on the socket pages of the v6 PPT (slide 3 GF, slide 7 FF; olive = double,
 blue = single, yellow = outdoor, "高" = high level). Those pages show the plan rotated 90° and scaled; the transform into the
 lighting tool's frame (slide EMU of walls_<F>.svg) is fitted on the wall shapes both pages share (error <= 1 EMU).
@@ -42,49 +42,70 @@ WP = [
 ]
 ALL_GF = [c["id"] for c in LJ["GF"]["circuits"]]
 ALL_FF = [c["id"] for c in LJ["FF"]["circuits"]]
+GF_OUT = ["L16", "L17", "L21"]                       # back-garden wall lights p, fence lights q, wall light u (porch c stays with the front)
+GF_FRONT = ["L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8", "L9", "L14"]
+GF_BACK = ["L10", "L11", "L12", "L13", "L15", "L18", "L19", "L20"]
+GF_IN = [c for c in ALL_GF if c not in GF_OUT]
 PLANS = {
     "A": dict(name="方案 A · 专业 18 路", short="专业 18 路",
-        lighting=None,   # = the lighting page (Rev G): WL1 一层前区 / WL2 一层后区 / WL3 户外 / WL4 二层
+        lighting=[dict(id="WL1", floor="GF", name="一层前区照明（门廊 / 门厅 / 起居室 / 餐厅 / 楼梯）", br="B6 1P+N RCBO 30mA", circ=GF_FRONT, note="约 400 W"),
+                  dict(id="WL2", floor="GF", name="一层后区照明（客厅 / 卫生间 / 厨房 / 吧台 / 洗衣房）+ 卫生间排气扇", br="B6 1P+N RCBO 30mA", circ=GF_BACK, note="约 280 W"),
+                  dict(id="WL3", floor="GF", name="户外照明（后花园壁灯 / 围栏地灯）", br="B6 1P+N RCBO 30mA", circ=GF_OUT, note="约 60 W；户外易进水，单独一路"),
+                  dict(id="WL4", floor="FF", name="二层照明 + 卫生间排气扇", br="B6 1P+N RCBO 30mA", circ=ALL_FF, note="约 320 W")],
         WX=GF_X + [
             dict(id="WX5", floor="FF", name="主卧插座（主卧 / 北卫 / 走廊 / 楼梯 / 电梯旁）", rooms=["主卧", "卫生间#0", "走廊", "楼梯", "电梯"], br="B32 RCBO 30mA", cable=RING, note="一个电脑 + 电视房间"),
             dict(id="WX6", floor="FF", name="卧室 2 插座（卧室 2 / 衣帽间 / 盥洗室 / 西卫）", rooms=["卧室 2", "衣帽间", "盥洗室", "卫生间#2"], br="B32 RCBO 30mA", cable=RING, note="一个电脑 + 电视房间；电热毛巾架接这里"),
             dict(id="WX7", floor="FF", name="书房 1 插座（卧室 3）", rooms=["卧室 3"], br="B32 RCBO 30mA", cable=RING, note="电脑 + 电视，单独一路"),
             dict(id="WX8", floor="FF", name="书房 2 插座（书房 / 后卫）", rooms=["书房", "卫生间#10"], br="B32 RCBO 30mA", cable=RING, note="电脑 + 电视，单独一路"),
             dict(id="WX9", floor="GF", name="户外插座（前院 + 后花园）", rooms=[], br="B32 RCBO 30mA", cable="4 mm² 径向 32A，出户段 SWA 铠装电缆", note="户外易进水，单独一路；32A 留给花园大功率工具"),
-        ], outdoor="WX9", WP=WP,
-        board=dict(model="British General CF236MS31", ways=31, price=155, spd="40kA Type 2 SPD（自带）", size="宽 387 × 高 483 × 深 116 mm（双排，先量楼梯下位置）",
+        ], outdoor="WX9", WP=WP, fridge="WX3",
+        board=dict(model="British General CF236MS31", ways=31, price=169.99, code="547EF", url="https://www.screwfix.com/p/british-general-36-module-31-way-part-populated-high-integrity-main-switch-consumer-unit-with-spd/547ef",
+                   spd="40kA Type 2 SPD（自带）", size="宽 387 × 高 483 × 深 116 mm（双排，先量楼梯下位置）",
                    main="100A 总闸", rcbo=RCBO, reserve="预留 1 位：大功率工具 32A 径向（位置待定）",
                    alt="单排替代 MK Sentry 21 位（YS5721SMET，518 × 261 mm）：装完只剩 2 个备用"),
+        diff=["照明 4 路：一层前区、一层后区、户外、二层，各自一路",
+              "二层插座 4 路：主卧、卧室 2、书房 1、书房 2 各一路",
+              "户外插座 32A（可用花园大功率工具）",
+              "冰箱接厨房插座（经带保险开关）",
+              "配电箱 31 位双排，剩 12 个备用"],
         pros=["每个「电脑 + 电视」房间独立：不会因漏电累加误跳，哪里出事只断哪里",
-              "照明 4 路：一层分前后两路，户外单独，一路跳闸不会整层黑",
+              "照明 4 路：一层前后分开、户外单独，一路跳闸不会整层黑",
               "户外 32A、烤箱和两台空调都单独，以后换大功率电器不用改线",
               "31 位箱还剩 12 个备用：加太阳能、电池、热泵、第 3 台空调都不用换箱"],
         cons=["配电箱高 483 mm（双排），先确认楼梯下放得下",
-              "材料比 B 多约 £200（箱子 + 3 个 RCBO + 几根回配电箱的线）",
+              "冰箱和厨房插座同一路：厨房电器出问题跳闸时冰箱也断电",
               "进箱的线多，接线整理和 EICR 检测项目略多",
               "部分回路功率上「大材小用」（书房、卧室 32A 环路，实际约 1 kW）"]),
-    "B": dict(name="方案 B · 精简 15 路", short="精简 15 路",
-        lighting=[dict(id="WL1", floor="GF", name="一层照明（含门廊、后花园壁灯、围栏地灯）+ 卫生间排气扇", br="B10 1P+N RCBO 30mA", circ=ALL_GF,
-                       note="估算约 740 W；B10 防几十个 LED 同时开灯误跳"),
-                  dict(id="WL2", floor="FF", name="二层照明 + 卫生间排气扇", br="B6 1P+N RCBO 30mA", circ=ALL_FF, note="估算约 320 W")],
+    "B": dict(name="方案 B · 精简 17 路", short="精简 17 路",
+        lighting=[dict(id="WL1", floor="GF", name="一层照明（门廊 / 门厅 / 起居室 / 餐厅 / 楼梯 / 客厅 / 卫生间 / 厨房 / 洗衣房）+ 卫生间排气扇", br="B10 1P+N RCBO 30mA", circ=GF_IN,
+                       note="约 680 W；B10 防几十个 LED 同时开灯误跳"),
+                  dict(id="WL3", floor="GF", name="户外照明（后花园壁灯 / 围栏地灯）", br="B6 1P+N RCBO 30mA", circ=GF_OUT, note="约 60 W；户外进水只断户外灯，一楼不会黑"),
+                  dict(id="WL4", floor="FF", name="二层照明 + 卫生间排气扇", br="B6 1P+N RCBO 30mA", circ=ALL_FF, note="约 320 W")],
         WX=GF_X + [
             dict(id="WX5", floor="GF", name="户外插座（前院 + 后花园）", rooms=[], br="B20 RCBO 30mA", cable="2.5 mm² 径向 20A，出户段 SWA 铠装电缆", note="插头式电动工具最大 13A，20A 够用"),
             dict(id="WX6", floor="FF", name="两个书房 + 走廊插座（卧室 3 / 书房 / 走廊 / 后卫）", rooms=["卧室 3", "书房", "走廊", "卫生间#10"], br="B20 RCBO 30mA",
-                 cable=RAD20 + "；两个书房各拉一根线回配电箱，现在接同一个 RCBO", note="两台电脑 + 电视实际约 3–7 mA（上限 9 mA）；误跳时把一根线挪到预留位即可拆开"),
+                 cable=RAD20 + "；两个书房各拉一根线回配电箱，现在接同一个 RCBO", note="两台电脑 + 电视实际约 3–7 mA（上限 9 mA）；误跳时把一根线挪到备用位即可拆开"),
             dict(id="WX7", floor="FF", name="主卧插座（主卧 / 北卫 / 楼梯 / 电梯旁）", rooms=["主卧", "卫生间#0", "楼梯", "电梯"], br="B20 RCBO 30mA", cable=RAD20, note="电脑 + 电视"),
             dict(id="WX8", floor="FF", name="次卧插座（卧室 2 / 衣帽间 / 盥洗室 / 西卫）", rooms=["卧室 2", "衣帽间", "盥洗室", "卫生间#2"], br="B20 RCBO 30mA", cable=RAD20, note="电脑 + 电视；电热毛巾架经带保险开关接这里"),
-        ], outdoor="WX5", WP=WP,
-        board=dict(model="British General CF22MS19-01", ways=19, price=62, spd="40kA Type 2 SPD（自带）", size="宽 496 × 高 231 × 深 116 mm（单排）",
+        ], outdoor="WX5", fridge="WP6",
+        WP=WP + [dict(id="WP6", name="冰箱", br="B16 RCBO 30mA", cable="2.5 mm² 径向", note="单独一路：别处跳闸冰箱不断电")],
+        board=dict(model="British General CF22MS19-01", ways=19, price=79.99, code="562CY", url="https://www.screwfix.com/p/british-general-22-module-19-way-part-populated-high-integrity-main-switch-consumer-unit-with-spd/562cy",
+                   spd="40kA Type 2 SPD（自带）", size="宽 496 × 高 231 × 深 116 mm（单排）",
                    main="100A 总闸", rcbo=RCBO, reserve="预留 1 位：两个书房以后拆成两路（两个书房现在各拉一根线，接在同一个 RCBO 上）",
-                   alt="想多留位就换 British General CF236MS31（31 位双排，约贵 £93）"),
+                   alt="充电桩若由安装商单独配小箱，主箱再空出 1–2 位；以后想加太阳能 + 电池，换 British General CF236MS31（31 位，贵 £90）"),
+        diff=["照明 3 路：一层合成一路（前后不分），户外单独，二层一路",
+              "二层插座 3 路：两个书房 + 走廊合一路，主卧、次卧各一路（20A 径向）",
+              "户外插座 20A",
+              "冰箱单独一路（别处跳闸冰箱不断电）",
+              "配电箱 19 位单排，剩 1 个备用（充电桩另配小箱则剩 3 个）"],
         pros=["按实际用量配：有电脑的房间用 20A 径向，线只拉单程，不「大材小用」",
-              "配电箱小一半（单排 496 × 231 mm），材料约省 £200",
-              "回路少，配电箱和图纸都简单，检测也快",
+              "配电箱小一半（单排 496 × 231 mm），材料更省",
+              "户外灯单独一路、冰箱单独一路：B 最怕的两个问题已经补上",
               "两个书房已各拉一根线，以后误跳挪一根线就能拆开，不用开墙"],
-        cons=["照明楼下只有一路：一层或户外任何一盏灯出问题，整层灯（含户外）一起灭",
+        cons=["一层照明只有一路：一层任何一盏灯出问题，一楼室内灯一起灭",
               "两个书房合一路：两边同时开电脑、电视，漏电余量变小，偶尔可能误跳",
               "户外 20A：以后要固定接线的大型工具，需要另拉专线",
-              "19 位箱只剩 3 个备用（1 个已留给书房拆分），以后加太阳能 / 电池等会比较紧"]),
+              "19 位箱只剩 1 个备用：以后加太阳能 / 电池很可能要换箱"]),
 }
 
 
@@ -141,7 +162,7 @@ for F in ("GF", "FF"):
             p["c"][pid] = pl["outdoor"] if k is None else {r: c["id"] for c in pl["WX"] if c["floor"] == F for r in c["rooms"]}.get(k)
             assert p["c"][pid], f"{pid} {F}: no socket circuit for room {k}"
 
-# ---------------- dedicated points (same circuit ids in both plans) ----------------
+# ---------------- dedicated points (same circuit ids in both plans, except the fridge) ----------------
 # dishwasher = the kitchen FCU nearest the 洗碗机 label of the water page (slide 4, same rotated layout as slide 3)
 sl4 = pr.slides[3]; T4 = fit(sl4, "GF"); dw = None
 for x, T, par in _ns["walk"](sl4.shapes, lambda a, b: (a, b)):
@@ -152,7 +173,7 @@ kitchen = sorted([f for f in fc.values() if f["x"] < 10.2e6], key=lambda f: math
 laundry = [f for f in fc.values() if f["x"] >= 10.2e6]
 DED = [dict(c="WX3", label="洗碗机", fcu=kitchen[0]["id"], x=kitchen[0]["x"], y=kitchen[0]["y"], floor="GF"),
        dict(c="WP1", label="烤箱", fcu=kitchen[1]["id"], x=kitchen[1]["x"], y=kitchen[1]["y"], floor="GF", tbc="烤箱 / 冰箱哪个 FCU 待现场定"),
-       dict(c="WX3", label="冰箱", fcu=kitchen[2]["id"], x=kitchen[2]["x"], y=kitchen[2]["y"], floor="GF", tbc="烤箱 / 冰箱哪个 FCU 待现场定")]
+       dict(c={p: PLANS[p]["fridge"] for p in PLANS}, label="冰箱", fcu=kitchen[2]["id"], x=kitchen[2]["x"], y=kitchen[2]["y"], floor="GF", tbc="烤箱 / 冰箱哪个 FCU 待现场定")]
 for f, lab in zip(sorted(laundry, key=lambda f: f["x"]), ("洗衣机", "烘干机")):
     DED.append(dict(c="WX4", label=lab, fcu=f["id"], x=f["x"], y=f["y"], floor="GF"))
 lift = [(a + b) / 2 for a, b in zip(*[[float(v) for v in re.sub('[MLZ]', ' ', p).split()][:2] for p in
@@ -162,6 +183,8 @@ door = [d for d in LJ["GF"]["doors"] if "Front Entrance Door_UpperPanel" in d["n
 dx, dy = min(p[0] for p in door), sum(p[1] for p in door) / len(door)
 DED.append(dict(c="WP5", label="充电桩（门口，位置示意）", x=round(dx - 0.9 * LJ["GF"]["units"]["emu_per_m"]), y=round(dy), floor="GF"))
 
+for d in DED:
+    if not isinstance(d["c"], dict): d["c"] = {p: d["c"] for p in PLANS}
 data = {F: dict(sockets=OUT[F]["pts"], items=[d for d in DED if d["floor"] == F]) for F in ("GF", "FF")}
 data["plans"] = PLANS; data["default"] = "A"; data["rev"] = "2026-10-04 · 方案 A / B 对比"
 for F in ("GF", "FF"):

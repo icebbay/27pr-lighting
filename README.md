@@ -10,18 +10,16 @@
 
 3D 漫游（可以在房子里走、开门；与本照明图同一版户型 v38）：https://icebbay.github.io/27pr-cgi/walkthrough/
 
-> 状态：照明 Rev G（4 路）。全屋回路还在 A / B 两个方案之间讨论：A 专业 18 路（照明 4 + 插座 9 + 专线 5，BG CF236MS31 31 位），B 精简 15 路（照明 2 + 插座 8 + 专线 5，BG CF22MS19-01 19 位）。规格为建议值，需要电工按 BS 7671 / Part P 复核。
+> 状态：灯、开关、联动已定（Rev G）。全屋回路有两个方案供讨论：**A 专业 18 路**（照明 4 + 插座 9 + 专线 5，BG CF236MS31 31 位，配电箱 + RCBO 约 £347）和 **B 精简 17 路**（照明 3 + 插座 8 + 专线 6，冰箱单独，BG CF22MS19-01 19 位，约 £228）。照明、插座、配电箱、施工图各页都能切换 A / B。规格为建议值，需要电工按 BS 7671 / Part P 复核。
 
-## 施工图（Rev G）
+## 施工图（Rev G，方案 A / B 各一套）
 
 | 文件 | 内容 |
 |---|---|
-| [一层 · 英式](lighting_tool/drawings/27PR_一层照明施工图_RevG_英式.pptx) | E-GF-00 索引 → 01–03 分区放大 → 04 开关面板表（逐键）→ 05 回路表 |
-| [一层 · 国标](lighting_tool/drawings/27PR_一层照明施工图_RevG_国标.pptx) | 电施-01 说明 / 图例 / 灯具表 → 02 全层平面 → 03–05 放大 → 06 AL1 系统图 → 07 面板表 + 回路表 |
-| [二层 · 英式](lighting_tool/drawings/27PR_二层照明施工图_RevG_英式.pptx) | E-FF-00–04 |
-| [二层 · 国标](lighting_tool/drawings/27PR_二层照明施工图_RevG_国标.pptx) | 电施-11–16 |
+| 方案 A（照明 4 路） | [一层英式](lighting_tool/drawings/27PR_一层照明施工图_RevG-A_英式.pptx) · [一层国标](lighting_tool/drawings/27PR_一层照明施工图_RevG-A_国标.pptx) · [二层英式](lighting_tool/drawings/27PR_二层照明施工图_RevG-A_英式.pptx) · [二层国标](lighting_tool/drawings/27PR_二层照明施工图_RevG-A_国标.pptx) |
+| 方案 B（照明 3 路） | [一层英式](lighting_tool/drawings/27PR_一层照明施工图_RevG-B_英式.pptx) · [一层国标](lighting_tool/drawings/27PR_一层照明施工图_RevG-B_国标.pptx) · [二层英式](lighting_tool/drawings/27PR_二层照明施工图_RevG-B_英式.pptx) · [二层国标](lighting_tool/drawings/27PR_二层照明施工图_RevG-B_国标.pptx) |
 
-不想下载 PPT 的话，每一页的图片在 [`lighting_tool/drawings/png/`](lighting_tool/drawings/png/)。
+不想下载 PPT：网页上的「施工图」页（https://icebbay.github.io/27pr-lighting/lighting_tool/drawings.html）逐页显示，可切换方案。
 
 **Rev G：全屋按专业方案定为 18 路，照明合为 4 路**
 - 照明：一层前区 WL1（22 盏）、一层后区 WL2（14 盏，原 WL2 + WL6）、户外 WL3（7 盏）、二层 WL4（16 盏，原 WL4/5/7）。按已购灯具估算一层室内约 680 W、二层约 320 W，LED 负载很小；分路是为了跳闸时不整屋黑（BS 7671 314.1），楼梯壁灯和吊灯在不同回路。
@@ -94,6 +92,7 @@ FLOOR=GF LIGHTING_JSON=lighting_tool/lighting_GF.json DST_OVERRIDE=out.pptx pyth
 | `lighting_tool/walls_*.svg` | 墙体（Blender 1.2 m 剖切，来自 `source_pptx/`） |
 | `make_lighting_drawings.py` / `_cn.py` | 英式 / 国标出图脚本 |
 | `lighting_tool/build_power.py` | 从 v6 PPT 插座页读插座点位（按两页共有的墙体换算坐标），按方案 A / B 分回路 → `power_*.json`、`power_plans.json`、`power_data.js` |
+| `lighting_tool/make_plan_drawings.py` | 按方案 A / B 重新分组照明回路，出两套施工图（`drawings/*_RevG-A/B_*`）+ 每页 PNG |
 | `lighting_tool/power.html`、`board.html` | 插座 / 动力页、配电箱页（`circuits.js` 按方案合并照明 WL + 插座 WX + 专线 WP；方案取自链接 `#A` / `#B`） |
 | `source_pptx/` | 用户标注的户型 PPT（墙体、灯位、开关位置点） |
 | `照明施工图_工作流程.md` | 规则、标注约定、出图规范、测试计划 T1–T6 |

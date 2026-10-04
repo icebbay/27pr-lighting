@@ -9,10 +9,10 @@
   const PPAL = ['#b71c1c', '#4e342e', '#283593', '#37474f', '#0277bd', '#00838f', '#558b2f'];
   const lamps = (F, ids) => ids.reduce((a, id) => a + (L[F].json.circuits.find(c => c.id === id)?.lights.length || 0), 0);
   const letters = (F, ids) => ids.map(id => L[F].json.circuits.find(c => c.id === id)?.letter).join(' ');
-  const items = id => ['GF', 'FF'].flatMap(F => P[F].items.filter(t => t.c === id).map(t => t.label));
 
   function build(pid) {
     const pl = P.plans[pid], out = [];
+    const items = id => ['GF', 'FF'].flatMap(F => P[F].items.filter(t => t.c[pid] === id).map(t => t.label));
     const wl = pl.lighting || ['GF', 'FF'].flatMap(F => Object.entries(L[F].json.wl).map(([id, v]) => ({ id, floor: F, name: v.name, br: v.br, circ: v.circ })));
     for (const w of wl) {
       const n = parseInt(w.id.replace(/\D/g, ''), 10) || 1;
@@ -23,11 +23,11 @@
     pl.WX.forEach((c, i) => { const it = items(c.id);
       out.push({ ...c, kind: 'WX', group: '插座', color: XPAL[i % XPAL.length], count: `${nS(c.id)} 个插座` + (it.length ? ' + ' + it.join('、') : '') }); });
     pl.WP.forEach((c, i) => out.push({ ...c, kind: 'WP', group: '专线', color: PPAL[i % PPAL.length],
-      floor: ['GF', 'FF'].find(F => P[F].items.some(t => t.c === c.id)) || null, count: items(c.id).join('、') || '位置待定' }));
+      floor: ['GF', 'FF'].find(F => P[F].items.some(t => t.c[pid] === c.id)) || null, count: items(c.id).join('、') || '位置待定' }));
     return { pid, plan: pl, list: out, byId: Object.fromEntries(out.map(c => [c.id, c])), board: pl.board };
   }
 
-  const pick = () => { const h = (location.hash || '').replace('#', '').toUpperCase(); return P.plans[h] ? h : P.default; };
+  const pick = () => { const h = (location.hash || '').replace('#', '').split('-')[0].toUpperCase(); return P.plans[h] ? h : P.default; };
   window.CIRCUITS = { FCN, build, pick, plans: Object.keys(P.plans), rev: P.rev,
     lightRev: (L.GF.json.meta.rev_cn || '').split(' ').slice(0, 2).join(' ') };
 })();

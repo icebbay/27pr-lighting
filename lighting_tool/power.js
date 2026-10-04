@@ -24,7 +24,7 @@ function lampsOf(F) {   // [{x, y, id, wl}] — each lamp coloured by the lighti
   return J.lights.filter(l => wlOf[l.id]).map(l => ({ x: l.x, y: l.y, id: l.id, wl: wlOf[l.id] }));
 }
 function pointsOf(F, cid) {
-  return [...P[F].sockets.filter(s => s.c[ui.plan] === cid).map(s => [s.x, s.y]), ...P[F].items.filter(t => t.c === cid).map(t => [t.x, t.y])];
+  return [...P[F].sockets.filter(s => s.c[ui.plan] === cid).map(s => [s.x, s.y]), ...P[F].items.filter(t => t.c[ui.plan] === cid).map(t => [t.x, t.y])];
 }
 function wires(F) {   // per circuit: AL1 (or the riser on FF) -> nearest point, then a tree through its points; each circuit leaves on its own track
   const b = L[F].json.board, al = [b.x, b.y], m = M(F), out = [];
@@ -100,7 +100,7 @@ class Pane {
     const b = L[F].json.board;
     o.push(`<g><rect x="${b.x - 0.28 * m}" y="${b.y - 0.13 * m}" width="${0.56 * m}" height="${0.26 * m}" fill="#fff" stroke="#111" stroke-width="${0.025 * m}"/><path d="M${b.x - 0.28 * m} ${b.y + 0.13 * m}L${b.x + 0.28 * m} ${b.y - 0.13 * m}L${b.x + 0.28 * m} ${b.y + 0.13 * m}Z" fill="#111"/>${txt(b.x, b.y + 0.4 * m, F === 'GF' ? 'AL1' : '↑ AL1 引上', 0.2 * m, 'text-anchor="middle" font-weight="bold"')}</g>`);
     for (const s of P[F].sockets) { const sc = s.c[ui.plan], c = C.byId[sc]; o.push(`<g data-c="${sc}" class="${dim(sc)}"><title>${esc(KIND[s.kind][0])} · ${esc(s.room)} · ${sc}</title>${sym(F, s.x, s.y, s.kind, c.color, m)}</g>`); }
-    for (const t of P[F].items) { const c = C.byId[t.c]; o.push(`<g data-c="${t.c}" class="${dim(t.c)}"><title>${esc(t.label)} · ${t.c}${t.tbc ? ' · ' + esc(t.tbc) : ''}</title>${itemSym(t, c.color, m)}</g>`); }
+    for (const t of P[F].items) { const tc = t.c[ui.plan], c = C.byId[tc]; o.push(`<g data-c="${tc}" class="${dim(tc)}"><title>${esc(t.label)} · ${tc}${t.tbc ? ' · ' + esc(t.tbc) : ''}</title>${itemSym(t, c.color, m)}</g>`); }
     this.ov.innerHTML = o.join('');
   }
 }
@@ -117,7 +117,7 @@ function select(id) { ui.sel = ui.sel === id ? null : id; draw(); }
 
 function side() {
   const h = [], row = c => {
-    const pts = ['GF', 'FF'].flatMap(F => P[F].items.filter(t => t.c === c.id));
+    const pts = ['GF', 'FF'].flatMap(F => P[F].items.filter(t => t.c[ui.plan] === c.id));
     return `<div class="crow ${ui.sel === c.id ? 'cur' : ''}" data-sel="${c.id}"><span class="chip" style="background:${c.color}">${c.id}</span>
       <div>${esc(c.name)}<div class="br">${esc(c.br)} · ${esc(c.cable)}</div>${c.note ? `<div class="br">${esc(c.note)}</div>` : ''}${pts.filter(t => t.tbc).map(t => `<div class="br tbc">${esc(t.label)}：${esc(t.tbc)}</div>`).join('')}</div>
       <span class="n">${esc(c.count)}</span></div>`;
@@ -133,7 +133,7 @@ function side() {
     `<svg viewBox="-12 -12 24 24" width="20" height="20"><rect x="-7" y="-7" width="14" height="14" transform="rotate(45)" fill="#fff" stroke="#666" stroke-width="3"/></svg><div>灯（颜色 = 照明回路；开关和联动见「照明」页）</div>`,
     `<svg viewBox="0 -4 28 8" width="24" height="8"><path d="M0 0H28" stroke="#666" stroke-width="4"/></svg><div>粗线 = AL1 引出（每路一根）</div>`,
     `<svg viewBox="0 -4 28 8" width="24" height="8"><path d="M0 0H28" stroke="#666" stroke-width="2" stroke-dasharray="5 3"/></svg><div>虚线 = 同一路的插座串在一起</div></div>`);
-  h.push(`<p class="muted">插座点位来自 v6 PPT 插座页（你标的圆点），两个方案点位相同，只是分路不同。线路只表示属于哪一路，实际走线现场定。照明见「照明」页（显示方案 A 的 4 路），全部回路和两个方案的对比见「配电箱」页。</p>`);
+  h.push(`<p class="muted">插座点位来自 v6 PPT 插座页（你标的圆点），两个方案点位相同，只是分路不同。线路只表示属于哪一路，实际走线现场定。开关和联动见「照明」页（也能切换 A / B），全部回路、两个方案的对比和采购清单见「配电箱」页。</p>`);
   $('#side').innerHTML = h.join('');
   $('#side').querySelectorAll('[data-sel]').forEach(e => e.onclick = () => select(e.dataset.sel));
 }

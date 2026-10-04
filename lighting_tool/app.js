@@ -1116,14 +1116,38 @@ async function demo() {
   b.dataset.run = ''; b.textContent = '逐个回路演示'; ui.trace = null; for (const k in sim.key) sim.key[k] = false; render();
 }
 
+/* ---------------- plan A / B (power_data.js): same lamps and switches, lighting regrouped onto different breakers ---------------- */
+const PLANS = window.POWER_DEFAULT?.plans || null;
+const planFromHash = () => { const h = (location.hash || '').replace('#', '').split('-')[0].toUpperCase(); return PLANS && PLANS[h] ? h : (window.POWER_DEFAULT?.default || null); };
+function applyPlan(pid) {
+  const pl = PLANS && PLANS[pid]; if (!pl || !pl.lighting) return;
+  for (const F of FLOORS) {
+    S[F].wl = {};
+    for (const w of pl.lighting.filter(x => x.floor === F)) {
+      S[F].wl[w.id] = { name: w.name, br: w.br, circ: w.circ.filter(id => S[F].circuits.some(c => c.id === id)) };
+      for (const cid of w.circ) { const c = S[F].circuits.find(x => x.id === cid); if (c) c.wl = w.id; }
+    }
+    for (const [w, v] of Object.entries(S[F].wl)) v.n = S[F].circuits.filter(c => c.wl === w).reduce((a, c) => a + c.lights.length, 0);
+  }
+  for (const F of FLOORS) S[F].wl_other = clone(S[F === 'GF' ? 'FF' : 'GF'].wl);
+  ui.plan = pid;
+  if (location.hash.replace('#', '').toUpperCase() !== pid) history.replaceState(null, '', '#' + pid);
+  document.querySelectorAll('[data-plan]').forEach(b => b.classList.toggle('on', b.dataset.plan === pid));
+  const v = document.getElementById('ver'), m = S.GF?.meta; if (v && m) v.textContent = (m.rev_cn || '').split(' ').slice(0, 2).join(' ') + ' · ' + pl.short;
+  const n = document.getElementById('plannote'); if (n) n.textContent = '照明 ' + pl.lighting.length + ' 路：' + pl.lighting.map(w => w.id + ' ' + w.name.replace(/（.*|\+.*/, '')).join(' / ');
+}
+
 /* ---------------- start ---------------- */
 async function start() {
   if (location.protocol.startsWith('http')) { try { SERVER = (await (await fetch('api/ping')).json()).ok; } catch (e) { SERVER = false; } }
   if (!ORIG) { document.body.innerHTML = '<p style="padding:20px">缺少 lighting_data.js，请先运行 export_lighting_json.py。</p>'; return; }
   for (const F of FLOORS) { S[F] = clone(ORIG[F].json); SVGSRC[F] = ORIG[F].svg; }
   for (const F of FLOORS) GEO[F] = buildGeo(F);
-  derive(); bind(); render();
   { const v = document.getElementById('ver'), m = S.GF?.meta || S.FF?.meta; if (v && m) v.textContent = (m.rev_cn || '').split(' ')[0] + ' ' + (m.rev_cn || '').split(' ')[1]; }
-  window.APP = { get S() { return S; }, get D() { return D; }, zoom: (F, x, y, w) => panes.find(p => p.F === F)?.zoomTo([x, y], w * M(F)), panes, sim, ui, ISS: () => ISS, exportFloor, GEO, derive, render };
+  if (planFromHash()) applyPlan(planFromHash());
+  derive(); bind(); render();
+  document.querySelectorAll('[data-plan]').forEach(el => el.onclick = () => { applyPlan(el.dataset.plan); derive(); render(); });
+  window.addEventListener('hashchange', () => { const p = planFromHash(); if (p && p !== ui.plan) { applyPlan(p); derive(); render(); } });
+  window.APP = { applyPlan, get S() { return S; }, get D() { return D; }, zoom: (F, x, y, w) => panes.find(p => p.F === F)?.zoomTo([x, y], w * M(F)), panes, sim, ui, ISS: () => ISS, exportFloor, GEO, derive, render };
 }
 start();
