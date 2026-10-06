@@ -142,7 +142,7 @@ function render() {
       <div class="card total"><b>${s.total}</b>合计（+ 总闸）</div><div class="card"><b>${s.spare}</b>备用位</div><div class="card total"><b>${s.C.board.ways}</b>位配电箱</div>
     </div>
     ${compare()}${detail(s)}${NOTES}
-    <p class="muted">数据：灯和开关来自照明工具（${esc(CC.lightRev)}，照明页也能切换方案 A / B），插座点位来自 v8 PPT 插座页（= v6 + 后卧室 4），${esc(CC.rev)}。</p>`;
+    <p class="muted">数据：灯和开关来自照明工具（${esc(CC.lightRev)}，照明页也能切换方案 A / B），插座点位来自 v10 PPT 插座页（= v6 + 后卧室 4 + 卧室 2 进门），${esc(CC.rev)}。</p>`;
 }
 document.querySelectorAll('[data-plan]').forEach(b => b.onclick = () => { location.hash = b.dataset.plan; });
 window.addEventListener('hashchange', render);

@@ -19,7 +19,7 @@ from pptx.enum.shapes import MSO_SHAPE, MSO_CONNECTOR
 import os
 FLOOR = os.environ.get("FLOOR", "GF")   # GF = ground floor (v4 slide 2); FF = first floor (v6 slide 6, user-marked 10-03)
 if FLOOR == "FF":
-    SRC = r"C:\Users\jcjia\Downloads\Blender模型户型图_灯_插座_水路_可编辑_v8_照明控制图_专业版_卧室套卫.pptx"   # v8 = v6 + 后卧室 4 / 东侧套卫 (2026-10-06)
+    SRC = r"C:\Users\jcjia\Downloads\Blender模型户型图_灯_插座_水路_可编辑_v10_照明控制图_专业版_卧室2进门.pptx"   # v10 = v6 + 后卧室 4 / 东侧套卫 + 卧室 2 进门西移 (2026-10-06)
     SLIDE, PLAN_GROUP, M_BASE = 5, "二层平面（横向）", 405900
 else:
     SRC = r"C:\Users\jcjia\Downloads\Blender模型户型图_灯_插座_水路_可编辑_v4.pptx"

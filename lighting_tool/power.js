@@ -196,7 +196,7 @@ function side() {
     `<svg viewBox="-12 -12 24 24" width="20" height="20"><rect x="-7" y="-7" width="14" height="14" transform="rotate(45)" fill="#fff" stroke="#666" stroke-width="3"/></svg><div>灯（颜色 = 照明回路；开关和联动见「照明」页）</div>`,
     `<svg viewBox="0 -4 28 8" width="24" height="8"><path d="M0 0H28" stroke="#666" stroke-width="4"/></svg><div>粗线 = AL1 引出（每路一根）</div>`,
     `<svg viewBox="0 -4 28 8" width="24" height="8"><path d="M0 0H28" stroke="#666" stroke-width="2" stroke-dasharray="5 3"/></svg><div>虚线 = 同一路的插座串在一起</div></div>`);
-  h.push(`<p class="muted">插座点位来自 v8 PPT 插座页（你标的圆点；2026-10-06 后卧室 4 按 v7 更新），两个方案点位相同，只是分路不同。线路只表示属于哪一路，实际走线现场定。开关和联动见「照明」页（也能切换 A / B），全部回路、两个方案的对比和采购清单见「配电箱」页。</p>`);
+  h.push(`<p class="muted">插座点位来自 v10 PPT 插座页（你标的圆点；2026-10-06 按 v7 / v9 更新），两个方案点位相同，只是分路不同。线路只表示属于哪一路，实际走线现场定。开关和联动见「照明」页（也能切换 A / B），全部回路、两个方案的对比和采购清单见「配电箱」页。</p>`);
   $('#side').innerHTML = h.join('');
   $('#side').querySelectorAll('[data-sel]').forEach(e => e.onclick = () => select(e.dataset.sel));
 }
