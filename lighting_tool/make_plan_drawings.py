@@ -1,7 +1,7 @@
 """Lighting drawings for each plan (A / B) — same lamps, switches and keys, lighting circuits regrouped per power_plans.json.
 
 For every plan: write out/lighting_<plan>_<F>.json (lighting_<F>.json with wl / circuit wl / notes replaced), run the English and
-GB drawing scripts into drawings/27PR_<floor>照明施工图_RevG-<plan>_<style>.pptx, and export slide PNGs with PowerPoint.
+GB drawing scripts into drawings/27PR_<floor>照明施工图_Rev<X>-<plan>_<style>.pptx (X = current rev letter), and export slide PNGs with PowerPoint.
 
     3D_gen_bench\\_tools_venv\\Scripts\\python.exe products\\lighting_tool\\make_plan_drawings.py
 """
@@ -14,6 +14,7 @@ FCN = {"GF": "一层", "FF": "二层"}
 SCRIPTS = (("make_lighting_drawings.py", "英式"), ("make_lighting_drawings_cn.py", "国标"))
 LJ = {F: json.load(open(os.path.join(HERE, f"lighting_{F}.json"), encoding="utf-8")) for F in ("GF", "FF")}
 PLANS = json.load(open(os.path.join(HERE, "power_plans.json"), encoding="utf-8"))
+REV = "Rev" + LJ["GF"]["meta"]["rev_cn"].split(" ")[1]          # "Rev H 2026-10-06" -> "RevH"
 os.makedirs(OUT, exist_ok=True)
 
 
@@ -35,6 +36,11 @@ def regroup(pid, pl):
         n.append(f"{'12' if F == 'GF' else '11'}. 本套图：{pl['name']}，全屋照明 {len(pl['lighting'])} 路"
                  f"（{' / '.join(w['id'] + ' ' + w['name'].split('（')[0].replace('+ 卫生间排气扇', '').strip() for w in pl['lighting'])}）。"
                  "两个方案的灯、开关和联动完全相同，只是照明回路分组不同；插座与专线见网页「配电箱」页。")
+        k = 0
+        for j, t in enumerate(n):                   # renumber "N. " notes after removing / appending
+            head = t.split(". ", 1)
+            if len(head) == 2 and head[0].isdigit():
+                k += 1; n[j] = f"{k}. {head[1]}"
         i = next(k for k, t in enumerate(n) if t.startswith("2. "))
         lst = "、".join(f"{w} {v['name'].split('（')[0].replace('+ 卫生间排气扇', '').strip()}（{v['br'].split(' ')[0]}）" for w, v in d["wl"].items())
         n[i] = (f"2. {FCN[F]}照明由照明配电箱 AL1{'（暂定楼梯下，现场定）' if F == 'GF' else '沿楼梯井引上'}引出 {len(d['wl'])} 个回路：{lst}，"
@@ -50,7 +56,7 @@ for pid, pl in PLANS.items():
         jp = os.path.join(OUT, f"lighting_{pid}_{F}.json")
         json.dump(d, open(jp, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
         for script, style in SCRIPTS:
-            dst = os.path.join(DWG, f"27PR_{FCN[F]}照明施工图_RevG-{pid}_{style}.pptx")
+            dst = os.path.join(DWG, f"27PR_{FCN[F]}照明施工图_{REV}-{pid}_{style}.pptx")
             env = dict(os.environ, FLOOR=F, LIGHTING_JSON=jp, DST_OVERRIDE=dst, PYTHONIOENCODING="utf-8")
             r = subprocess.run([sys.executable, os.path.join(PROD, script)], cwd=PROD, env=env, capture_output=True, text=True, encoding="utf-8")
             assert r.returncode == 0 and os.path.exists(dst), r.stdout[-1500:] + r.stderr[-1500:]
@@ -70,6 +76,6 @@ if ($pp.Presentations.Count -eq 0) {{ $pp.Quit() }}
 files = ",".join("'" + f.replace("'", "''") + "'" for f in made)
 r = subprocess.run(["powershell", "-NoProfile", "-Command", PS.format(files=files, png=os.path.join(DWG, "png"))], capture_output=True, text=True)
 print(r.stdout.strip() or r.stderr[-2000:])
-counts = {os.path.basename(d): len(glob.glob(os.path.join(d, "*.png"))) for d in glob.glob(os.path.join(DWG, "png", "*RevG-*"))}
+counts = {os.path.basename(d): len(glob.glob(os.path.join(d, "*.png"))) for d in glob.glob(os.path.join(DWG, "png", f"*{REV}-*"))}
 json.dump(counts, open(os.path.join(DWG, "png", "counts.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 print(counts)

@@ -121,7 +121,7 @@ function detail(s) {
 
 const NOTES = `<div class="box"><h2>给电工的说明（两个方案通用）</h2><ul class="notes">
     <li>每一路都是带 30 mA 漏电保护的 RCBO：哪一路出问题只断哪一路。</li>
-    <li>漏电：电脑、电视正常工作时对地漏电（实际约 0.5–1.5 mA / 台，上限 3.5–5 mA）；BS 7671 要求一路 30 mA RCBO 平时不超过 9 mA。A 方案一路一个「电脑 + 电视」房间；B 方案两个书房合一路（约 3–7 mA），两个书房各拉一根线回配电箱，误跳时挪一根线到预留位即可拆开。</li>
+    <li>漏电：电脑、电视正常工作时对地漏电（实际约 0.5–1.5 mA / 台，上限 3.5–5 mA）；BS 7671 要求一路 30 mA RCBO 平时不超过 9 mA。A 方案一路一个「电脑 + 电视」房间；B 方案书房和卧室 4 合一路（约 3–7 mA），两间各拉一根线回配电箱，误跳时挪一根线到预留位即可拆开。</li>
     <li>回路面积（IET On-Site Guide）：32A 环路 ≤ 100 m²；20A 径向 2.5 mm² ≤ 50 m²；32A 径向 4 mm² ≤ 75 m²。</li>
     <li>充电桩：一般 7 kW、单独 32A；安装前要通知供电公司（DNO），通常由充电桩安装商代办。</li>
     <li>总负荷：电梯 + 烤箱 + 2 台空调 + 充电桩 + 洗衣烘干同时用会很大。英国住宅进户一般 60–100A，请按实际功率算；不够可以给充电桩加负载管理，比升级进户便宜。</li>
@@ -142,7 +142,7 @@ function render() {
       <div class="card total"><b>${s.total}</b>合计（+ 总闸）</div><div class="card"><b>${s.spare}</b>备用位</div><div class="card total"><b>${s.C.board.ways}</b>位配电箱</div>
     </div>
     ${compare()}${detail(s)}${NOTES}
-    <p class="muted">数据：灯和开关来自照明工具（${esc(CC.lightRev)}，照明页也能切换方案 A / B），插座点位来自 v6 PPT 插座页，${esc(CC.rev)}。</p>`;
+    <p class="muted">数据：灯和开关来自照明工具（${esc(CC.lightRev)}，照明页也能切换方案 A / B），插座点位来自 v8 PPT 插座页（= v6 + 后卧室 4），${esc(CC.rev)}。</p>`;
 }
 document.querySelectorAll('[data-plan]').forEach(b => b.onclick = () => { location.hash = b.dataset.plan; });
 window.addEventListener('hashchange', render);

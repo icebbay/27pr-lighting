@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>27PR 照明施工图</title>
-<link rel="stylesheet" href="pages.css?v=p7">
+<link rel="stylesheet" href="pages.css?v=p9">
 <style>
   .sets { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; }
   .sets button.on { background: var(--accent); color: #fff; border-color: var(--accent); }
@@ -32,7 +32,7 @@
   <div id="slides"></div>
 </main>
 <div id="zoom"><button class="close">关闭</button><img alt=""></div>
-<script src="power_data.js?v=p7"></script>
+<script src="power_data.js?v=p9"></script>
 <script>
 (function () {
   const P = window.POWER_DEFAULT.plans;
@@ -45,8 +45,8 @@
     return { plan, set };
   }
   function render() {
-    const { plan, set } = pick(), pl = P[plan], file = `27PR_${set[2]}照明施工图_RevG-${plan}_${set[3]}`;
-    $('#ver').textContent = 'Rev G · ' + pl.short;
+    const { plan, set } = pick(), pl = P[plan], file = `27PR_${set[2]}照明施工图_RevH-${plan}_${set[3]}`;
+    $('#ver').textContent = 'Rev H · ' + pl.short;
     $('#plans').innerHTML = Object.keys(P).map(k => `<button data-go="${k}-${set[0]}" class="${k === plan ? 'on' : ''}">${P[k].name}</button>`).join('');
     $('#sets').innerHTML = SETS.map(x => `<button data-go="${plan}-${x[0]}" class="${x === set ? 'on' : ''}">${x[1]}</button>`).join('');
     $('#plannote').innerHTML = `照明 ${pl.lighting.length} 路：${pl.lighting.map(w => `<b>${w.id}</b> ${w.name.replace(/（.*|\+.*/, '')}`).join(' / ')}。两个方案的灯、开关、联动完全一样，只是照明回路分组不同（看系统图那一页最清楚）。`;
