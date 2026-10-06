@@ -48,6 +48,11 @@ for w, v in ff["wl"].items():
 
 ff["meta"]["cn_notes"].append("12. Rev I：卧室 2 进门由北墙东端挪到西端（净宽约 0.70 m，合页在东、向内开），门旁开关 S7 随门挪到锁侧短墙（S6 在床头东墙）；"
                               "取消门旁筒灯 1 盏，回路 j 剩 1 盏筒灯。")
+# 2026-10-07: the key-28 light is a floodlight (SOLLA 3-head LED 150 W, 6000 K, IP66), ~3.5 m up between the two garden French doors
+fl = next(c for c in gf["circuits"] if c["id"] == "L22")
+fl["name"] = "后花园投光灯 SOLLA 三头 150W（离地约 3.5 m，三控：S11、S12、S7）"
+gf["meta"]["cn_notes"].append("15. 2026-10-07：键 28 的灯为后花园投光灯（SOLLA 三头 LED 150 W、6000 K、IP66），装在两扇后花园法式门中间的后墙上、离地约 3.5 m，"
+                              "照向院子；仍为回路 v、户外 WL3，S11 / S12 两路 + S7 中途三控。")
 for d in D.values():
     d["meta"]["version"] = VERSION; d["meta"]["rev_cn"] = REV_CN
     d["meta"]["basis"] = d["meta"]["basis"].split("；")[0] + "；PPT v7 / v9（用户 2026-10-06 标注）；Blender v40"
