@@ -8,7 +8,7 @@
 - **配电箱 AL1（两个方案对比）**：https://icebbay.github.io/27pr-lighting/lighting_tool/board.html （A 专业 18 路 vs B 精简 15 路：路数、配电箱、备用位、材料估算、优缺点，以及各自的单线图和回路表）
 - **插座 / 动力**：https://icebbay.github.io/27pr-lighting/lighting_tool/power.html#A 、[#B](https://icebbay.github.io/27pr-lighting/lighting_tool/power.html#B) （每个插座、电器属于哪一路，点一路只看这一路）
 
-3D 漫游（可以在房子里走、开门；与本照明图同一版户型 v38）：https://icebbay.github.io/27pr-cgi/walkthrough/
+3D 漫游（可以在房子里走、开门；与本照明图同一版户型 v40，2026-10-06）：https://icebbay.github.io/27pr-cgi/walkthrough/
 
 > 状态：灯、开关、联动已定（Rev G）。全屋回路有两个方案供讨论：**A 专业 18 路**（照明 4 + 插座 9 + 专线 5，BG CF236MS31 31 位，配电箱 + RCBO 约 £347）和 **B 精简 17 路**（照明 3 + 插座 8 + 专线 6，冰箱单独，BG CF22MS19-01 19 位，约 £228）。照明、插座、配电箱、施工图各页都能切换 A / B。规格为建议值，需要电工按 BS 7671 / Part P 复核。
 
