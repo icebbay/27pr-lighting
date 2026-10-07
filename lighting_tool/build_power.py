@@ -38,7 +38,7 @@ WP = [
     dict(id="WP2", name="电梯", br="按电梯厂家要求（常见 B16–B20）", cable="按厂家", note="厂家通常要求独立隔离开关"),
     dict(id="WP3", name="空调 1", br="按空调型号（常见 B16）", cable="2.5 mm²（按型号复核）", note="书房（卧室 3）北墙，见二层插座图「高」"),
     dict(id="WP4", name="空调 2", br="按空调型号（常见 B16）", cable="2.5 mm²（按型号复核）", note="卧室 4 南墙（2026-10-06 改到南墙），见二层插座图「高」"),
-    dict(id="WP5", name="充电桩（门口）", br="B32/B40 RCBO Type A + 直流漏电保护（或充电桩自带）", cable="6–10 mm²（按距离复核）", note="7 kW；配电箱 → 进门左手墙 40A 双极隔离开关（室内总控，随时可断电）→ 门口左侧墙垛充电桩；安装前通知供电公司 DNO；建议加负载管理（CT 互感器）"),
+    dict(id="WP5", name="充电桩（门口）", br="B32/B40 RCBO Type A + 直流漏电保护（或充电桩自带）", cable="6–10 mm²（按距离复核）", note="7 kW；配电箱 → 客厅内副客厅前门旁 40A 双极隔离开关（室内总控，随时可断电）→ 门外充电桩；安装前通知供电公司 DNO；建议加负载管理（CT 互感器）"),
 ]
 ALL_GF = [c["id"] for c in LJ["GF"]["circuits"]]
 ALL_FF = [c["id"] for c in LJ["FF"]["circuits"]]
@@ -183,10 +183,10 @@ door = [d for d in LJ["GF"]["doors"] if "Front Entrance Door_UpperPanel" in d["n
 dx, dy = min(p[0] for p in door), sum(p[1] for p in door) / len(door)
 _M = json.load(open(os.path.join(HERE, "b2t_GF.json")))
 _b2t = lambda x, y: (round(x * _M[0][0] + y * _M[1][0] + _M[2][0]), round(x * _M[0][1] + y * _M[1][1] + _M[2][1]))
-# 2026-10-07: charger on the front-wall pier west of the recessed front door (Blender 2.80, 0.00), outside tap FT beside it;
-# indoor double-pole isolator ("power control") on the entrance-hall west wall just inside the door (3.22, 0.75)
-DED.append(dict(c="WP5", label="充电桩（门口左侧墙垛外，离地约 1.0 m）", x=_b2t(2.80, 0.00)[0], y=_b2t(2.80, 0.00)[1], floor="GF"))
-DED.append(dict(c="WP5", label="充电桩室内控制开关（40A 双极隔离开关，进门左手墙，离地 1.2 m）", x=_b2t(3.22, 0.75)[0], y=_b2t(3.22, 0.75)[1], floor="GF"))
+# 2026-10-07 (user sketch): charger by the side-lounge (副客厅) front door on the pier east of it (Blender -1.25, 0.65), car-wash tap FT
+# beside it; indoor double-pole isolator ("power control") on the 客厅 side of that pier, just inside the door (-1.70, 1.65)
+DED.append(dict(c="WP5", label="充电桩（副客厅前门东侧墙外，离地约 1.0 m）", x=_b2t(-1.25, 0.65)[0], y=_b2t(-1.25, 0.65)[1], floor="GF"))
+DED.append(dict(c="WP5", label="充电桩室内控制开关（40A 双极隔离开关，客厅内副客厅前门旁，离地 1.2 m）", x=_b2t(-1.70, 1.65)[0], y=_b2t(-1.70, 1.65)[1], floor="GF"))
 
 for d in DED:
     if not isinstance(d["c"], dict): d["c"] = {p: d["c"] for p in PLANS}
