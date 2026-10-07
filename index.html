@@ -23,14 +23,14 @@
 <body class="board-page">
 <header>
   <h1>27PR 电气总览 <small class="ver" id="ver"></small></h1>
-  <nav class="nav"><a class="on" href="index.html">总览</a><a href="lighting_tool/index.html">照明</a><a href="lighting_tool/power.html">插座 / 动力</a><a href="lighting_tool/board.html">配电箱</a><a href="lighting_tool/drawings.html">施工图</a></nav>
+  <nav class="nav"><a class="on" href="index.html">总览</a><a href="lighting_tool/index.html">照明</a><a href="lighting_tool/power.html">插座 / 动力</a><a href="lighting_tool/plumbing.html">给排水</a><a href="lighting_tool/board.html">配电箱</a><a href="lighting_tool/drawings.html">施工图</a></nav>
 </header>
 <main class="hub">
   <div class="status" id="status"></div>
   <div class="grid">
     <div class="tile"><h3>照明</h3>
       <p>灯、开关、联动、照明回路。点开关试灯，点灯看它从配电箱到开关再到灯的整条线路。顶部可切换方案 A（照明 4 路）/ B（照明 3 路）。</p>
-      <img src="lighting_tool/drawings/png/27PR_一层照明施工图_RevI-A_国标/slide02.png" alt="一层照明平面">
+      <img src="lighting_tool/drawings/png/27PR_一层照明施工图_RevJ-A_国标/slide02.png" alt="一层照明平面">
       <div class="links"><a class="prim" href="lighting_tool/index.html#A">照明 · 方案 A</a><a href="lighting_tool/index.html#B">照明 · 方案 B</a></div></div>
     <div class="tile"><h3>插座 / 动力</h3>
       <p>点任意插座或电器，看它的电从配电箱哪一路、经过哪些房间过来，以及这一路跳闸时还有什么一起断电。勾「灯」可以同时看照明分路。</p>
@@ -38,9 +38,15 @@
     <div class="tile"><h3>配电箱 AL1 · 方案对比</h3>
       <p>两个方案并排：路数、配电箱型号、备用位、材料估算、优缺点；下面是所选方案的单线图和回路表。</p>
       <div class="links"><a class="prim" href="lighting_tool/board.html#A">对比（看 A）</a><a href="lighting_tool/board.html#B">对比（看 B）</a></div></div>
+    <div class="tile"><h3>给排水</h3>
+      <p>给水 / 排水管线叠在平面图上，可切换一层 / 二层、给水 / 排水；点管段看走向说明。西卫（主卧卫生间）地面不抬高，详见 P-08。</p>
+      <div class="links"><a class="prim" href="lighting_tool/plumbing.html">给排水 · 两层</a><a href="lighting_tool/plumbing.html#GF">一层</a><a href="lighting_tool/plumbing.html#FF">二层</a></div></div>
+    <div class="tile"><h3>施工图 PDF（Rev B）</h3>
+      <p>给施工队的 A3 施工图：给排水 P-00…P-08、照明布线 E-01…E-03、插座动力 E-11…E-13（2026-10-08，与模型 v42 同步）。</p>
+      <div class="links"><a class="prim" href="lighting_tool/drawings.html">下载 / 预览</a></div></div>
     <div class="tile"><h3>照明施工图</h3>
       <p>方案 A、B 各一套（英式 / 国标，一层、二层）。灯和开关一样，照明回路分组不同。图片是方案 B 的配电箱系统图。</p>
-      <img src="lighting_tool/drawings/png/27PR_一层照明施工图_RevI-B_国标/slide06.png" alt="二层照明平面">
+      <img src="lighting_tool/drawings/png/27PR_一层照明施工图_RevJ-B_国标/slide06.png" alt="二层照明平面">
       <div class="links"><a class="prim" href="lighting_tool/drawings.html#A-GF-cn">施工图 · 方案 A</a><a href="lighting_tool/drawings.html#B-GF-cn">施工图 · 方案 B</a></div></div>
     <div class="tile"><h3>3D 漫游</h3>
       <p>在房子里走、开门，和这些图纸是同一版户型。开场画面上有「返回电气总览」。</p>
@@ -52,7 +58,7 @@
   <div class="box" id="plans"></div>
   <p class="muted">规格为建议值，回路划分、配电箱位置需要电工按 BS 7671 / Part P 复核。</p>
 </main>
-<script src="lighting_tool/lighting_data.js?v=p11"></script>
+<script src="lighting_tool/lighting_data.js?v=revJ-v42"></script>
 <script src="lighting_tool/power_data.js?v=p11"></script>
 <script src="lighting_tool/circuits.js?v=p11"></script>
 <script>

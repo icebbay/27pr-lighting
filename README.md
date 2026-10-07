@@ -1,8 +1,25 @@
 # 27PR 照明施工图 · 平面图照明 workflow
 
-27PR 住宅改造的灯具、开关、回路资料，以及一个网页工具。在网页上可以直接按开关试灯、看每盏灯的线路从配电箱 AL1 怎么接到开关、再接到灯。
+27PR 住宅改造的灯具、开关、回路资料，以及一个网页工具。在网页上可以直接按开关试灯、看每盏灯的线路从配电箱 AL1 怎么接到开关、再接到灯；也可以看给排水管线。
 
-**在线打开（不用安装）：https://icebbay.github.io/27pr-lighting/** —— 首页是**总览**，从这里进照明、插座 / 动力、配电箱（方案 A / B）、施工图和 3D 漫游；每个页面顶部也能互相跳转。
+**在线打开（不用安装）：https://icebbay.github.io/27pr-lighting/** —— 首页是**总览**，从这里进照明、插座 / 动力、给排水、配电箱（方案 A / B）、施工图和 3D 漫游；每个页面顶部也能互相跳转。
+
+## 施工图 PDF（Rev B · 2026-10-08，给施工队）
+
+与 Blender 模型 v42 同步（北卫门洞后移 0.20 m、卧室 2 门西移 79 mm + 走廊 100 门垛、一层楼梯旁厨房门洞 + 762 门）。A3 横向打印。
+
+| 文件 | 内容 |
+|---|---|
+| [给排水施工图 P-00…P-08](trade_drawings/out/27PR_给排水施工图_RevB.pdf) | 目录 + 说明、一 / 二层给水、一 / 二层排水、系统图、锅炉 + 软水机 / 净水器详图、后花园水池、**P-08 西卫后墙详图** |
+| [照明布线施工图 E-01…E-03](trade_drawings/out/27PR_照明布线施工图_RevB.pdf) | 一 / 二层照明布线（JB、开关下线、双控 / 中途联络线）、开关接线详图 |
+| [插座动力施工图 E-11…E-13](trade_drawings/out/27PR_插座动力施工图_RevB.pdf) | 一 / 二层插座与专线（含充电桩、空调一拖一 ×2）、配电箱回路表 |
+| [P-04B 方案 B](trade_drawings/out/27PR_给排水_P-04B_方案B_西卫走北墙.pdf) | 西卫马桶管走北墙（未采用，仅供参考） |
+
+> **西卫（主卧卫生间）地面一律不抬高**：淋浴盘、马桶直接坐原楼板完成面，不做台阶。马桶后假墙 160 厚 × 1100 高（顶面置物平台，内有 110 落管 + AAV，留检修口）；淋浴后假墙 100 厚到天花，多出的厚度做两个壁龛（宽 300、离地 850–1750、深 80、中间隔板），中间明装恒温淋浴；墙排地漏在假墙内。马桶管落进马桶下那一格搁栅按 1:40 往后到 S1。见 P-08。
+
+网页版：
+- **给排水**：https://icebbay.github.io/27pr-lighting/lighting_tool/plumbing.html —— 水管叠在平面图上，可切换一层 / 二层 / 两层、给水 / 排水；点管段看走向说明，编号与 PDF 上的圆圈一致。链接加 `#GF`、`#FF`、`#FF-drain` 等可直接打开某一层 / 某一系统。
+- **施工图**：https://icebbay.github.io/27pr-lighting/lighting_tool/drawings.html —— 上面是三套 PDF 下载和单页预览，下面是照明 PPT 施工图（方案 A / B）。
 
 另外两页（照明页不变），都有 **方案 A / 方案 B** 切换，链接末尾加 `#A` 或 `#B` 可以直接打开某个方案，方便发给别人讨论：
 - **配电箱 AL1（两个方案对比）**：https://icebbay.github.io/27pr-lighting/lighting_tool/board.html （A 专业 18 路 vs B 精简 15 路：路数、配电箱、备用位、材料估算、优缺点，以及各自的单线图和回路表）
@@ -95,6 +112,9 @@ FLOOR=GF LIGHTING_JSON=lighting_tool/lighting_GF.json DST_OVERRIDE=out.pptx pyth
 | `lighting_tool/make_plan_drawings.py` | 按方案 A / B 重新分组照明回路，出两套施工图（`drawings/*_RevG-A/B_*`）+ 每页 PNG |
 | `lighting_tool/power.html`、`board.html` | 插座 / 动力页、配电箱页（`circuits.js` 按方案合并照明 WL + 插座 WX + 专线 WP；方案取自链接 `#A` / `#B`） |
 | `source_pptx/` | 用户标注的户型 PPT（墙体、灯位、开关位置点） |
+| `trade_drawings/` | A3 施工图脚本：`plan_base.py`（墙体 / 图框）、`plumbing.py`（P-00…P-08）、`electrical.py`（E-01…E-03）、`power_sheets.py`（E-11…E-13）、`make_variant_b.py`（P-04B）；`python trade_drawings/build_drawings.py` 出全部 PDF + `out/png/` 预览（需要 Playwright） |
+| `trade_drawings/patch_walls_v42.py` | 把模型 v42 的门洞改动（`_v42_section.json`，Blender 剖切）补进 `walls_GF/FF.svg`；原 PPT 墙体留在 `walls_*_ppt.svg`。之后跑 `lighting_tool/build_data_js.py` |
+| `lighting_tool/build_plumbing.py` → `plumbing_data.js` | 给排水页的数据（由 `trade_drawings/plumbing.py` 换算到网页坐标）；`plumbing.html` / `plumbing.js` 是页面 |
 | `照明施工图_工作流程.md` | 规则、标注约定、出图规范、测试计划 T1–T6 |
 | `lighting_tool/screenshots/` | 测试截图（T1–T5、试灯、追踪、电路图） |
 
