@@ -32,7 +32,7 @@
   <div id="slides"></div>
 </main>
 <div id="zoom"><button class="close">关闭</button><img alt=""></div>
-<script src="power_data.js?v=p14"></script>
+<script src="power_data.js?v=p15"></script>
 <script>
 (function () {
   const P = window.POWER_DEFAULT.plans;
@@ -45,8 +45,8 @@
     return { plan, set };
   }
   function render() {
-    const { plan, set } = pick(), pl = P[plan], file = `27PR_${set[2]}照明施工图_RevI-${plan}_${set[3]}`;
-    $('#ver').textContent = 'Rev I · ' + pl.short;
+    const { plan, set } = pick(), pl = P[plan], file = `27PR_${set[2]}照明施工图_RevJ-${plan}_${set[3]}`;
+    $('#ver').textContent = 'Rev J · ' + pl.short;
     $('#plans').innerHTML = Object.keys(P).map(k => `<button data-go="${k}-${set[0]}" class="${k === plan ? 'on' : ''}">${P[k].name}</button>`).join('');
     $('#sets').innerHTML = SETS.map(x => `<button data-go="${plan}-${x[0]}" class="${x === set ? 'on' : ''}">${x[1]}</button>`).join('');
     $('#plannote').innerHTML = `照明 ${pl.lighting.length} 路：${pl.lighting.map(w => `<b>${w.id}</b> ${w.name.replace(/（.*|\+.*/, '')}`).join(' / ')}。两个方案的灯、开关、联动完全一样，只是照明回路分组不同（看系统图那一页最清楚）。`;

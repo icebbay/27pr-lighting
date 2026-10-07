@@ -147,6 +147,22 @@ for F, si in (("GF", 3), ("FF", 7)):
         pts.append(dict(kind="high" if txt == "高" else KIND.get(fill_of(s), "double"), x=round(x), y=round(y)))
     OUT[F] = dict(pts=pts, T=T, slide=sl)
 
+def _t2b(F, x, y):
+    M = np.array(json.load(open(os.path.join(HERE, f"b2t_{F}.json"))))
+    v = np.linalg.solve(np.array([[M[0][0], M[1][0]], [M[0][1], M[1][1]]]), np.array([x - M[2][0], y - M[2][1]]))
+    return float(v[0]), float(v[1])
+
+
+# 2026-10-07 audit: sockets on a party wall whose nearest label is the wrong room (checked on the plan, Blender metres)
+ROOM_FIX = {"FF": {(2.26, 6.23, "d"): "卧室 3", (-0.02, 5.70, "s"): "卧室 3", (-0.38, 7.75, "d"): "卧室 3",   # were 楼梯 / 电梯 / 北卫 → WX5
+                   (-0.91, 1.49, "d"): "主卧",                                                                 # was 盥洗室 → WX6
+                   # label only (same circuit): no sockets inside the bathrooms
+                   (1.40, 2.00, "d"): "卧室 2", (3.22, 10.31, "d"): "卧室 4", (-3.56, 7.79, "d"): "主卧"},
+            "GF": {(-0.36, 7.43, "d"): "餐厅",                                                                  # was 卫生间 → WX2
+                   (-0.89, 6.08, "s"): "客厅", (-4.09, 7.26, "d"): "客厅",
+                   (2.79, 3.50, "d"): "起居室", (2.73, 2.92, "d"): "起居室", (2.75, 2.27, "d"): "起居室"}}
+# the two high sockets are the air-conditioner outlets on their own circuits (WP3 卧室 3, WP4 卧室 4)
+HIGH_WP = {"卧室 3": "WP3", "卧室 4": "WP4"}
 # room of each socket = nearest room label (labels sit mid-room); its circuit in each plan (outdoor dots -> the plan's outdoor circuit)
 for F in ("GF", "FF"):
     rooms = LJ[F]["rooms"]
@@ -157,9 +173,14 @@ for F in ("GF", "FF"):
         else:
             i = min(range(len(rooms)), key=lambda i: math.dist((rooms[i]["x"], rooms[i]["y"]), (p["x"], p["y"])))
             p["room"], k = rooms[i]["name"], keyof(i)
+        bx, by = _t2b(F, p["x"], p["y"])
+        for (fx, fy, fk), rk in ROOM_FIX.get(F, {}).items():
+            if math.dist((bx, by), (fx, fy)) < 0.08:
+                p["room"], k = rk.split("#")[0], rk
         p["c"] = {}
         for pid, pl in PLANS.items():
             p["c"][pid] = pl["outdoor"] if k is None else {r: c["id"] for c in pl["WX"] if c["floor"] == F for r in c["rooms"]}.get(k)
+            if p["kind"] == "high" and p["room"] in HIGH_WP: p["c"][pid] = HIGH_WP[p["room"]]
             assert p["c"][pid], f"{pid} {F}: no socket circuit for room {k}"
 
 # ---------------- dedicated points (same circuit ids in both plans, except the fridge) ----------------
