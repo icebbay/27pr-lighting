@@ -115,6 +115,15 @@ def plan_sheet(F, number):
               f'<text x="{px+(3 if "控制开关" in i["label"] or "电梯" in i["label"] else 12):.2f}" y="{py+(5.2 if "控制开关" in i["label"] else -2.8):.2f}" font-size="1.7" fill="{col}">{html.escape(i["label"])} · {i["cc"]}</text>')
     if F == "FF":
         ac_overlay(s)
+    # reserved cable for the future garden-end building (owner 2026-10-08): drawn to where it leaves the house, not beyond
+    fr = Frame(F)
+    for r in json.load(open(os.path.join(TOOL, f"power_{F}.json"), encoding="utf-8")).get("reserved", []):
+        pts = [s.P(*fr.t2b(x, y)) for x, y in r["pts"]]
+        A('<path d="M' + " L".join(f"{x:.2f} {y:.2f}" for x, y in pts) + '" fill="none" stroke="#5d4037" stroke-width=".7" stroke-dasharray="3 1.2"/>')
+        ex, ey = pts[-1]
+        A(f'<circle cx="{ex:.2f}" cy="{ey:.2f}" r="1.2" fill="#fff" stroke="#5d4037" stroke-width=".4"/>'
+          + "".join(f'<text x="{ex - 1:.2f}" y="{ey - 9.5 + i * 2.8:.2f}" font-size="2" fill="#5d4037" text-anchor="end">{html.escape(t)}</text>'
+                    for i, t in enumerate(r["label"].replace("（", "|（").split("|"))))
     bx, by = s.P(*board)
     A(f'<rect x="{bx-2.6:.2f}" y="{by-1.6:.2f}" width="5.2" height="3.2" class="cu"/><text x="{bx:.2f}" y="{by+5:.2f}" font-size="2.1" text-anchor="middle" font-weight="bold">'
       + ("AL1 配电箱 CU（楼梯下）" if F == "GF" else "↑ 二层回路自一层 AL1 沿楼梯井引上") + '</text>')
@@ -195,7 +204,7 @@ NOTES = [
     "5. 卫生间 0 / 1 区内不得装插座；电热毛巾架用 FCU 接 WX8。户外插座 IP66，出户段 SWA 铠装电缆。",
     "6. 充电桩 WP5：AL1 → 客厅内 40A 双极隔离开关（离地 1.2 m）→ 穿墙 → 副客厅前门西侧凹进处的充电桩（离地约 1.0 m）。B32/B40 Type A RCBO + 6 mA 直流检测（充电桩自带或另装）；10 mm²（业主要求预留）；建议带负载管理（CT 互感器）；安装前通知 DNO。",
     "7. 电梯 WP2 按厂家要求设独立隔离开关。空调一拖一 ×2：内机高位插座接 WP3 / WP4；外机在副楼平屋顶，电源由内机侧按机型接线（或 WP3 / WP4 直接到屋面隔离开关），外机旁装 IP65 双极隔离开关；冷媒管 / 冷凝水 / 信号线经阁楼走，穿屋面用防水套管；冷凝水接屋面雨水口或带存水弯接污水。",
-    "8. 院子尽头小房子：预留 10 mm² 三芯 SWA，埋地（≥ 600）拉到院尾，两头封好，暂不接（以后占 1 个备用位），走向现场定。",
+    "8. 预留：配电箱拉一根 10 mm² 三芯 SWA 到洗衣房后墙外角，出墙留约 2 m、端头封好，暂不接；以后建院子尽头的小房子时从这里接线延长过去。",
 ]
 
 
@@ -206,7 +215,7 @@ def board_sheet():
     rows = [[c["id"], c["name"], c["br"], c.get("cable", "1.5 mm² 6242Y"), c.get("note", "")] for c in PL["lighting"]]
     rows += [[c["id"], c["name"], c["br"], c["cable"], c.get("note", "")] for c in PL["WX"] + PL["WP"]]
     rows += [["备用", b.get("reserve", ""), "", "", ""]]
-    if b.get("spare_cable"): rows += [["预留线", "院子尽头小房子（暂不接）", "以后占 1 个备用位：B32 / B40 RCBO 30 mA", "10 mm² 三芯 SWA 铠装，埋地 ≥ 600", "两头留足长度、封好端头；小房子内另装小配电箱；走向现场定，图上不画"]]
+    if b.get("spare_cable"): rows += [["预留线", "院子尽头小房子（以后再接）", "暂不接；以后占 1 个备用位", "10 mm² 三芯 SWA", "拉到洗衣房后墙外角，出墙留约 2 m、端头封好"]]
     y = table(s, 16, 34, [("回路", 12), ("名称", 92), ("保护", 66), ("线缆", 60), ("备注", 150)], rows, fs=2.1, title=f"AL1 配电箱（楼梯下）· {b['model']} · {b['ways']} 位")
     info = [f"总闸 {b['main']}；浪涌保护 {b['spd']}；尺寸 {b['size']}", f"RCBO：{b['rcbo']}",
             "照明 B6 / B10（一层室内照明合一路）、插座环路 B32、径向 B20 / B32 按线径；全部 30 mA RCBO，单回路故障不影响其它回路。", "完工后贴回路标签（与本表编号一致），出具 EIC 与测试记录。"]

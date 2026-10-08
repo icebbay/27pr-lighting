@@ -144,6 +144,12 @@ class Pane {
     o.push(`<g><rect x="${b.x - 0.28 * m}" y="${b.y - 0.13 * m}" width="${0.56 * m}" height="${0.26 * m}" fill="#fff" stroke="#111" stroke-width="${0.025 * m}"/><path d="M${b.x - 0.28 * m} ${b.y + 0.13 * m}L${b.x + 0.28 * m} ${b.y - 0.13 * m}L${b.x + 0.28 * m} ${b.y + 0.13 * m}Z" fill="#111"/>${txt(b.x, b.y + 0.4 * m, F === 'GF' ? 'AL1' : '↑ AL1 引上', 0.2 * m, 'text-anchor="middle" font-weight="bold"')}</g>`);
     P[F].sockets.forEach((s, i) => { const sc = s.c[ui.plan], c = C.byId[sc]; o.push(`<g data-c="${sc}" data-node="s${i}" class="${dim(sc)}"><title>${esc(KIND[s.kind][0])} · ${esc(s.room)} · ${sc}（点一下看电从哪来）</title>${sym(F, s.x, s.y, s.kind, c.color, m)}</g>`); });
     P[F].items.forEach((t, i) => { const tc = t.c[ui.plan], c = C.byId[tc]; o.push(`<g data-c="${tc}" data-node="i${i}" class="${dim(tc)}"><title>${esc(t.label)} · ${tc}（点一下看电从哪来）</title>${itemSym(t, c.color, m)}</g>`); });
+    for (const r of (P[F].reserved || [])) {   // reserved cable, not connected (owner 2026-10-08): AL1 -> coil outside the laundry
+      const e = r.pts[r.pts.length - 1];
+      o.push(`<g><title>${esc(r.note)}</title><path d="M${r.pts.map(q => q.join(' ')).join('L')}" fill="none" stroke="#5d4037" stroke-width="${0.05 * m}" stroke-dasharray="${0.18 * m} ${0.08 * m}"/>`
+        + `<circle cx="${e[0]}" cy="${e[1]}" r="${0.1 * m}" fill="#fff" stroke="#5d4037" stroke-width="${0.04 * m}"/>`
+        + txt(e[0] - 0.2 * m, e[1] - 0.3 * m, r.label, 0.18 * m, 'fill="#5d4037" text-anchor="end"') + '</g>');
+    }
     if (T && T.F === F) { const n = nodeInfo(F, T.node); o.push(`<circle cx="${n.p[0]}" cy="${n.p[1]}" r="${0.32 * m}" fill="none" stroke="#c62828" stroke-width="${0.05 * m}" pointer-events="none"/>`); }
     this.ov.innerHTML = o.join('');
   }
@@ -196,6 +202,7 @@ function side() {
     `<svg viewBox="-12 -12 24 24" width="20" height="20"><rect x="-7" y="-7" width="14" height="14" transform="rotate(45)" fill="#fff" stroke="#666" stroke-width="3"/></svg><div>灯（颜色 = 照明回路；开关和联动见「照明」页）</div>`,
     `<svg viewBox="0 -4 28 8" width="24" height="8"><path d="M0 0H28" stroke="#666" stroke-width="4"/></svg><div>粗线 = AL1 引出（每路一根）</div>`,
     `<svg viewBox="0 -4 28 8" width="24" height="8"><path d="M0 0H28" stroke="#666" stroke-width="2" stroke-dasharray="5 3"/></svg><div>虚线 = 同一路的插座串在一起</div></div>`);
+  for (const r of (P.GF.reserved || [])) h.push(`<div class="off" style="border-color:#5d4037"><b>${esc(r.label)}</b><div>${esc(r.note)}</div></div>`);
   h.push(`<p class="muted">插座点位来自 v10 PPT 插座页（你标的圆点；2026-10-06 按 v7 / v9 更新）。线路只表示属于哪一路，实际走线现场定。开关和联动见「照明」页，全部回路、采购清单见「配电箱」页。</p>`);
   $('#side').innerHTML = h.join('');
   $('#side').querySelectorAll('[data-sel]').forEach(e => e.onclick = () => select(e.dataset.sel));

@@ -92,7 +92,7 @@ PLANS = {
         board=dict(model="British General CF22MS19-01", ways=19, price=79.99, code="562CY", url="https://www.screwfix.com/p/british-general-22-module-19-way-part-populated-high-integrity-main-switch-consumer-unit-with-spd/562cy",
                    spd="40kA Type 2 SPD（自带）", size="宽 496 × 高 231 × 深 116 mm（单排）",
                    main="100A 总闸", rcbo=RCBO, reserve="预留 1 位：书房 / 卧室 4 以后拆成两路（现在各拉一根线，接在同一个 RCBO 上）",
-                   spare_cable="院子尽头小房子预留线（业主 2026-10-08）：10 mm² 三芯 SWA 铠装电缆，配电箱 → 出外墙 → 埋地（≥ 600 深，上铺警示带）→ 院子尽头，两头各留足长度并封好端头；现在不接断路器，以后用时占 1 个备用位（B32 / B40 RCBO 30 mA），小房子里另装小配电箱。图上不画走向，现场定。",
+                   spare_cable="预留：配电箱拉一根 10 mm² 三芯 SWA 到洗衣房后墙外角，出墙留约 2 m、端头封好，暂不接；以后建院子尽头的小房子时从这里接线延长过去。",
                    alt="充电桩若由安装商单独配小箱，主箱再空出 1–2 位；以后想加太阳能 + 电池，换 British General CF236MS31（31 位，贵 £90）"),
         diff=["照明 3 路：一层合成一路（前后不分），户外单独，二层一路",
               "二层插座 3 路：书房 + 卧室 4 + 走廊合一路，主卧、次卧各一路（20A 径向）",
@@ -213,6 +213,10 @@ DED.append(dict(c="WP5", label="充电桩室内控制开关（40A 双极隔离�
 for d in DED:
     if not isinstance(d["c"], dict): d["c"] = {p: d["c"] for p in PLANS}
 data = {F: dict(sockets=OUT[F]["pts"], items=[d for d in DED if d["floor"] == F]) for F in ("GF", "FF")}
+# owner 2026-10-08: just leave a cable for the future garden-end building, brought out at the laundry rear-east corner
+RESERVE_PATH = [(4.12, 6.98), (4.05, 6.98), (4.05, 16.80)]   # Blender m: AL1 -> along the kitchen / laundry east wall -> out at the rear corner
+data["GF"]["reserved"] = [dict(label="预留线 10 mm² SWA（以后接到院子尽头小房子）", note="预留：配电箱拉一根 10 mm² 三芯 SWA 到洗衣房后墙外角，出墙留约 2 m、端头封好，暂不接；以后建院子尽头的小房子时从这里接线延长过去。", pts=[list(_b2t(x, y)) for x, y in RESERVE_PATH])]
+data["FF"]["reserved"] = []
 data["plans"] = {"B": PLANS["B"]}; data["default"] = "B"; data["rev"] = "2026-10-08 · 方案 B（精简 17 路）"   # owner 2026-10-08: plan A dropped from the web pages
 for F in ("GF", "FF"):
     json.dump(data[F], open(os.path.join(HERE, f"power_{F}.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
