@@ -1,6 +1,6 @@
 """Rev K (2026-10-08) applied to the Rev J data — two FF switch positions corrected by the user on the setting-out draft:
 
-  二层  S3（主卧主灯 F19 键 2，与 S4 双控）挪回主卧南墙（与衣帽间之间那面墙），主卧一侧、C19 西侧约 250（Blender -0.80, 3.37）。
+  二层  S3（主卧主灯 F19 键 2，与 S4 双控）挪回主卧南墙（与衣帽间之间那面墙），主卧一侧、墙中间（Blender -0.80, 2.90）。
   二层  S7（卧室 2 灯 键 14/15）留在门西侧短墙，但改到卧室 2 一侧（原来画在走廊一侧）（Blender 1.47, 4.25）。
 
     3D_gen_bench\\_tools_venv\\Scripts\\python.exe products\\lighting_tool\\apply_revK.py
@@ -23,7 +23,7 @@ def b2t(F, x, y):
     return round(x * M[0][0] + y * M[1][0] + M[2][0]), round(x * M[0][1] + y * M[1][1] + M[2][1])
 
 
-MOVE = {("FF", "S3"): (-0.80, 3.37, "主卧南墙（衣帽间那面墙）主卧一侧，C19 西侧"),
+MOVE = {("FF", "S3"): (-0.80, 2.90, "主卧南墙（衣帽间那面墙）主卧一侧，墙中间"),
         ("FF", "S7"): (1.47, 4.25, "卧室2 门旁（门西侧短墙，卧室2 一侧，锁侧）")}
 for (F, pid), (x, y, loc) in MOVE.items():
     p = next(q for q in D[F]["plates"] if q["id"] == pid)
@@ -31,7 +31,7 @@ for (F, pid), (x, y, loc) in MOVE.items():
 # GF S2: its panel hid a lamp on the plan (user 2026-10-08) -> pulled off the wall + a label; display only, the switch itself stays put
 s2 = next(q for q in D["GF"]["plates"] if q["id"] == "S2")
 s2["panel_out"] = 0.95; s2["panel_note"] = "储物间门口的开关"
-D["FF"]["meta"]["cn_notes"].append("14. Rev K：主卧灯开关 S3 挪回主卧南墙（C19 西侧）；卧室 2 门旁开关 S7 改装在短墙的卧室 2 一侧。按键不变。")
+D["FF"]["meta"]["cn_notes"].append("14. Rev K：主卧灯开关 S3 挪到主卧南墙中间；卧室 2 门旁开关 S7 改装在短墙的卧室 2 一侧。按键不变。")
 for d in D.values():
     d["meta"]["version"] = VERSION; d["meta"]["rev_cn"] = REV_CN
 D["GF"]["wl_other"] = json.loads(json.dumps(D["FF"]["wl"])); D["FF"]["wl_other"] = json.loads(json.dumps(D["GF"]["wl"]))

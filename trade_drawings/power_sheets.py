@@ -140,7 +140,7 @@ def plan_sheet(F, number):
     for (r, k), n in cnt.items(): rooms.setdefault(r, []).append(f"{KIND[k][0].split(' ')[0]}×{n}")
     rows = [[r, "、".join(v), next((p["cc"] for p in socks if p["room"] == r), "")] for r, v in rooms.items()]
     table(s, 300, 32, [("房间", 22), ("插座", 64), ("回路", 12)], rows, fs=1.7, title="房间插座数量 Outlets by room")
-    s.frame(NOTES)
+    s.frame(NOTES[:3] + ["其余说明（插座高度、安全区、卫生间、充电桩、电梯 / 空调、院子预留线）见 E-13。"])
     return s
 
 
@@ -189,12 +189,13 @@ def ac_overlay(s):
 NOTES = [
     "说明 Notes",
     "1. 依据 BS 7671:2018+A2、IET On-Site Guide；Part P 须由注册电工施工、测试并出具 EIC；全部回路 RCBO 30 mA（Type A）。",
-    "2. 方案 B：一层插座 WX1、WX2 为 2.5 mm² 6242Y 环路 B32（单个环路 ≤ 100 m²）；厨房 WX3 为 6 mm² 径向 B32；洗衣房 WX4 为 4 mm² 32A 径向；户外 WX5、二层 WX6–WX8 为 2.5 mm² 20A 径向（B20）。业主要求（2026-10-08）：厨房（WX3 插座、WP1 烤箱、WP6 冰箱）和空调 WP3 / WP4 一律 6 mm²，充电桩 WP5 预留 10 mm²。",
+    "2. 方案 B：WX1、WX2 为 2.5 mm² 环路 B32；WX4 洗衣房 4 mm² 32A 径向；WX5 户外、WX6–WX8 二层 2.5 mm² 20A 径向。厨房（WX3、烤箱 WP1、冰箱 WP6）和空调 WP3 / WP4 一律 6 mm²，充电桩 WP5 10 mm²（业主要求）。",
     "3. 插座中心离地 450（Part M），厨房台面插座离台面 150；FCU 装在台面上方或相邻柜内可触及处，电器插头不藏在电器背后。",
     "4. 墙内线缆只走安全区（插座 / 开关正上下方及距墙角 150 mm 内），否则用金属保护或 RCD（已全 RCD）。",
     "5. 卫生间 0 / 1 区内不得装插座；电热毛巾架用 FCU 接 WX8。户外插座 IP66，出户段 SWA 铠装电缆。",
     "6. 充电桩 WP5：AL1 → 客厅内 40A 双极隔离开关（离地 1.2 m）→ 穿墙 → 副客厅前门西侧凹进处的充电桩（离地约 1.0 m）。B32/B40 Type A RCBO + 6 mA 直流检测（充电桩自带或另装）；10 mm²（业主要求预留）；建议带负载管理（CT 互感器）；安装前通知 DNO。",
     "7. 电梯 WP2 按厂家要求设独立隔离开关。空调一拖一 ×2：内机高位插座接 WP3 / WP4；外机在副楼平屋顶，电源由内机侧按机型接线（或 WP3 / WP4 直接到屋面隔离开关），外机旁装 IP65 双极隔离开关；冷媒管 / 冷凝水 / 信号线经阁楼走，穿屋面用防水套管；冷凝水接屋面雨水口或带存水弯接污水。",
+    "8. 院子尽头小房子：预留 10 mm² 三芯 SWA，埋地（≥ 600）拉到院尾，两头封好，暂不接（以后占 1 个备用位），走向现场定。",
 ]
 
 
@@ -205,12 +206,13 @@ def board_sheet():
     rows = [[c["id"], c["name"], c["br"], c.get("cable", "1.5 mm² 6242Y"), c.get("note", "")] for c in PL["lighting"]]
     rows += [[c["id"], c["name"], c["br"], c["cable"], c.get("note", "")] for c in PL["WX"] + PL["WP"]]
     rows += [["备用", b.get("reserve", ""), "", "", ""]]
+    if b.get("spare_cable"): rows += [["预留线", "院子尽头小房子（暂不接）", "以后占 1 个备用位：B32 / B40 RCBO 30 mA", "10 mm² 三芯 SWA 铠装，埋地 ≥ 600", "两头留足长度、封好端头；小房子内另装小配电箱；走向现场定，图上不画"]]
     y = table(s, 16, 34, [("回路", 12), ("名称", 92), ("保护", 66), ("线缆", 60), ("备注", 150)], rows, fs=2.1, title=f"AL1 配电箱（楼梯下）· {b['model']} · {b['ways']} 位")
     info = [f"总闸 {b['main']}；浪涌保护 {b['spd']}；尺寸 {b['size']}", f"RCBO：{b['rcbo']}",
             "照明 B6 / B10（一层室内照明合一路）、插座环路 B32、径向 B20 / B32 按线径；全部 30 mA RCBO，单回路故障不影响其它回路。", "完工后贴回路标签（与本表编号一致），出具 EIC 与测试记录。"]
     for i, t in enumerate(info):
         s.add(f'<text x="16" y="{y + 10 + i * 6:.1f}" font-size="2.6">{html.escape(t)}</text>')
-    s.frame()
+    s.frame(NOTES)
     return s
 
 

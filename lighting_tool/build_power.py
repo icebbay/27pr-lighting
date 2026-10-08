@@ -92,6 +92,7 @@ PLANS = {
         board=dict(model="British General CF22MS19-01", ways=19, price=79.99, code="562CY", url="https://www.screwfix.com/p/british-general-22-module-19-way-part-populated-high-integrity-main-switch-consumer-unit-with-spd/562cy",
                    spd="40kA Type 2 SPD（自带）", size="宽 496 × 高 231 × 深 116 mm（单排）",
                    main="100A 总闸", rcbo=RCBO, reserve="预留 1 位：书房 / 卧室 4 以后拆成两路（现在各拉一根线，接在同一个 RCBO 上）",
+                   spare_cable="院子尽头小房子预留线（业主 2026-10-08）：10 mm² 三芯 SWA 铠装电缆，配电箱 → 出外墙 → 埋地（≥ 600 深，上铺警示带）→ 院子尽头，两头各留足长度并封好端头；现在不接断路器，以后用时占 1 个备用位（B32 / B40 RCBO 30 mA），小房子里另装小配电箱。图上不画走向，现场定。",
                    alt="充电桩若由安装商单独配小箱，主箱再空出 1–2 位；以后想加太阳能 + 电池，换 British General CF236MS31（31 位，贵 £90）"),
         diff=["照明 3 路：一层合成一路（前后不分），户外单独，二层一路",
               "二层插座 3 路：书房 + 卧室 4 + 走廊合一路，主卧、次卧各一路（20A 径向）",
