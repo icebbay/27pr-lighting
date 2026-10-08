@@ -24,6 +24,7 @@ __pycache__/
 !/trade_drawings/out/
 /trade_drawings/out/*
 !/trade_drawings/out/*RevC.pdf
+!/trade_drawings/out/27PR_点位定位尺寸图_RevA.pdf
 !/trade_drawings/out/png/
 /trade_drawings/out/png/*
 !/trade_drawings/out/png/P-*.png

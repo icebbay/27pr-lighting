@@ -23,11 +23,15 @@ def b2t(F, x, y):
     return round(x * M[0][0] + y * M[1][0] + M[2][0]), round(x * M[0][1] + y * M[1][1] + M[2][1])
 
 
-MOVE = {("FF", "S3"): (-0.80, 2.90, "主卧南墙（衣帽间那面墙）主卧一侧，墙中间"),
-        ("FF", "S7"): (1.47, 4.25, "卧室2 门旁（门西侧短墙，卧室2 一侧，锁侧）")}
+MOVE = {("FF", "S3"): (-0.80, 3.86, "主卧床头柜上方（C19 一侧，离地 700，与门口 S4 双控）"),
+        ("FF", "S7"): (1.47, 4.25, "卧室2 门旁（门西侧短墙，卧室2 一侧，锁侧）"),
+        # 2026-10-08 owner: S4 and S5 on the short dining-room wall are stacked one above the other (S4 below, S5 above), 200 from the wall end
+        ("GF", "S4"): (2.95, 4.40, "楼梯口 · 拱门旁（与 S5 上下叠放，S4 在下）"),
+        ("GF", "S5"): (2.95, 4.40, "G07 区侧 · 拱门旁（叠在 S4 正上方）")}
 for (F, pid), (x, y, loc) in MOVE.items():
     p = next(q for q in D[F]["plates"] if q["id"] == pid)
     p["x"], p["y"] = b2t(F, x, y); p["location"] = loc
+next(q for q in D["GF"]["plates"] if q["id"] == "S5")["stack_above"] = "S4"
 # GF S2: its panel hid a lamp on the plan (user 2026-10-08) -> pulled off the wall + a label; display only, the switch itself stays put
 s2 = next(q for q in D["GF"]["plates"] if q["id"] == "S2")
 s2["panel_out"] = 0.95; s2["panel_note"] = "储物间门口的开关"

@@ -194,8 +194,8 @@ fc = {f["id"]: f for f in LJ["GF"]["fcus"]}
 kitchen = sorted([f for f in fc.values() if f["x"] < 10.2e6], key=lambda f: math.dist((f["x"], f["y"]), dw))
 laundry = [f for f in fc.values() if f["x"] >= 10.2e6]
 DED = [dict(c="WX3", label="洗碗机", fcu=kitchen[0]["id"], x=kitchen[0]["x"], y=kitchen[0]["y"], floor="GF"),
-       dict(c="WP1", label="烤箱", fcu=kitchen[1]["id"], x=kitchen[1]["x"], y=kitchen[1]["y"], floor="GF", tbc="烤箱 / 冰箱哪个 FCU 待现场定"),
-       dict(c={p: PLANS[p]["fridge"] for p in PLANS}, label="冰箱", fcu=kitchen[2]["id"], x=kitchen[2]["x"], y=kitchen[2]["y"], floor="GF", tbc="烤箱 / 冰箱哪个 FCU 待现场定")]
+       dict(c="WP1", label="烤箱", fcu=kitchen[1]["id"], x=kitchen[1]["x"], y=kitchen[1]["y"], floor="GF"),
+       dict(c={p: PLANS[p]["fridge"] for p in PLANS}, label="冰箱", fcu=kitchen[2]["id"], x=kitchen[2]["x"], y=kitchen[2]["y"], floor="GF")]
 for f, lab in zip(sorted(laundry, key=lambda f: f["x"]), ("洗衣机", "烘干机")):
     DED.append(dict(c="WX4", label=lab, fcu=f["id"], x=f["x"], y=f["y"], floor="GF"))
 lift = [(a + b) / 2 for a, b in zip(*[[float(v) for v in re.sub('[MLZ]', ' ', p).split()][:2] for p in
