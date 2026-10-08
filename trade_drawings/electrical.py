@@ -303,4 +303,4 @@ def detail_sheet():
 
 
 def sheets():
-    return [draw_plan("GF", "E-01"), draw_plan("FF", "E-02"), detail_sheet()]
+    return [draw_plan("GF", "E-01"), draw_plan("FF", "E-02")]   # E-03 wiring details dropped (owner 2026-10-08: explained on site)

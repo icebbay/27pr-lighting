@@ -26,8 +26,8 @@
   <div class="box"><h2>施工图 PDF（Rev C · 2026-10-08 · 与模型 v43 同步）</h2>
     <p>给施工队用的 A3 施工图，手机上点开即可看，打印用 A3 横向。</p>
     <ul class="notes">
-      <li><a href="../trade_drawings/out/27PR_%E7%BB%99%E6%8E%92%E6%B0%B4%E6%96%BD%E5%B7%A5%E5%9B%BE_RevC.pdf" target="_blank" rel="noopener"><b>给排水施工图 Rev C</b> P-00 … P-08（PDF）</a> —— 西卫马桶管按<b>方案 B</b>（假墙内走到北墙角，沿北墙下那一格搁栅往后进 S1）；P-08 西卫后墙详图：<b style="color:#b00020">地面不抬高</b>、假墙尽量薄（能借原墙就借）、马桶后 1100 平台、淋浴后两个壁龛</li>
-      <li><a href="../trade_drawings/out/27PR_%E7%85%A7%E6%98%8E%E5%B8%83%E7%BA%BF%E6%96%BD%E5%B7%A5%E5%9B%BE_RevC.pdf" target="_blank" rel="noopener"><b>照明布线施工图</b> E-01 … E-03（PDF）</a></li>
+      <li><a href="../trade_drawings/out/27PR_%E7%BB%99%E6%8E%92%E6%B0%B4%E6%96%BD%E5%B7%A5%E5%9B%BE_RevC.pdf" target="_blank" rel="noopener"><b>给排水施工图 Rev C</b> P-00 … P-07（PDF）</a> —— 西卫马桶管按<b>方案 B</b>（假墙内走到北墙角，沿北墙下那一格搁栅往后进 S1）；P-07 西卫后墙详图：<b style="color:#b00020">地面不抬高</b>、假墙尽量薄（能借原墙就借）、马桶后 1100 平台、淋浴后两个壁龛</li>
+      <li><a href="../trade_drawings/out/27PR_%E7%85%A7%E6%98%8E%E5%B8%83%E7%BA%BF%E6%96%BD%E5%B7%A5%E5%9B%BE_RevC.pdf" target="_blank" rel="noopener"><b>照明布线施工图</b> E-01 … E-02（PDF）</a></li>
       <li><a href="../trade_drawings/out/27PR_%E6%8F%92%E5%BA%A7%E5%8A%A8%E5%8A%9B%E6%96%BD%E5%B7%A5%E5%9B%BE_RevC.pdf" target="_blank" rel="noopener"><b>插座动力施工图</b> E-11 … E-13（PDF）</a></li>
     </ul>
     <p class="muted">水管线路也可以在网页上看：<a href="plumbing.html">给排水页面</a>（可切换一层 / 二层、给水 / 排水，管段编号与 PDF 一致）。</p>
@@ -66,7 +66,7 @@
     document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => { location.hash = b.dataset.go; });
     document.querySelectorAll('.slide img').forEach(im => im.onclick = () => { zoom.querySelector('img').src = im.src; zoom.style.display = 'block'; });
   }
-  const TD = ['P-00', 'P-01', 'P-02', 'P-03', 'P-04', 'P-05', 'P-06', 'P-07', 'P-08', 'E-01', 'E-02', 'E-03', 'E-11', 'E-12', 'E-13'];
+  const TD = ['P-00', 'P-01', 'P-02', 'P-03', 'P-04', 'P-05', 'P-06', 'P-07', 'E-01', 'E-02', 'E-11', 'E-12', 'E-13'];
   $('#tdp').innerHTML = '<span class="muted">单页预览：</span>' + TD.map(n => `<button data-td="${n}">${n}</button>`).join('');
   document.querySelectorAll('[data-td]').forEach(b => b.onclick = () => { zoom.querySelector('img').src = `../trade_drawings/out/png/${b.dataset.td}.png`; zoom.style.display = 'block'; });
   zoom.querySelector('.close').onclick = () => { zoom.style.display = 'none'; };

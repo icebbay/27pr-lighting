@@ -3,7 +3,7 @@
 (function () {
   const D = window.PLUMBING, L = window.LIGHTING_DEFAULT;
   const FCN = { GF: '一层 ', FF: '二层 ' };
-  const PDF = [['27PR_给排水施工图_RevC.pdf', '给排水施工图 P-00…P-08（Rev C）'], ['27PR_照明布线施工图_RevC.pdf', '照明布线施工图 E-01…E-03'],
+  const PDF = [['27PR_给排水施工图_RevC.pdf', '给排水施工图 P-00…P-07（Rev C）'], ['27PR_照明布线施工图_RevC.pdf', '照明布线施工图 E-01…E-03'],
                ['27PR_插座动力施工图_RevC.pdf', '插座动力施工图 E-11…E-13']];
   const pdfUrl = f => '../trade_drawings/out/' + encodeURIComponent(f);
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -131,7 +131,7 @@
     const kinds = Object.entries(D.style).filter(([k, s]) => ui.sys[s.sys]);
     const floors = ui.view === 'both' ? ['GF', 'FF'] : [ui.view];
     let h = `<h3>选中</h3>${detail()}`;
-    if (floors.includes('FF')) h += `<div class="warn"><b>西卫（主卧卫生间）地面不抬高</b>：淋浴盘、马桶直接坐原楼板；后墙假墙尽量薄，能借后面原墙的位置就借，尽量保留卫生间内空：马桶段 1100 高（顶面平台，AAV + 检修口），淋浴段到天花、两个壁龛；110 马桶管在假墙内、地面以上走到北墙角，再沿北墙下那一格搁栅往后进 S1（方案 B）。详见 <a href="${pdfUrl(PDF[0][0])}#page=9" target="_blank" rel="noopener">P-08 西卫后墙详图</a>。</div>`;
+    if (floors.includes('FF')) h += `<div class="warn"><b>西卫（主卧卫生间）地面不抬高</b>：淋浴盘、马桶直接坐原楼板；后墙假墙尽量薄，能借后面原墙的位置就借，尽量保留卫生间内空：马桶段 1100 高（顶面平台，AAV + 检修口），淋浴段到天花、两个壁龛；110 马桶管在假墙内、地面以上走到北墙角，再沿北墙下那一格搁栅往后进 S1（方案 B）。详见 <a href="${pdfUrl(PDF[0][0])}#page=9" target="_blank" rel="noopener">P-07 西卫后墙详图</a>。</div>`;
     h += `<h3>图例</h3><div class="legend">${kinds.map(([k, s]) => `<span class="sw" style="border-top-color:${s.color};border-top-style:${s.dash ? 'dashed' : 'solid'}"></span><div>${esc(s.label)}</div>`).join('')}
       <span style="display:inline-block;width:12px;height:12px;border:1.5px solid #333;background:#fff"></span><div>用水点（编号同 PDF）</div>
       <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#6b3e1e"></span><div>污水立管 S1 / S2</div></div>`;
