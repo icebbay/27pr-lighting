@@ -267,7 +267,8 @@ def collect(F):
         add(cat="new", id="N-TR2", name="北卫智能马桶 + 电热毛巾架出线面板（双联，新增）", room="", circ="WX7",
             p=(-1.47, 7.88), h=300, why="马桶与毛巾架之间的双联出线面板 h 300（毛巾架挪到马桶旁后墙，离马桶约 200）；两个 FCU 13A 装在卫生间门外 h 1100", mount="wall")
     fix_points(F, items)
-    return [i for i in items if i["cat"] != "water"]   # owner 2026-10-08: water points live on the plumbing drawings only
+    # owner 2026-10-08: water points live on the plumbing drawings only; dedicated / FCU points are fixed on site (to be grouped under the stairs)
+    return [i for i in items if i["cat"] not in ("water", "power")]
 
 
 # 2026-10-08 (owner: no open points left) — final positions:
