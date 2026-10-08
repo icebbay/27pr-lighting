@@ -157,10 +157,10 @@ def plan_sheet(F, number):
     return s
 
 
-# 空调一拖一 ×2 (2026-10-07, model v41): indoor units on the 卧室 3 / 书房二 party wall, outdoor units on the annex flat roof,
+# 空调一拖一 ×2 (2026-10-07, model v41): indoor units on the 卧室 3 / 卧室 4 party wall, outdoor units on the annex flat roof,
 # refrigerant pair + condensate + signal cable through the loft over 卧室 3, out through a weathered roof sleeve.
-AC_IN = {"WP3": ((0.73, 1.57, 7.72, 7.93), "卧室 3 内机"), "WP4": ((1.72, 2.56, 8.11, 8.32), "书房二 内机")}
-AC_OUT = [((-1.56, -0.71, 6.64, 7.12), "外机 1（卧室 3）"), ((-2.62, -1.76, 6.64, 7.12), "外机 2（书房二）")]   # on the flat roof, z 5.44
+AC_IN = {"WP3": ((0.73, 1.57, 7.72, 7.93), "卧室 3 内机"), "WP4": ((1.72, 2.56, 8.11, 8.32), "卧室 4 内机")}
+AC_OUT = [((-1.56, -0.71, 6.64, 7.12), "外机 1（卧室 3）"), ((-2.62, -1.76, 6.64, 7.12), "外机 2（卧室 4）")]   # on the flat roof, z 5.44
 AC_ROUTE = [[(1.00, 7.80), (1.00, 7.20)], [(2.00, 8.15), (2.00, 8.02), (2.00, 7.20)],
             [(2.00, 7.20), (-0.64, 7.20), (-0.80, 7.20), (-0.80, 6.60), (-2.62, 6.60)], [(-1.55, 6.60), (-1.55, 6.70)], [(-2.60, 6.60), (-2.60, 6.70)]]
 
@@ -185,11 +185,11 @@ def ac_overlay(s):
     # note block in the empty area behind the rear wall, leaders to the outdoor units and the roof sleeve
     bx, by, bw = 196.0, 42.0, 80.0
     lines = ["空调一拖一 ×2（虚线 = 屋面上，不在室内）",
-             "• 外机 1（卧室 3）、外机 2（书房二）在副楼平屋顶，",
+             "• 外机 1（卧室 3）、外机 2（卧室 4）在副楼平屋顶，",
              "\u3000 主卧 / 北卫上方；外机旁各一个 IP65 双极隔离开关 DP",
              "• 冷媒管 + 冷凝水 + 信号线：卧室 3 上方阁楼内走，",
              "\u3000 穿屋面防水套管；墙外不做管槽",
-             "• 内机高位插座离地 2000：卧室 3 → WP3，书房二 → WP4"]
+             "• 内机高位插座离地 2000：卧室 3 → WP3，卧室 4 → WP4"]
     h = 3.0 * len(lines) + 2.5; bold = ' font-weight="bold"'
     A(f'<rect x="{bx}" y="{by}" width="{bw}" height="{h:.1f}" fill="#fff" stroke="{col}" stroke-width=".3"/>')
     for i, t in enumerate(lines):
