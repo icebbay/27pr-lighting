@@ -3,7 +3,7 @@
 (function () {
   const D = window.PLUMBING, L = window.LIGHTING_DEFAULT;
   const FCN = { GF: '一层 ', FF: '二层 ' };
-  const PDF = [['27PR_给排水施工图_RevC.pdf', '给排水施工图 P-00…P-09（Rev C）'], ['27PR_照明布线施工图_RevC.pdf', '照明布线施工图 E-01…E-03'],
+  const PDF = [['27PR_给排水施工图_RevC.pdf', '给排水施工图 P-00…P-08（Rev C）'], ['27PR_照明布线施工图_RevC.pdf', '照明布线施工图 E-01…E-03'],
                ['27PR_插座动力施工图_RevC.pdf', '插座动力施工图 E-11…E-13']];
   const pdfUrl = f => '../trade_drawings/out/' + encodeURIComponent(f);
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -143,7 +143,7 @@
           return `<div class="prow ${ui.sel === k ? 'cur' : ''}" data-sel="${k}"><span class="no" style="background:${s.color}">${p.sheet === 'P-07' ? 'G' : ''}${p.no}</span><div>${esc(s.short)} Ø${p.size} · ${esc(p.label)}</div></div>`; }).join('');
       h += `<details><summary class="muted">${FCN[F]}${sys === 'supply' ? '给水' : '排水'}说明</summary><ol class="nt">${fd.notes[sys].map(n => `<li>${esc(n.replace(/^\d+\.\s*/, ''))}</li>`).join('')}</ol></details>`;
     }
-    if (floors.includes('GF')) h += `<details><summary class="muted">后花园水池说明（P-07）</summary><ol class="nt">${D.garden_notes.map(n => `<li>${esc(n.replace(/^\d+\.\s*/, ''))}</li>`).join('')}</ol></details>`;
+    if (floors.includes('GF')) h += `<details><summary class="muted">后花园水池说明</summary><ol class="nt">${D.garden_notes.map(n => `<li>${esc(n.replace(/^\d+\.\s*/, ''))}</li>`).join('')}</ol></details>`;
     h += `<h3>施工图 PDF</h3>${PDF.map(([f, t]) => `<a class="pdf" href="${pdfUrl(f)}" target="_blank" rel="noopener">${esc(t)}</a>`).join('<br>')}`;
     $('#side').innerHTML = h;
     document.querySelectorAll('[data-sel]').forEach(r => r.onclick = () => select(r.dataset.sel));

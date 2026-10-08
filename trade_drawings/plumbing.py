@@ -29,7 +29,7 @@ STYLE = {   # kind: (colour, width mm, dash, label)
     "sw":    ("#2e7d32", 1.0, "2.5 1.2", "地表水 Surface water（110 mm PVC-U，≥ 1:80）→ 渗水井，不接污水"),
     "gas":   ("#d4a000", 0.8, "4 1", "燃气 Natural gas（铜管 22 / 15，Gas Safe 注册技工施工）"),
     "prv":   ("#8d6e63", 0.5, "1 0.6", "锅炉安全阀排放 15 铜管（出户，管口朝下贴墙，不接下水道）"),
-    "ufh":   ("#8e24aa", 0.8, "", "地暖供 / 回水 UFH flow / return（两根并行，保温，见 P-09）"),
+    "ufh":   ("#8e24aa", 0.8, "", "地暖供 / 回水 UFH flow / return（两根并行，保温；盘管由地暖供应商深化）"),
 }
 
 SHORT = {"mdpe": "进户", "hard": "冷水（硬）", "soft": "冷水（软）", "hot": "热水", "pure": "净水", "waste": "废水", "soil": "污水", "ug": "地下排水",
@@ -90,7 +90,7 @@ PIPES = [
     ("GF", "hard", 15, [(-2.90, 8.10), (-2.90, 1.07), (-4.20, 1.07)], "15 硬水：室内地坪下一条直线到前面（不穿墙），转弯到副客厅前门西侧，穿门口新砌外墙（预留套管）接洗车龙头 FT（室内隔离阀 + 泄水阀，防冻）"),
     ("GF", "hard", 15, [(4.00, 8.30), (4.00, 16.15), (3.58, 16.15), (3.58, 16.40)], "15 硬水 → 户外水斗（DCV + 室内隔离阀，防冻保温）"),
     ("GF", "hard", 15, [(3.80, 16.15), (3.80, 16.40)], "15 硬水 → 水池补水（洗衣房内三通 + 隔离阀 + 泄水阀，穿后墙套管）"),
-    ("GF", "yard", 20, [(3.80, 16.40), (3.80, 16.95), (3.20, 16.95)], "20 MDPE 埋地 → 后花园水池补水井 TU + 花园龙头（见 P-07）"),
+    ("GF", "yard", 20, [(3.80, 16.40), (3.80, 16.95), (3.20, 16.95)], "20 MDPE 埋地 → 后花园水池补水井 TU + 花园龙头"),
     ("GF", "hard", 22, [(4.00, 8.30), (1.85, 8.30), (1.70, 8.45)], "22 → 软水机（三阀旁通）"),
     ("GF", "hard", 15, [(3.10, 10.78), (2.95, 10.68)], "15 硬水 → RO 净水器（水槽冷水三通，业主 2026-10-08 改接硬水）"),
     ("GF", "pure", 10, [(2.95, 10.62), (3.05, 10.48)], "饮用水龙头"),
@@ -149,8 +149,6 @@ PIPES = [
     ("FF", "soil", 110, [(-0.95, 7.60), (-0.95, 8.20), (-0.88, 8.26)], "110 北卫马桶（后墙东角）→ 直穿后墙 → S1"),
     ("FF", "waste", 40, [(-1.14, 6.84), (-1.14, 7.90), (-0.90, 7.95), (-0.88, 8.20)], "40 淋浴 → 楼板内往后 → S1 boss"),
     ("FF", "waste", 40, [(-2.02, 6.64), (-2.02, 6.47), (-1.25, 6.47), (-1.25, 6.95), (-1.16, 7.00)], "40 台盆 → 落进楼板 → 接淋浴废水"),
-    ("FF", "waste", 22, [(1.06, 7.78), (1.06, 7.26)], "22 空调 1 冷凝水（卧室 3 内机）→ 随冷媒管进阁楼"),
-    ("FF", "waste", 22, [(2.06, 8.13), (2.06, 7.26), (-0.74, 7.26), (-0.74, 6.70)], "22 空调冷凝水（两台在阁楼合并）→ 随冷媒管 → 副楼平屋面雨水口（坡度不够时内机加冷凝水泵）"),
     (("FF", "soil", 110, [(0.79, 2.18), (0.79, 2.45), (0.75, 2.62), (0.75, 7.80), (-0.70, 7.85), (-0.70, 8.16), (-0.76, 8.29)], "110 西卫马桶 → 马桶段假墙内下到楼板（完成面下约 150）→ 落进本格搁栅直着往后 1:40 → 后墙内侧借梁位横走到 S1 旁 → 出墙进 S1（墙外无横管；起点 AAV 在假墙内）")
      if VARIANT == "A" else
      ("FF", "soil", 110, [(0.78, 2.20), (0.78, 2.45), (-0.31, 2.45), (-0.31, 2.62), (-0.31, 8.30), (-0.73, 8.30)], "110 西卫马桶 → 假墙内（地面以上）沿后墙 1:40 到北墙角（约 1.1 m，起点 AAV 在马桶段检修口内）→ 下到楼板，落进北墙下那一格搁栅 → 直着往后约 5.7 m（1:40）→ 穿后墙 → S1 侧口")),
@@ -192,7 +190,7 @@ NOTES_GARDEN = [
 NOTES_SUPPLY = [
     "说明 Notes",
     "[GF]1. 进户：楼梯下总阀后装泄水阀、DCV；22 主管经地坪到厨房。",
-    "[GF]2. 软水机 G24 在锅炉 G23 正下方（自带旁通）。不过软水机、接进户硬水：厨房水槽冷水 + RO 净水器、户外水斗、后花园水池 / 花园龙头（P-07）、洗车龙头 FT。",
+    "[GF]2. 软水机 G24 在锅炉 G23 正下方（自带旁通）。不过软水机、接进户硬水：厨房水槽冷水 + RO 净水器、户外水斗、后花园水池 / 花园龙头、洗车龙头 FT。",
     "3. 软化后冷水供：锅炉冷水进、全屋马桶 / 台盆 / 淋浴 / 洗碗机 / 洗衣机。热水全部来自 combi 锅炉，无热水缸。",
     "4. 二层冷 / 热水经 R1 立管（卧室 4 西南角箱封 150×150）上楼，楼板内敷设；穿搁栅按 Building Regs 规定打孔，不得开深槽。",
     "5. 管材：铜管或 PEX（WRAS 认证），主管 22 mm、支管 15 mm；热水管及外墙 / 楼板内冷水管全部保温。",
@@ -212,7 +210,7 @@ NOTES_DRAIN = [
     "5. 台盆 32 mm（≤ 1.7 m，否则 40）；淋浴 / 洗碗机 / 洗衣 40；废水单独接立管（strap-on boss），一层台盆接马桶支管。",
     "6. 存水弯水封 ≥ 75 mm；转弯处留清扫口。地下排水 110 PVC-U ≥ 1:40，碎石垫层；IC1 / IC2 / IC4 为 450 塑料检查井，只在检查井处转向。",
     "[GF]8. 锅炉冷凝水 + 软水机再生排水进漏斗 TD（空气隔断）→ 40 废水 → 门槛下出户进 IC4；锅炉安全阀 15 铜管单独出户、管口朝下。",
-    "[FF]9. 空调冷凝水（2026-10-08）：两台内机各一根 22 冷凝水管，随冷媒管进阁楼，接副楼平屋面雨水口；坡度不够时内机加冷凝水泵。",
+    "[FF]9. 空调内外机、冷媒管和冷凝水见 P-07。",
     "[GF]7. 一层卫生间先进 IC1，与 S1 汇合去后院 MH；全屋都进后院 MH。洗衣房 → MH 约 11 m，MH 须比起点深 ≥ 0.28 m（施工前量）。不含雨水。",
 ]
 
@@ -342,8 +340,6 @@ def drainage_marks(s, F):
         if sid == "S2":
             rect(s, *S2_BOX, "fill:none;stroke:#111;stroke-width:.35;stroke-dasharray:.8 .4")
     if F != "GF":
-        import power_sheets          # air conditioning (indoor / outdoor units, refrigerant route via the loft) — same as E-12
-        power_sheets.ac_overlay(s)
         west_bath_plan(s)
         a = s.P(-0.85, 8.26); s.add(f'<text x="{a[0]+3:.2f}" y="{a[1]-3:.2f}" font-size="2.0" class="lbl">S1 110（后墙外）：北卫 + 西卫 / 盥洗室 → IC1 → MH</text>')
         leader(s, [(4.29, 8.40), (s.P(4.29, 8.40)[0] + 6, s.P(4.29, 8.40)[1] + 6)], "S2 箱封 200×200（高 1200，顶部 AAV + 检修门）", 1.9, col="#6b3e1e")
@@ -696,8 +692,7 @@ def cover_sheet():
     A = s.add
     A('<text x="16" y="34" font-size="3.4" font-weight="bold">图纸目录 Drawing list</text>')
     for i, t in enumerate(["P-00 目录 + 设计说明", "P-01 一层给水平面图", "P-02 二层给水平面图", "P-03 一层排水平面图（含地下排水）",
-                           "P-04 二层排水平面图（西卫马桶管：方案 B 走北墙）", "P-05 给水系统图 + 排水系统图", "P-06 设备详图：锅炉 + 软水机、水槽下净水器", "P-07 后花园水池：补水 + 地沟 + 渗水井",
-                           "P-08 西卫后墙详图：地面不抬高 · 马桶平台 · 淋浴壁龛 · 110 走北墙（方案 B）", "P-09 地暖系统图：分水器、分区、温控、地面构造"]):
+                           "P-04 二层排水平面图（西卫马桶管：方案 B 走北墙）", "P-05 给水系统图 + 排水系统图", "P-06 设备详图：锅炉 + 软水机、水槽下净水器", "P-07 空调：内外机位置、冷媒管、冷凝水排出", "P-08 西卫后墙详图：地面不抬高 · 马桶平台 · 淋浴壁龛 · 110 走北墙（方案 B）"]):
         A(f'<text x="20" y="{40+i*4.6}" font-size="2.5">{html.escape(t)}</text>')
     A('<text x="16" y="86" font-size="3.4" font-weight="bold">设计依据与条件 Basis</text>')
     basis = ["• UK Water Supply (Water Fittings) Regulations 1999、WRAS 认证产品；Building Regulations Part G（卫生与热水）、Part H（排水）、Part L（保温）。",
@@ -853,6 +848,56 @@ def ufh_sheet():
     return s
 
 
+# air conditioning (owner 2026-10-08: own sheet, show where the condensate goes): two 1-to-1 splits, indoor units on the rear walls of
+# 卧室 3 / 卧室 4, outdoor units on the annex flat roof above 北卫; refrigerant + condensate + signal through the loft, roof sleeve.
+# Condensate: 22 PVC from each indoor unit along the refrigerant route, joined in the loft, out through the roof sleeve, across the flat
+# roof to the external soil stack S1 at the rear wall, into it through a waterless trap (HepVO) at roof level -> S1 -> IC1 -> MH.
+AC_COND = [
+    [(1.06, 7.78), (1.06, 7.26)],
+    [(2.06, 8.13), (2.06, 7.26), (-0.74, 7.26)],
+    [(-0.74, 7.26), (-0.74, 8.12), (-0.80, 8.22)],
+]
+
+
+def ac_sheet():
+    import power_sheets
+    s = Sheet("空调 Air conditioning：内外机、冷媒管、冷凝水排出", "P-07", "FF", bounds("FF"), discipline="给排水 Plumbing / 暖通 HVAC")
+    s.base_plan("FF")
+    power_sheets.ac_overlay(s)
+    A = s.add; OR = STYLE["waste"][0]
+    labels = ["22 冷凝水：卧室 3 内机 → 沿冷媒管进阁楼（≥ 1:100 坡向出口）",
+              "22 冷凝水：卧室 4 内机 → 阁楼内与空调 1 合并 → 随冷媒管穿屋面防水套管",
+              "22 冷凝水（屋面上）：沿副楼平屋顶到后墙 → HepVO 无水存水弯 → 接入污水立管 S1 → IC1 → MH"]
+    runs = []
+    for i, (pts, t) in enumerate(zip(AC_COND, labels), 1):
+        pipe(s, "waste", pts, 22, i); runs.append([i, "冷凝水", "Ø22", t])
+    for sid, x, y, txt in STACKS:
+        if sid == "S1":
+            px, py = s.P(x, y)
+            A(f'<circle cx="{px:.2f}" cy="{py:.2f}" r="2.2" class="stk"/><text x="{px:.2f}" y="{py+0.8:.2f}" font-size="2" fill="#fff" text-anchor="middle" font-weight="bold">S1</text>')
+            A(f'<text x="{px+3:.2f}" y="{py+0.8:.2f}" font-size="2" fill="{OR}">S1 后墙外污水立管：屋面高度用 HepVO 无水存水弯接冷凝水，往下进 IC1 → MH</text>')
+    from plan_base import table
+    table(s, 14, 214, [("No.", 7), ("介质", 15), ("管径", 9), ("走向 / 说明 Route", 117)], runs, fs=1.85, title="冷凝水管段表（图中圆圈编号）")
+    # schematic section: unit -> loft -> roof -> S1
+    x0, y0 = 168, 222
+    A(f'<text x="{x0}" y="{y0}" font-size="2.6" font-weight="bold">冷凝水怎么排出去（示意剖面）</text>')
+    A(f'<rect x="{x0}" y="{y0+6}" width="22" height="7" fill="#e3f2fd" stroke="#0077b6" stroke-width=".4"/><text x="{x0+11}" y="{y0+10.6}" font-size="1.8" text-anchor="middle">内机（离地约 2200）</text>')
+    A(f'<path d="M{x0+11} {y0+13} V{y0+4} H{x0+60} L{x0+66} {y0+9} H{x0+92} V{y0+30}" fill="none" stroke="{OR}" stroke-width=".8"/>')
+    A(f'<text x="{x0+24}" y="{y0+3}" font-size="1.8" fill="{OR}">阁楼内 22 冷凝水，≥ 1:100 坡向出口</text><text x="{x0+62}" y="{y0+7.6}" font-size="1.8" fill="{OR}">屋面套管</text>')
+    A(f'<line x1="{x0+50}" y1="{y0+9}" x2="{x0+96}" y2="{y0+9}" stroke="#555" stroke-width=".5"/><text x="{x0+50}" y="{y0+12}" font-size="1.7" fill="#555">副楼平屋面（外机在此）</text>')
+    A(f'<rect x="{x0+90}" y="{y0+2}" width="4" height="38" fill="#6b3e1e" opacity=".85"/><text x="{x0+96}" y="{y0+20}" font-size="1.8" fill="#6b3e1e">S1 110 立管</text>'
+      f'<rect x="{x0+86}" y="{y0+15}" width="6" height="4" fill="#fff" stroke="{OR}" stroke-width=".4"/><text x="{x0+96}" y="{y0+25}" font-size="1.8" fill="{OR}">HepVO 无水存水弯</text>'
+      f'<text x="{x0+96}" y="{y0+30}" font-size="1.8" fill="#6b3e1e">→ IC1 → MH</text>')
+    notes = ["说明 Notes",
+             "1. 空调一拖一 ×2：内机在卧室 3、卧室 4 后墙（离地约 2200，高位插座 WP3 / WP4）；外机在副楼平屋顶（北卫上方），旁设 IP65 双极隔离开关 DP。",
+             "2. 冷媒管 + 信号线 + 冷凝水同走卧室 3 上方阁楼，穿屋面防水套管；墙外不做管槽。冷媒管保温，按机型选管径。",
+             "3. 冷凝水 22 PVC，全程坡向出口 ≥ 1:100，不得有反坡、不得打弯成存水；在屋面上接入后墙污水立管 S1，接口用 HepVO 无水存水弯（防臭、防虹吸）。",
+             "4. 内机位置若坡度不够（阁楼比内机出水口高），内机内加冷凝水泵（电源取自内机）。",
+             "5. 冬天不用空调时冷凝水管不结冰：屋面外露段短、可加保温。"]
+    s.frame(notes)
+    return s
+
+
 def sheets():
     return [cover_sheet(), plan_sheet("GF", "supply", "P-01"), plan_sheet("FF", "supply", "P-02"),
-            plan_sheet("GF", "drain", "P-03"), plan_sheet("FF", "drain", "P-04"), schematic_sheet(), detail_sheet(), garden_sheet(), west_bath_sheet(), ufh_sheet()]
+            plan_sheet("GF", "drain", "P-03"), plan_sheet("FF", "drain", "P-04"), schematic_sheet(), detail_sheet(), ac_sheet(), west_bath_sheet()]

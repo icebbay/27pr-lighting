@@ -44,7 +44,7 @@ def main():
             have = {(k, tuple(map(tuple, p))) for _, k, _, p, _ in P.PIPES}
             for i, (kind, size, pts, label) in enumerate(P.GARDEN_PIPES, 1):
                 if (kind, tuple(map(tuple, pts))) in have: continue
-                pipes.append(dict(sys="supply" if kind in SUPPLY else "drain", kind=kind, size=size, no=i, sheet="P-07", label=label, pts=[T(*p) for p in pts]))
+                pipes.append(dict(sys="supply" if kind in SUPPLY else "drain", kind=kind, size=size, no=i, sheet="—", label=label, pts=[T(*p) for p in pts]))
         fixtures = [dict(code=P.CODE[k], name=v[3], sup=v[4], drain=(f"{v[5][0]} Ø{v[5][1]}" if v[5][1] else "车道排水"), p=T(v[1], v[2]))
                     for k, v in P.FIX.items() if v[0] == F]
         equip = [dict(id=e, name=t, p=T(x, y), w=w, d=d) for e, fl, x, y, w, d, t in P.EQUIP if fl == F]
