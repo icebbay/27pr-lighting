@@ -16,14 +16,13 @@
 /lighting_tool/out/
 __pycache__/
 *.pyc
-# trade drawings (施工图): scripts + the current PDFs (给排水 Rev C, 照明 / 插座 Rev B) + sheet previews only
+# trade drawings (施工图): scripts + the current PDFs (Rev C) + sheet previews only
 !/trade_drawings/
 /trade_drawings/*
 !/trade_drawings/*.py
 !/trade_drawings/_v42_section.json
 !/trade_drawings/out/
 /trade_drawings/out/*
-!/trade_drawings/out/*RevB.pdf
 !/trade_drawings/out/*RevC.pdf
 !/trade_drawings/out/png/
 /trade_drawings/out/png/*

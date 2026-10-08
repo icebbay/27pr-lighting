@@ -7,7 +7,12 @@ radials (4 mm², WX4 laundry, WX9 outdoor) stop at the last outlet. Dedicated po
 Routes are orthogonal schematic runs (in practice: down the wall from the ceiling void / along the floor void, safe zones only).
 """
 import html, json, math, os
-from plan_base import Sheet, BASE_CSS, MM, load_tool, Frame, table, TOOL
+from plan_base import Sheet as _Sheet, BASE_CSS, MM, load_tool, Frame, table, TOOL
+
+
+def Sheet(*a, **k):
+    k.setdefault("rev", "C"); k.setdefault("date", "2026-10-08")
+    return _Sheet(*a, **k)
 
 PLAN = "A"
 PL = json.load(open(os.path.join(TOOL, "power_plans.json"), encoding="utf-8"))[PLAN]

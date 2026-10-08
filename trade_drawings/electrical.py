@@ -8,7 +8,12 @@ first two-way switch), 3C+E strappers between two-way switches and through inter
 Plan A (专业 18 路) lighting groups; plan B only joins WL1 + WL2 at the board (same cables).
 """
 import html, math
-from plan_base import Sheet, BASE_CSS, MM, load_tool, Frame, table
+from plan_base import Sheet as _Sheet, BASE_CSS, MM, load_tool, Frame, table
+
+
+def Sheet(*a, **k):
+    k.setdefault("rev", "C"); k.setdefault("date", "2026-10-08")
+    return _Sheet(*a, **k)
 
 # positions agreed with the user after Rev I (to be written back to the tool / model): Blender metres
 OVERRIDE = {}   # Rev J (2026-10-07) wrote the agreed S7 / S3 positions back into the lighting tool
@@ -30,9 +35,34 @@ def floor_data(F):
     return J, lights, plates, board
 
 
+FOOT = {}    # floor -> house footprint (shapely), set in design(): routes must stay inside the house
+
+
+def footprint(F):
+    """house outline from the wall drawing: walls + windows + doors, gaps closed by 0.6 m, outer ring filled"""
+    from shapely.geometry import Polygon, LineString
+    from shapely.ops import unary_union
+    from plan_base import walls
+    w, _ = walls(F)
+    parts = []
+    for k in ("wall", "window", "door"):
+        for _, pts, closed in w.get(k, []):
+            if len(pts) >= 3 and closed: parts.append(Polygon(pts).buffer(0))
+            elif len(pts) >= 2: parts.append(LineString(pts).buffer(0.02))
+    g = unary_union(parts).buffer(0.6)
+    big = max(getattr(g, "geoms", [g]), key=lambda p: p.area)
+    return Polygon(big.exterior).buffer(-0.6 + 0.05)
+
+
 def ortho(a, b):
-    """L-shaped ceiling route: along the house (Blender y) first, then across"""
-    return [a, (a[0], b[1]), b]
+    """L-shaped ceiling route: along the house (Blender y) first, then across — unless that leaves the house
+    (2026-10-08 user: the FF WL4 feed hung outside between 北卫 and 卧室 4), then across first."""
+    r1, r2 = [a, (a[0], b[1]), b], [a, (b[0], a[1]), b]
+    fp = FOOT.get("cur")
+    if fp is None: return r1
+    from shapely.geometry import LineString
+    out = lambda r: LineString(r).difference(fp).length
+    return r1 if out(r1) <= out(r2) + 1e-6 else r2
 
 
 def mlen(pts):
@@ -41,6 +71,7 @@ def mlen(pts):
 
 def design(F):
     J, lights, plates, board = floor_data(F)
+    FOOT["cur"] = footprint(F)
     circ = J["circuits"]
     keyplates = {}     # key -> [(plate, middle?)]
     for p in plates.values():
@@ -187,7 +218,7 @@ NOTES_PLAN = [
     "4. 双控：JB→第一个开关 2C+E（COM），开关之间 3C+E（L1/L2）；三处控制中间为中途开关；所有开关线（蓝 / 灰芯作火线用）套棕色套管。",
     "5. 线路走向：吊顶内沿最短正交路线，穿搁栅中线打孔（≥ 50 mm 距上下缘）；墙内只在开关正上方竖直走（安全区），埋深 < 50 mm 时须 RCD 保护（已满足）。",
     "6. 卫生间灯 IP44 以上、排气扇接卫生间灯回路（随灯开、延时关）；户外灯 IP65+，户外段用 SWA 或套管。",
-    "7. 一层 S7、二层 S3 按 2026-10-07 修正位置（S7 移到法式门框东侧；S3 移到主卧门旁、S4 西侧）。",
+    "7. 一层 S7 在法式门框东侧（Rev J）。二层 Rev C（照明 Rev K，2026-10-08）：S3 挪回主卧南墙（衣帽间那面墙）主卧一侧、C19 西侧；卧室 2 门旁 S7 装在门西侧短墙的卧室 2 一侧。",
 ]
 
 

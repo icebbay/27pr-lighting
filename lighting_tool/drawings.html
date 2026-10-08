@@ -23,12 +23,12 @@
   <nav class="nav"><a href="../index.html">总览</a><a href="index.html">照明</a><a href="power.html">插座 / 动力</a><a href="plumbing.html">给排水</a><a href="board.html">配电箱</a><a class="on" href="drawings.html">施工图</a></nav>
 </header>
 <main>
-  <div class="box"><h2>施工图 PDF（2026-10-08 · 给排水 Rev C，照明 / 插座 Rev B · 与模型 v42 同步）</h2>
+  <div class="box"><h2>施工图 PDF（Rev C · 2026-10-08 · 与模型 v43 同步）</h2>
     <p>给施工队用的 A3 施工图，手机上点开即可看，打印用 A3 横向。</p>
     <ul class="notes">
       <li><a href="../trade_drawings/out/27PR_%E7%BB%99%E6%8E%92%E6%B0%B4%E6%96%BD%E5%B7%A5%E5%9B%BE_RevC.pdf" target="_blank" rel="noopener"><b>给排水施工图 Rev C</b> P-00 … P-08（PDF）</a> —— 西卫马桶管按<b>方案 B</b>（假墙内走到北墙角，沿北墙下那一格搁栅往后进 S1）；P-08 西卫后墙详图：<b style="color:#b00020">地面不抬高</b>、假墙尽量薄（能借原墙就借）、马桶后 1100 平台、淋浴后两个壁龛</li>
-      <li><a href="../trade_drawings/out/27PR_%E7%85%A7%E6%98%8E%E5%B8%83%E7%BA%BF%E6%96%BD%E5%B7%A5%E5%9B%BE_RevB.pdf" target="_blank" rel="noopener"><b>照明布线施工图</b> E-01 … E-03（PDF）</a></li>
-      <li><a href="../trade_drawings/out/27PR_%E6%8F%92%E5%BA%A7%E5%8A%A8%E5%8A%9B%E6%96%BD%E5%B7%A5%E5%9B%BE_RevB.pdf" target="_blank" rel="noopener"><b>插座动力施工图</b> E-11 … E-13（PDF）</a></li>
+      <li><a href="../trade_drawings/out/27PR_%E7%85%A7%E6%98%8E%E5%B8%83%E7%BA%BF%E6%96%BD%E5%B7%A5%E5%9B%BE_RevC.pdf" target="_blank" rel="noopener"><b>照明布线施工图</b> E-01 … E-03（PDF）</a></li>
+      <li><a href="../trade_drawings/out/27PR_%E6%8F%92%E5%BA%A7%E5%8A%A8%E5%8A%9B%E6%96%BD%E5%B7%A5%E5%9B%BE_RevC.pdf" target="_blank" rel="noopener"><b>插座动力施工图</b> E-11 … E-13（PDF）</a></li>
     </ul>
     <p class="muted">水管线路也可以在网页上看：<a href="plumbing.html">给排水页面</a>（可切换一层 / 二层、给水 / 排水，管段编号与 PDF 一致）。</p>
     <div class="sets" id="tdp"></div>
@@ -55,8 +55,8 @@
     return { plan, set };
   }
   function render() {
-    const { plan, set } = pick(), pl = P[plan], file = `27PR_${set[2]}照明施工图_RevJ-${plan}_${set[3]}`;
-    $('#ver').textContent = 'Rev J · ' + pl.short;
+    const { plan, set } = pick(), pl = P[plan], file = `27PR_${set[2]}照明施工图_RevK-${plan}_${set[3]}`;
+    $('#ver').textContent = 'Rev K · ' + pl.short;
     $('#plans').innerHTML = Object.keys(P).map(k => `<button data-go="${k}-${set[0]}" class="${k === plan ? 'on' : ''}">${P[k].name}</button>`).join('');
     $('#sets').innerHTML = SETS.map(x => `<button data-go="${plan}-${x[0]}" class="${x === set ? 'on' : ''}">${x[1]}</button>`).join('');
     $('#plannote').innerHTML = `照明 ${pl.lighting.length} 路：${pl.lighting.map(w => `<b>${w.id}</b> ${w.name.replace(/（.*|\+.*/, '')}`).join(' / ')}。两个方案的灯、开关、联动完全一样，只是照明回路分组不同（看系统图那一页最清楚）。`;

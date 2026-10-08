@@ -3,7 +3,8 @@ and the web tool.
 
 Inside small zones only, the PPT-derived wall / door shapes are replaced by the v42 horizontal section (_v42_section.json,
 GF z = 1.0, FF z = 4.1, exported from Blender): north-bath door moved 0.20 m along its west wall, bedroom 2 door 79 mm west +
-the 100 mm corridor nib, GF stair -> kitchen opening (x 2.530) with its 762 door.  Everything outside the zones is untouched.
+the 100 mm corridor nib, GF stair -> kitchen opening (x 2.530) with its 762 door, and the full-height GF sofa wall
+between 客厅 and 起居室 (V12_Continuous_Flat_Sofa_Wall, missing from the PPT walls).  Everything outside the zones is untouched.
 The first run keeps the original as walls_<F>_ppt.svg; later runs always patch from that copy (idempotent).
 
     python products/trade_drawings/patch_walls_v42.py      (then lighting_tool/build_data_js.py for the web tool)
@@ -14,13 +15,14 @@ from shapely.ops import polygonize, unary_union
 from plan_base import Frame, TOOL
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-WALLISH = re.compile(r"Wall_Shell|Infill|Nib_100|Fill_Bed2|Partition")
+WALLISH = re.compile(r"Wall_Shell|Infill|Nib_100|Fill_Bed2|Partition|Sofa_Wall")
 DOORISH = re.compile(r"Leaf|Jamb|Lining")
 # floor: [(name, wall zone (x0, x1, y0, y1), door zone)] in Blender metres
 ZONES = {
     "FF": [("北卫门", (-2.95, -2.45, 6.45, 7.70), (-3.60, -2.45, 6.45, 7.70)),
            ("卧室2门", (1.45, 2.75, 4.20, 4.75), (1.45, 2.75, 3.55, 4.75))],
-    "GF": [("厨房门", (2.30, 3.50, 7.85, 8.30), (2.30, 3.50, 7.85, 9.00))],
+    "GF": [("厨房门", (2.30, 3.50, 7.85, 8.30), (2.30, 3.50, 7.85, 9.00)),
+           ("客厅 / 起居室之间的沙发墙（PPT 漏画，v42 有，到顶）", (-0.80, -0.63, 0.80, 4.30), (-0.70, -0.69, 2.00, 2.01))],
 }
 
 
