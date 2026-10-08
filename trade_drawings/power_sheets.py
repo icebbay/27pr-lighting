@@ -80,7 +80,7 @@ def plan_sheet(F, number):
         sched.append([cid, c.get("name", ""), c.get("br", ""), ("环路 ring" if ring else "径向 radial") + " " + c.get("cable", ""),
                       " ".join(f"{k}×{v}" for k, v in kinds.items()), f"{run + 3 * len(pts):.0f}"])
     # dedicated home runs (lift, charger via the indoor isolator)
-    ded = [i for i in items if not i.get("fcu")]
+    ded = [i for i in items if not i.get("fcu") and not i.get("alarm")]
     ev = sorted([i for i in ded if i["cc"] == "WP5"], key=lambda i: "控制开关" not in i["label"])
     for cid in sorted({i["cc"] for i in ded}):
         chain = [board] + [i["b"] for i in (ev if cid == "WP5" else [i for i in ded if i["cc"] == cid])]
@@ -102,7 +102,7 @@ def plan_sheet(F, number):
         else:
             A(f'<circle cx="{px:.2f}" cy="{py:.2f}" r="1.5" class="so" stroke="{col}"/><text x="{px:.2f}" y="{py+0.7:.2f}" font-size="1.7" text-anchor="middle" font-weight="bold" fill="{col}">{"2" if k == "double" else "1" if k == "single" else "高"}</text>')
         A(f'<text x="{px+1.9:.2f}" y="{py-1.4:.2f}" font-size="1.4" fill="{col}">{p["cc"]}</text>')
-    for i in items:
+    for i in [i for i in items if not i.get("alarm")]:
         px, py = s.P(*i["b"]); col = COL.get(i["cc"], "#333")
         lab = i["label"].split("（")[0]
         if i.get("fcu"):
@@ -115,6 +115,10 @@ def plan_sheet(F, number):
               f'<text x="{px+(3 if "控制开关" in i["label"] or "电梯" in i["label"] else 12):.2f}" y="{py+(5.2 if "控制开关" in i["label"] else -2.8):.2f}" font-size="1.7" fill="{col}">{html.escape(i["label"])} · {i["cc"]}</text>')
     if F == "FF":
         ac_overlay(s)
+    for al in [i for i in items if i.get("alarm")]:   # heat + CO alarm (lighting circuit), symbol only
+        ax, ay = s.P(*al["b"])
+        A(f'<circle cx="{ax:.2f}" cy="{ay:.2f}" r="2" fill="#fff" stroke="#c62828" stroke-width=".4"/><text x="{ax:.2f}" y="{ay+0.7:.2f}" font-size="1.6" text-anchor="middle" fill="#c62828" font-weight="bold">CO</text>'
+          f'<text x="{ax+2.6:.2f}" y="{ay+0.7:.2f}" font-size="1.9" fill="#c62828">温感 + 一氧化碳报警器（天花，市电）</text>')
     # reserved cable for the future garden-end building (owner 2026-10-08): drawn to where it leaves the house, not beyond
     fr = Frame(F)
     for r in json.load(open(os.path.join(TOOL, f"power_{F}.json"), encoding="utf-8")).get("reserved", []):
@@ -205,6 +209,8 @@ NOTES = [
     "6. 充电桩 WP5：AL1 → 客厅内 40A 双极隔离开关（离地 1.2 m）→ 穿墙 → 副客厅前门西侧凹进处的充电桩（离地约 1.0 m）。B32/B40 Type A RCBO + 6 mA 直流检测（充电桩自带或另装）；10 mm²（业主要求预留）；建议带负载管理（CT 互感器）；安装前通知 DNO。",
     "7. 电梯 WP2 按厂家要求设独立隔离开关。空调一拖一 ×2：内机高位插座接 WP3 / WP4；外机在副楼平屋顶，电源由内机侧按机型接线（或 WP3 / WP4 直接到屋面隔离开关），外机旁装 IP65 双极隔离开关；冷媒管 / 冷凝水 / 信号线经阁楼走，穿屋面用防水套管；冷凝水接屋面雨水口或带存水弯接污水。",
     "8. 预留：配电箱拉一根 10 mm² 三芯 SWA 到洗衣房后墙外角，出墙留约 2 m、端头封好，暂不接；以后建院子尽头的小房子时从这里接线延长过去。",
+    "9. 通风（业主 2026-10-08）：有窗的房间（含洗衣房和各卫生间）不装排气扇，开窗通风；唯一无窗的卧室 4 套内卫生间装排气扇，经烟囱排风；抽油烟机排风也接烟囱（现场确认烟道）。烟机罩内留高位插座（离地约 2200）。",
+    "10. 报警：厨房天花装一个温感 + 一氧化碳二合一报警器（市电，接一层照明回路），距锅炉水平 1–3 m；新装燃气锅炉时同屋须有一氧化碳报警器（Building Regs Part J）。锅炉接 3A FCU（Vaillant 要求固定接线），与软水机插座做在同一块双联面板上。",
 ]
 
 

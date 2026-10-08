@@ -31,6 +31,8 @@ for (F, pid), (x, y, loc) in MOVE.items():
 # GF S2: its panel hid a lamp on the plan (user 2026-10-08) -> pulled off the wall + a label; display only, the switch itself stays put
 s2 = next(q for q in D["GF"]["plates"] if q["id"] == "S2")
 s2["panel_out"] = 0.95; s2["panel_note"] = "储物间门口的开关"
+D["GF"]["meta"]["cn_notes"].append("17. Rev K（2026-10-08）：一层卫生间有窗，不装排气扇；洗衣房有窗，也不装。厨房天花装一个温感 + 一氧化碳报警器（市电，接本层照明回路）。")
+D["FF"]["meta"]["cn_notes"].append("15. Rev K（2026-10-08）：排气扇只装无窗的卧室 4 套卫（经烟囱排风）；北卫、西卫有窗，不装。")
 D["FF"]["meta"]["cn_notes"].append("14. Rev K：主卧灯开关 S3 挪到主卧南墙中间；卧室 2 门旁开关 S7 改装在短墙的卧室 2 一侧。按键不变。")
 for d in D.values():
     d["meta"]["version"] = VERSION; d["meta"]["rev_cn"] = REV_CN
