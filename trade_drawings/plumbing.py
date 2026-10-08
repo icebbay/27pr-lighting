@@ -293,7 +293,7 @@ def leader(s, pts, txt=None, size=1.9, anchor="start", col="#b00020"):
 
 
 def west_bath_plan(s):
-    """P-04: the west-bath false walls / niches / wall drain drawn to scale + the 'no raised floor' callout"""
+    """P-04: the west-bath false walls / niches / wall drain drawn to scale"""
     rect(s, *WB_SHOWER_WALL, "fill:#f3e3c3;stroke:#a07a3a;stroke-width:.25")
     rect(s, *WB_WC_WALL, "fill:#e9d2a6;stroke:#a07a3a;stroke-width:.25")
     for x0, x1 in WB_NICHES:
@@ -301,30 +301,6 @@ def west_bath_plan(s):
     s.poly([(WB_DRAIN[0], WB_FACE - 0.01), (WB_DRAIN[1], WB_FACE - 0.01)], style="stroke:#c77d1a;stroke-width:.7;fill:none")
     px, py = s.P(*WB_AAV)
     s.add(f'<circle cx="{px:.2f}" cy="{py:.2f}" r=".9" fill="#fff" stroke="#6b3e1e" stroke-width=".3"/>')
-    # callout box in the (empty) master bedroom, leaders to the false walls
-    bx, by, bw = 20.0, 70.0, 74.0
-    lines = ["西卫（主卧卫生间）：地面不抬高 —— 详见 P-08",
-             "• 淋浴盘、马桶直接坐原楼板完成面，不做台阶 / 不垫高",
-             "• 马桶后：假墙 160 厚 × 1100 高，顶面置物平台；",
-             "　 内放 110 落管 + AAV，留检修口",
-             "• 淋浴后：假墙 100 厚到天花，两个壁龛 300 宽，",
-             "　 离地 850–1750，深 80，中间隔板；中间明装恒温淋浴",
-             "• 墙排地漏在假墙内；排水只走假墙内 / 楼板内"] if VARIANT == "A" else \
-            ["西卫（主卧卫生间）：地面不抬高 —— 详见 P-08",
-             "• 淋浴盘、马桶直接坐原楼板完成面，不做台阶 / 不垫高",
-             "• 后墙假墙尽量薄，能借原墙就借：马桶段 1100 高，平台",
-             "　 （AAV + 检修口）；淋浴段到天花，两个壁龛 300 宽，",
-             "　 离地 850–1750，深 80，中间隔板；中间明装恒温淋浴",
-             "• 110 马桶管（方案 B）：假墙内、地面以上 1:40 走到",
-             "　 北墙角，下到楼板，沿北墙下那一格搁栅往后进 S1",
-             "• 墙排地漏在假墙内，接北墙角落管；排水只走假墙 / 楼板内"]
-    h = 3.0 * len(lines) + 2.5
-    s.add(f'<rect x="{bx}" y="{by}" width="{bw}" height="{h:.1f}" fill="#fff" stroke="#b00020" stroke-width=".35"/>')
-    for i, t in enumerate(lines):
-        s.add(f'<text x="{bx+1.5}" y="{by+3.6+i*3.0:.1f}" font-size="{2.1 if i == 0 else 1.85}" fill="{"#b00020" if i == 0 else "#222"}"{BOLD_ if i == 0 else ""}>{html.escape(t)}</text>')
-    for x, y in ((0.78, 2.45), WB_DROP if VARIANT == "B" else (-0.07, 2.48)):
-        a = s.P(x, y)
-        s.add(f'<path d="M{bx+bw:.2f} {by+h/2:.2f} L{a[0]:.2f} {a[1]:.2f}" stroke="#b00020" stroke-width=".22" fill="none"/><circle cx="{a[0]:.2f}" cy="{a[1]:.2f}" r=".45" fill="#b00020"/>')
 
 
 def drainage_marks(s, F):
