@@ -74,8 +74,12 @@ PIPES = [
     # ---- GF supply ----
     ("GF", "mdpe", 25, [(4.00, -0.60), (4.00, 3.00)], "自前院进户 MDPE 25（现场确认位置）"),
     ("GF", "hard", 22, [(4.00, 3.00), (4.00, 8.30)], "22 主管（楼板 / 地坪内）"),
-    # FT 2026-10-08 (owner): inside, one straight run, shortest, no bends — tee right after the stopcock / DCV, diagonal under the slab
-    ("GF", "hard", 15, [(4.00, 3.40), (-4.20, 1.07)], "15 硬水 → 洗车龙头 FT：总阀 + DCV 后三通，地坪下一根直线斜穿到副客厅前门西侧凹角（约 8.5 m，无弯头，全程套管；浇地坪前拍照量位置备案），户外插座正下方出墙（室内隔离阀 + 泄水阀，防冻）"),
+    # FT 2026-10-08 (owner): source = under the boiler (before the softener, still hard); no new holes in existing walls —
+    # out under the kitchen-side French-door threshold, buried along the back, in under the lounge French-door threshold,
+    # one straight run indoors to the front; the front wall at FT is not built yet, so the pipe goes through it there
+    ("GF", "hard", 15, [(1.70, 8.45), (1.70, 8.95), (1.15, 8.95)], "15 硬水 → 洗车龙头 FT：热水器下软水机前三通作总口（硬水）+ 隔离阀 → 厨房侧落地门门槛下出户（不在墙上开洞）"),
+    ("GF", "yard", 20, [(1.15, 8.95), (-2.90, 8.95), (-2.90, 8.10)], "20 MDPE 硬水 后院埋地 ≥ 750，约 4 m（检查井 IC1 / IC4 外侧、MH 内侧之间）→ 客厅后落地门门槛下进屋"),
+    ("GF", "hard", 15, [(-2.90, 8.10), (-2.90, 1.07), (-4.20, 1.07)], "15 硬水：室内地坪下一条直线到前面（不穿墙），转弯到副客厅前门西侧，穿门口新砌外墙（预留套管）接洗车龙头 FT（室内隔离阀 + 泄水阀，防冻）"),
     ("GF", "hard", 15, [(4.00, 8.30), (4.00, 16.15), (3.58, 16.15), (3.58, 16.40)], "15 硬水 → 户外水斗（DCV + 室内隔离阀，防冻保温）"),
     ("GF", "hard", 15, [(3.80, 16.15), (3.80, 16.40)], "15 硬水 → 水池补水（洗衣房内三通 + 隔离阀 + 泄水阀，穿后墙套管）"),
     ("GF", "yard", 20, [(3.80, 16.40), (3.80, 16.95), (3.20, 16.95)], "20 MDPE 埋地 → 后花园水池补水井 TU + 花园龙头（见 P-07）"),
@@ -261,7 +265,7 @@ def setting_out(F):
 
 
 def valves(s, F):
-    V = {"GF": [(4.00, 3.25), (4.00, 8.05), (1.85, 8.30), (3.58, 16.25), (3.80, 16.28), (3.75, 3.33), (-3.90, 1.16), (1.54, 8.40)], "FF": []}
+    V = {"GF": [(4.00, 3.25), (4.00, 8.05), (1.85, 8.30), (3.58, 16.25), (3.80, 16.28), (1.70, 8.65), (-3.90, 1.07), (1.54, 8.40)], "FF": []}
     for x, y in V[F]:
         px, py = s.P(x, y)
         s.add(f'<path d="M{px-1.5:.2f} {py-1:.2f} L{px+1.5:.2f} {py+1:.2f} L{px+1.5:.2f} {py-1:.2f} L{px-1.5:.2f} {py+1:.2f} Z" class="valve"/>')
