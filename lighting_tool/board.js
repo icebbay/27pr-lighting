@@ -20,6 +20,8 @@ const money = v => '£' + v.toFixed(2);
 function homeRun(c) {
   if (c.kind === 'WL') return [25, 0.7];
   if (/环路/.test(c.cable)) return [40, 1.0];   // a ring goes out and comes back
+  if (/10 mm²/.test(c.cable)) return [20, 5.0];
+  if (/6 mm²/.test(c.cable)) return [20, 3.0];
   if (/4 mm²/.test(c.cable)) return [20, 1.8];
   return [20, 1.0];
 }

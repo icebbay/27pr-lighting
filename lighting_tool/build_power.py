@@ -30,15 +30,15 @@ RCBO = "BG 单模块 RCBO（Type A 30 mA），约 £11–16 / 个"
 GF_X = [
     dict(id="WX1", floor="GF", name="一层前区插座（起居室 / 餐厅 / 门厅 / 楼梯）", rooms=["起居室", "餐厅", "储物间#4", "储物间#6", "楼梯"], br="B32 RCBO 30mA", cable=RING, note="起居室电视、吸尘器、电暖器"),
     dict(id="WX2", floor="GF", name="一层客厅插座（客厅 / 卫生间）", rooms=["客厅", "卫生间", "储物间#12"], br="B32 RCBO 30mA", cable=RING, note="客厅电视"),
-    dict(id="WX3", floor="GF", name="厨房插座（厨房 / 吧台区，含冰箱、洗碗机、燃气灶点火）", rooms=["厨房", "厨房（吧台区）"], br="B32 RCBO 30mA", cable=RING, note="电水壶等集中，用量接近满载"),
+    dict(id="WX3", floor="GF", name="厨房插座（厨房 / 吧台区，含冰箱、洗碗机、燃气灶点火）", rooms=["厨房", "厨房（吧台区）"], br="B32 RCBO 30mA", cable="6 mm² 径向 32A（业主 2026-10-08 要求加粗）", note="电水壶等集中，用量接近满载；6 mm² 径向代替 2.5 mm² 环路"),
     dict(id="WX4", floor="GF", name="洗衣房（洗衣机 + 烘干机 + 洗衣房插座）", rooms=["洗衣房"], br="B32 RCBO 30mA", cable="4 mm² 径向 32A", note="两台同时用约 4.5 kW"),
 ]
 WP = [
-    dict(id="WP1", name="烤箱", br="B20 RCBO 30mA", cable="2.5 mm² 径向（> 4.6 kW 的烤箱改 4 mm² / 32A）"),
+    dict(id="WP1", name="烤箱", br="B32 RCBO 30mA", cable="6 mm² 径向（业主 2026-10-08 要求加粗）"),
     dict(id="WP2", name="电梯", br="按电梯厂家要求（常见 B16–B20）", cable="按厂家", note="厂家通常要求独立隔离开关"),
-    dict(id="WP3", name="空调 1", br="按空调型号（常见 B16）", cable="2.5 mm²（按型号复核）", note="书房（卧室 3）北墙，见二层插座图「高」"),
-    dict(id="WP4", name="空调 2", br="按空调型号（常见 B16）", cable="2.5 mm²（按型号复核）", note="卧室 4 南墙（2026-10-06 改到南墙），见二层插座图「高」"),
-    dict(id="WP5", name="充电桩（门口）", br="B32/B40 RCBO Type A + 直流漏电保护（或充电桩自带）", cable="6–10 mm²（按距离复核）", note="7 kW；配电箱 → 客厅内充电桩背面墙 40A 双极隔离开关（室内总控，随时可断电）→ 门外充电桩；安装前通知供电公司 DNO；建议加负载管理（CT 互感器）"),
+    dict(id="WP3", name="空调 1", br="按空调型号（常见 B16）", cable="6 mm² 径向（业主 2026-10-08 要求加粗）", note="书房（卧室 3）北墙，见二层插座图「高」"),
+    dict(id="WP4", name="空调 2", br="按空调型号（常见 B16）", cable="6 mm² 径向（业主 2026-10-08 要求加粗）", note="卧室 4 南墙（2026-10-06 改到南墙），见二层插座图「高」"),
+    dict(id="WP5", name="充电桩（门口）", br="B32/B40 RCBO Type A + 直流漏电保护（或充电桩自带）", cable="10 mm² 径向（预留，业主 2026-10-08 要求）", note="7 kW；配电箱 → 客厅内充电桩背面墙 40A 双极隔离开关（室内总控，随时可断电）→ 门外充电桩；安装前通知供电公司 DNO；建议加负载管理（CT 互感器）"),
 ]
 ALL_GF = [c["id"] for c in LJ["GF"]["circuits"]]
 ALL_FF = [c["id"] for c in LJ["FF"]["circuits"]]
@@ -88,7 +88,7 @@ PLANS = {
             dict(id="WX7", floor="FF", name="主卧插座（主卧 / 北卫 / 楼梯 / 电梯旁）", rooms=["主卧", "卫生间#0", "楼梯", "电梯"], br="B20 RCBO 30mA", cable=RAD20, note="电脑 + 电视"),
             dict(id="WX8", floor="FF", name="次卧插座（卧室 2 / 衣帽间 / 盥洗室 / 西卫）", rooms=["卧室 2", "衣帽间", "盥洗室", "卫生间#2"], br="B20 RCBO 30mA", cable=RAD20, note="电脑 + 电视；电热毛巾架经带保险开关接这里"),
         ], outdoor="WX5", fridge="WP6",
-        WP=WP + [dict(id="WP6", name="冰箱", br="B16 RCBO 30mA", cable="2.5 mm² 径向", note="单独一路：别处跳闸冰箱不断电")],
+        WP=WP + [dict(id="WP6", name="冰箱", br="B16 RCBO 30mA", cable="6 mm² 径向（业主 2026-10-08 要求加粗）", note="单独一路：别处跳闸冰箱不断电")],
         board=dict(model="British General CF22MS19-01", ways=19, price=79.99, code="562CY", url="https://www.screwfix.com/p/british-general-22-module-19-way-part-populated-high-integrity-main-switch-consumer-unit-with-spd/562cy",
                    spd="40kA Type 2 SPD（自带）", size="宽 496 × 高 231 × 深 116 mm（单排）",
                    main="100A 总闸", rcbo=RCBO, reserve="预留 1 位：书房 / 卧室 4 以后拆成两路（现在各拉一根线，接在同一个 RCBO 上）",
