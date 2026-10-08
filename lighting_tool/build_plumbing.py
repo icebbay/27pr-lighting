@@ -15,8 +15,8 @@ os.environ["WB_VARIANT"] = "B"
 import plumbing as P
 from plan_base import Frame
 
-SUPPLY = ["mdpe", "hard", "yard", "soft", "hot", "pure"]
-DRAIN = ["soil", "waste", "ug", "sw"]
+SUPPLY = ["mdpe", "hard", "yard", "soft", "hot", "pure", "gas"]
+DRAIN = ["soil", "waste", "ug", "sw", "prv"]
 SHEET = {("GF", "supply"): "P-01", ("FF", "supply"): "P-02", ("GF", "drain"): "P-03", ("FF", "drain"): "P-04"}
 
 
