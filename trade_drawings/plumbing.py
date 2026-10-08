@@ -29,15 +29,18 @@ STYLE = {   # kind: (colour, width mm, dash, label)
     "sw":    ("#2e7d32", 1.0, "2.5 1.2", "地表水 Surface water（110 mm PVC-U，≥ 1:80）→ 渗水井，不接污水"),
     "gas":   ("#d4a000", 0.8, "4 1", "燃气 Natural gas（铜管 22 / 15，Gas Safe 注册技工施工）"),
     "prv":   ("#8d6e63", 0.5, "1 0.6", "锅炉安全阀排放 15 铜管（出户，管口朝下贴墙，不接下水道）"),
+    "ufh":   ("#8e24aa", 0.8, "", "地暖供 / 回水 UFH flow / return（两根并行，保温，见 P-09）"),
 }
 
 SHORT = {"mdpe": "进户", "hard": "冷水（硬）", "soft": "冷水（软）", "hot": "热水", "pure": "净水", "waste": "废水", "soil": "污水", "ug": "地下排水",
-         "yard": "花园给水", "sw": "地表水", "gas": "燃气", "prv": "安全阀排放"}
+         "yard": "花园给水", "sw": "地表水", "gas": "燃气", "prv": "安全阀排放", "ufh": "地暖供回"}
 
 EQUIP = [   # id, floor, x, y, w, d (m), text
     ("SC", "GF", 4.00, 3.00, 0.18, 0.18, "总阀 Stopcock + 泄水阀 + DCV（楼梯下）"),
     ("SOFT", "GF", 1.54, 8.53, 0.32, 0.46, "G24 中央软水机 Softener（锅炉正下方，带三阀旁通）"),
     ("BLR", "GF", 1.51, 8.33, 0.44, 0.34, "G23 Vaillant combi 锅炉（挂墙 1.25–1.97 m）"),
+    ("UF1", "GF", 3.85, 6.20, 0.60, 0.15, "地暖分水器 UF1（一层，楼梯下）：混水泵组 + 接线中心，约 11 路"),
+    ("UF2", "FF", 1.30, 8.12, 0.60, 0.15, "地暖分水器 UF2（二层，R1 旁箱封加宽约 600，带检修门）：混水泵组 + 接线中心，约 10 路"),
     ("GM", "GF", 3.70, 2.85, 0.30, 0.18, "燃气表 Gas meter（位置现场确认，暂按楼梯下）"),
     ("HOB", "GF", 4.02, 13.13, 0.45, 0.30, "燃气灶 Gas hob（抽油烟机 G01 正下方，灶台下设燃气阀）"),
     ("TD", "GF", 1.45, 8.72, 0.12, 0.12, "漏斗 Tundish（空气隔断）：锅炉冷凝水 + 软水机再生排水 / 溢流"),
@@ -51,7 +54,7 @@ FIX = {     # id: floor, x, y, name, supplies, drain (kind, size)
     "G19":  ("GF", -1.27, 6.67, "一层卫生间台盆 Basin", "SH", ("waste", 32)),
     "SINK": ("GF", 3.04, 10.73, "厨房岛台水槽 Kitchen sink（冷水接进户硬水）", "CHP", ("waste", 40)),
     "DW":   ("GF", 3.97, 11.62, "洗碗机 Dishwasher", "S", ("waste", 40)),
-    "LDY":  ("GF", 3.90, 15.44, "洗衣柜（洗衣机 + 干衣机只接冷水；上盆冷 / 热）Laundry", "SH", ("waste", 40)),
+    "LDY":  ("GF", 3.90, 15.44, "洗衣柜（洗衣机 + 烘干机只接冷水，烘干机排水并入洗衣机排水口；上盆冷 / 热）Laundry", "SH", ("waste", 40)),
     "OUT":  ("GF", 3.58, 16.45, "户外水斗 Outdoor sink", "C", ("waste", 32)),
     "CAR":  ("GF", -4.27, 1.07, "洗车龙头 Outside tap（副客厅前门西侧凹角，户外插座正下方，离地约 380）", "C", ("车道", 0)),
     "F13":  ("FF", 0.79, 1.93, "西卫智能马桶 WC（需 13A 插座，坐原楼板，不抬高）", "S", ("soil", 110)),
@@ -104,6 +107,11 @@ PIPES = [
     # ---- GF gas (2026-10-08): meter -> under the stair-side kitchen doorway (no wall holes) -> boiler 22 / hob 15 ----
     ("GF", "gas", 22, [(3.70, 2.85), (3.70, 7.85), (2.95, 7.85), (2.95, 8.40), (1.75, 8.40)], "22 燃气 → 锅炉：燃气表 → 楼梯旁厨房门洞下过（不在墙上开洞）→ 锅炉燃气阀（combi 须 22 mm，按 Vaillant 说明书复核压降）"),
     ("GF", "gas", 15, [(2.95, 8.40), (3.70, 8.40), (3.70, 13.13), (3.95, 13.13)], "15 燃气 → 燃气灶：沿厨房东侧 → 灶台下燃气阀（地坪内须用带护套铜管 / 套管，或沿柜底明装）"),
+    # ---- UFH flow / return (2026-10-08, whole house): boiler -> UF1 under the stairs (via the stair-side kitchen doorway, no wall holes);
+    #      up R1 with the water risers -> UF2 ----
+    ("GF", "ufh", 22, [(1.62, 8.52), (3.05, 8.52), (3.05, 7.80), (3.85, 7.80), (3.85, 6.20)], "22 地暖供 / 回（两根）：锅炉 → 楼梯旁厨房门洞下 → 楼梯下分水器 UF1"),
+    ("GF", "ufh", 22, [(1.50, 8.45), (1.42, 8.22)], "22 地暖供 / 回 ↑ 经 R1 立管上二层 → UF2"),
+    ("FF", "ufh", 22, [(1.42, 8.22), (1.30, 8.12)], "22 地暖供 / 回（自 R1）→ 分水器 UF2"),
     # ---- FF supply (R1 riser from the boiler) ----
     ("FF", "soft", 22, [(1.37, 8.23), (3.45, 8.23), (3.45, 9.20), (4.15, 9.20), (4.15, 11.00)], "22 → 后卫（马桶 / 台盆 / 淋浴）"),
     ("FF", "hot", 22, [(1.42, 8.29), (3.50, 8.29), (3.50, 9.26), (4.10, 9.26), (4.10, 11.05)], "22 热"),
@@ -120,7 +128,7 @@ PIPES = [
     ("GF", "waste", 32, [(-1.27, 6.67), (-1.00, 6.67), (-1.00, 7.82), (-1.20, 7.82)], "32 台盆（接马桶支管 strap-on boss）"),
     ("GF", "waste", 40, [(3.04, 10.73), (1.15, 10.73), (0.40, 10.73)], "40 岛台水槽 → G2（地坪内预埋，≥1:40）"),
     ("GF", "waste", 40, [(3.97, 11.62), (3.04, 11.62), (3.04, 10.80)], "40 洗碗机"),
-    ("GF", "waste", 40, [(3.90, 15.44), (3.85, 15.55)], "40 洗衣机 + 上盆（存水弯）→ 地坪下 50 废水管"),
+    ("GF", "waste", 40, [(3.90, 15.44), (3.85, 15.55)], "40 洗衣机 + 烘干机（排水软管 Y 接头共用洗衣机排水口）+ 上盆（存水弯）→ 地坪下 50 废水管"),
     ("GF", "waste", 32, [(3.58, 16.45), (3.58, 16.10), (3.85, 15.70)], "32 户外水斗 → 穿后墙 → 接洗衣房地坪下管"),
     ("GF", "waste", 50, [(3.85, 15.80), (0.70, 11.00)], "50 废水（洗衣机 + 台盆 + 户外水斗）斜穿厨房地坪下 → 穿西墙 → IC2（约 5.7 m，≥ 1:40，起点留清扫口）"),
     ("GF", "ug", 110, [(0.40, 10.73), (0.70, 11.00)], ""),
@@ -367,7 +375,7 @@ def plan_sheet(F, which, number):
     title = f"{fl} {'给水平面图 Water supply' if which == 'supply' else '排水平面图 Drainage'}"
     s = Sheet(title, number, F, bounds(F), discipline="给排水 Plumbing & drainage")
     s.base_plan(F)
-    kinds = ["mdpe", "hard", "yard", "soft", "hot", "pure", "gas"] if which == "supply" else ["soil", "waste", "ug", "prv"]
+    kinds = ["mdpe", "hard", "yard", "soft", "hot", "pure", "gas", "ufh"] if which == "supply" else ["soil", "waste", "ug", "prv"]
     runs = []
     for fl_, kind, size, pts, label in PIPES:
         if fl_ == F and kind in kinds:
@@ -379,7 +387,8 @@ def plan_sheet(F, which, number):
     if which == "supply": valves(s, F)
     else: drainage_marks(s, F)
     legend(s, [k for k in kinds if F == "GF" or k not in ("mdpe", "pure", "ug", "yard", "gas", "prv")], x=168, y=219)
-    table(s, 14, 214, [("No.", 7), ("介质", 15), ("管径", 9), ("走向 / 说明 Route", 117)], runs, fs=1.85, title="管段表 Pipe schedule（图中圆圈编号）")
+    table(s, 14, 214, [("No.", 7), ("介质", 15), ("管径", 9), ("走向 / 说明 Route", 117)], runs, fs=1.85 if len(runs) <= 18 else 1.45,
+          title="管段表 Pipe schedule（图中圆圈编号）")
     fx = [[CODE[k], v[3], v[4] if which == "supply" else (f"{v[5][0]} Ø{v[5][1]}" if v[5][1] else "车道排水")] for k, v in FIX.items() if v[0] == F]
     y = table(s, 300, 32, [("编号", 10), ("用水点 Fixture", 70), ("给水" if which == "supply" else "排水", 18)], fx, fs=1.85,
               title="用水点 Fixtures（S 软冷 H 热 C 冷 P 净水）" if which == "supply" else "用水点 Fixtures")
@@ -686,7 +695,7 @@ def cover_sheet():
     A('<text x="16" y="34" font-size="3.4" font-weight="bold">图纸目录 Drawing list</text>')
     for i, t in enumerate(["P-00 目录 + 设计说明", "P-01 一层给水平面图", "P-02 二层给水平面图", "P-03 一层排水平面图（含地下排水）",
                            "P-04 二层排水平面图（西卫马桶管：方案 B 走北墙）", "P-05 给水系统图 + 排水系统图", "P-06 设备详图：锅炉 + 软水机、水槽下净水器", "P-07 后花园水池：补水 + 地沟 + 渗水井",
-                           "P-08 西卫后墙详图：地面不抬高 · 马桶平台 · 淋浴壁龛 · 110 走北墙（方案 B）"]):
+                           "P-08 西卫后墙详图：地面不抬高 · 马桶平台 · 淋浴壁龛 · 110 走北墙（方案 B）", "P-09 地暖系统图：分水器、分区、温控、地面构造"]):
         A(f'<text x="20" y="{40+i*4.6}" font-size="2.5">{html.escape(t)}</text>')
     A('<text x="16" y="86" font-size="3.4" font-weight="bold">设计依据与条件 Basis</text>')
     basis = ["• UK Water Supply (Water Fittings) Regulations 1999、WRAS 认证产品；Building Regulations Part G（卫生与热水）、Part H（排水）、Part L（保温）。",
@@ -773,6 +782,75 @@ def garden_sheet():
     return s
 
 
+UFH_ZONES = {   # owner 2026-10-08: whole house wet UFH; one wireless room thermostat per zone
+    "GF": [("Z1", "起居室", 2), ("Z2", "客厅", 2), ("Z3", "餐厅", 2), ("Z4", "厨房 + 吧台区（避开岛台、橱柜、冰箱下）", 2),
+           ("Z5", "洗衣房", 1), ("Z6", "一层卫生间", 1), ("Z7", "门厅 / 楼梯 / 储物间", 1)],
+    "FF": [("Z1", "主卧", 2), ("Z2", "卧室 2 + 衣帽间 + 盥洗室", 2), ("Z3", "西卫（主卧卫生间）", 1), ("Z4", "北卫", 1),
+           ("Z5", "卧室 3（书房）", 1), ("Z6", "卧室 4 + 套内卫生间", 2), ("Z7", "走廊 / 楼梯平台", 1)],
+}
+
+
+def ufh_sheet():
+    """P-09: whole-house wet underfloor heating — manifolds, zones, controls, floor build-ups (schematic, NTS)"""
+    s = Sheet("地暖系统图 Underfloor heating（全屋地暖，示意）", "P-09", "", ((0, 1), (0, 1)), scale_note="NTS", discipline="给排水 Plumbing & heating")
+    A = s.add
+    PU = STYLE["ufh"][0]
+
+    def box(x, y, w, h, t, cls="eq", fs=2.4):
+        A(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" class="{cls}" rx="1"/><text x="{x+w/2}" y="{y+h/2+0.9}" font-size="{fs}" text-anchor="middle">{html.escape(t)}</text>')
+
+    def ln(pts, col=PU, w=0.8, dash=""):
+        A('<path d="M' + " L".join(f"{a} {b}" for a, b in pts) + f'" fill="none" stroke="{col}" stroke-width="{w}" stroke-dasharray="{dash}"/>')
+
+    A('<text x="16" y="30" font-size="3.4" font-weight="bold">① 系统 System</text>')
+    box(20, 40, 46, 16, "G23 Vaillant combi 锅炉（厨房）")
+    A('<text x="20" y="62" font-size="2.1">热水优先；采暖出水按地暖设定（约 45–50 °C），</text><text x="20" y="66" font-size="2.1">分水器混水阀再降到约 35–40 °C</text>')
+    ln([(66, 46), (90, 46), (90, 44), (110, 44)]); ln([(66, 50), (92, 50), (92, 52), (110, 52)], dash="2 1")
+    A('<text x="72" y="43" font-size="2" fill="#8e24aa">22 供 flow</text><text x="72" y="55" font-size="2" fill="#8e24aa">22 回 return</text>')
+    for k, (F, y0, nm, where) in enumerate((("GF", 36, "UF1 一层分水器", "楼梯下（总阀旁）"), ("FF", 96, "UF2 二层分水器", "R1 旁箱封内（经 R1 立管上楼）"))):
+        if k: ln([(100, 44), (100, 100), (110, 100)]); ln([(102, 52), (102, 108), (110, 108)], dash="2 1")
+        box(110, y0, 60, 28, "", "eq")
+        A(f'<text x="140" y="{y0+7}" font-size="2.6" text-anchor="middle" font-weight="bold">{nm}</text><text x="140" y="{y0+12}" font-size="2.1" text-anchor="middle">{where}</text>'
+          f'<text x="140" y="{y0+17}" font-size="2" text-anchor="middle">混水泵组 + 恒温混水阀 + 流量计</text><text x="140" y="{y0+21.5}" font-size="2" text-anchor="middle">接线中心（无线温控接收）· FCU 3A 供电</text>'
+          f'<text x="140" y="{y0+26}" font-size="2" text-anchor="middle">约 {sum(z[2] for z in UFH_ZONES[F])} 路</text>')
+        for i, (zid, room, loops) in enumerate(UFH_ZONES[F]):
+            yy = y0 - 2 + i * 6
+            ln([(170, y0 + 14), (182, yy + 3)], w=0.4)
+            box(182, yy, 92, 5, f"{zid} {room}（{loops} 路）· 无线温控器", "fix", 2)
+    A('<text x="16" y="150" font-size="3.4" font-weight="bold">② 地面构造 Floor build-up</text>')
+    # GF screed build-up
+    layers = [("完成面（地砖 / 木地板，选地暖适用型）", "#f5f0e6", 4), ("找平层 / 湿铺砂浆 65（或自流平 45）", "#dedede", 9),
+              ("地暖管 16 PE-RT / PEX-AL-PEX，间距 150–200，卡钉固定", "#e1bee7", 3), ("保温板 PIR 75–100 + 周边隔热条 8", "#fff59d", 10),
+              ("防潮层 DPM", "#90a4ae", 2), ("原地坪（已挖开，按此重做）", "#bcaaa4", 8)]
+    y = 158
+    A('<text x="20" y="156" font-size="2.4" font-weight="bold">一层 GF：混凝土地坪 + 湿式地暖</text>')
+    for t, c, h in layers:
+        A(f'<rect x="20" y="{y}" width="60" height="{h}" fill="{c}" stroke="#666" stroke-width=".2"/><text x="84" y="{y+h/2+0.8}" font-size="2.1">{html.escape(t)}</text>'); y += h
+    A('<text x="216" y="156" font-size="2.4" font-weight="bold">二层 FF：木搁栅楼板，搁栅之间装地暖（地面不加高）</text>')
+    jx = 216
+    A(f'<rect x="{jx}" y="160" width="120" height="4" fill="#d7ccc8" stroke="#666" stroke-width=".2"/><text x="{jx+124}" y="163" font-size="2.1">完成面 + 地板 / 瓷砖背板（原标高）</text>')
+    for i in range(4):
+        x0 = jx + 4 + i * 38
+        A(f'<rect x="{x0}" y="164" width="8" height="40" fill="#bcaaa4" stroke="#666" stroke-width=".2"/>')
+        if i < 3:
+            A(f'<path d="M{x0+8} 165 h30" stroke="#90a4ae" stroke-width="1.2"/><circle cx="{x0+18}" cy="166.5" r="1.4" fill="#e1bee7" stroke="#8e24aa" stroke-width=".3"/>'
+              f'<circle cx="{x0+28}" cy="166.5" r="1.4" fill="#e1bee7" stroke="#8e24aa" stroke-width=".3"/><rect x="{x0+8}" y="168" width="30" height="10" fill="#fff59d" stroke="#999" stroke-width=".2"/>')
+    A(f'<text x="{jx+124}" y="167" font-size="2.1">铝导热板 + 地暖管（在搁栅之间，从上面装）</text><text x="{jx+124}" y="174" font-size="2.1">搁栅间保温（下面挡板托住）</text>'
+      f'<text x="{jx+124}" y="196" font-size="2.1">搁栅 Joist（不切、不开槽；管子顺搁栅方向走，</text><text x="{jx+124}" y="200" font-size="2.1">换格时在搁栅中线打孔穿过）</text>')
+    req = ["说明 Notes",
+           "1. 全屋湿式地暖（业主 2026-10-08）：combi 锅炉直接带地暖，不设热水缸、不另设暖气片；两个分水器 UF1（一层楼梯下）/ UF2（二层 R1 旁箱封）。",
+           "2. 盘管路数、间距、单路长度（≤ 100 m）、热负荷与锅炉功率由地暖供应商按本图分区深化出图；本图只定分水器位置、分区和走管原则。",
+           "3. 温控：每区一个无线温控器（不用在墙里布线），接分水器旁接线中心；接线中心给锅炉采暖需求信号。每个分水器一个 3A FCU 供电（见插座图）。",
+           "4. 不铺管：橱柜 / 岛台 / 冰箱 / 衣柜固定柜体下，马桶地脚螺栓处；西卫马桶 110 管所在那一格搁栅（北墙下）不铺地暖管。",
+           "5. 二层地面不加高（含西卫「地面不抬高」）：搁栅之间装导热板；一层随地坪重做，地坪内的给水 / 排水 / 燃气管在地暖管下方先铺好并拍照留档。",
+           "6. 完成面材料选地暖适用型；初次加热按供应商要求逐步升温。"]
+    lines = [l for n in req for l in (wrap(n, 108) if not n.startswith("说明") else [n])]
+    for i, l in enumerate(lines):
+        A(f'<text x="216" y="{214 + i * 3.4:.1f}" font-size="{2.4 if i == 0 else 2.1}"{BOLD_ if i == 0 else ""}>{html.escape(l)}</text>')
+    s.frame()
+    return s
+
+
 def sheets():
     return [cover_sheet(), plan_sheet("GF", "supply", "P-01"), plan_sheet("FF", "supply", "P-02"),
-            plan_sheet("GF", "drain", "P-03"), plan_sheet("FF", "drain", "P-04"), schematic_sheet(), detail_sheet(), garden_sheet(), west_bath_sheet()]
+            plan_sheet("GF", "drain", "P-03"), plan_sheet("FF", "drain", "P-04"), schematic_sheet(), detail_sheet(), garden_sheet(), west_bath_sheet(), ufh_sheet()]

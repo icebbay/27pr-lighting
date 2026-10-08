@@ -3,7 +3,7 @@
 (function () {
   const D = window.PLUMBING, L = window.LIGHTING_DEFAULT;
   const FCN = { GF: '一层 ', FF: '二层 ' };
-  const PDF = [['27PR_给排水施工图_RevC.pdf', '给排水施工图 P-00…P-08（Rev C）'], ['27PR_照明布线施工图_RevC.pdf', '照明布线施工图 E-01…E-03'],
+  const PDF = [['27PR_给排水施工图_RevC.pdf', '给排水施工图 P-00…P-09（Rev C）'], ['27PR_照明布线施工图_RevC.pdf', '照明布线施工图 E-01…E-03'],
                ['27PR_插座动力施工图_RevC.pdf', '插座动力施工图 E-11…E-13']];
   const pdfUrl = f => '../trade_drawings/out/' + encodeURIComponent(f);
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));

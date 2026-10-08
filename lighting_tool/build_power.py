@@ -214,6 +214,11 @@ DED.append(dict(c="WP5", label="充电桩室内控制开关（40A 双极隔离�
 # cooker-hood socket high inside the hood chimney cover; one heat + CO alarm on the kitchen ceiling (boiler is in the kitchen), mains, on the lighting circuit
 DED.append(dict(c="WX3", label="锅炉 + 软水机（双联面板：锅炉 FCU 3A + 软水机插座，离地约 700）", fcu="FCU6", x=_b2t(1.32, 8.62)[0], y=_b2t(1.32, 8.62)[1], floor="GF"))
 DED.append(dict(c="WX3", label="抽油烟机高位插座（烟机罩内，离地约 2200）", fcu="高位", x=_b2t(4.20, 13.13)[0], y=_b2t(4.20, 13.13)[1], floor="GF"))
+_MF = json.load(open(os.path.join(HERE, "b2t_FF.json")))
+_b2tF = lambda x, y: (round(x * _MF[0][0] + y * _MF[1][0] + _MF[2][0]), round(x * _MF[0][1] + y * _MF[1][1] + _MF[2][1]))
+# whole-house UFH (owner 2026-10-08): each manifold's pump + wiring centre on a 3A FCU
+DED.append(dict(c="WX1", label="地暖分水器 UF1 接线中心 + 混水泵（FCU 3A，楼梯下）", fcu="FCU7", x=_b2t(3.70, 6.20)[0], y=_b2t(3.70, 6.20)[1], floor="GF"))
+DED.append(dict(c="WX6", label="地暖分水器 UF2 接线中心 + 混水泵（FCU 3A，R1 旁箱封）", fcu="FCU8", x=_b2tF(1.20, 8.00)[0], y=_b2tF(1.20, 8.00)[1], floor="FF"))
 DED.append(dict(c="WL1", label="温感 + 一氧化碳报警器（厨房天花，市电，接一层照明回路）", alarm=True, x=_b2t(2.40, 9.40)[0], y=_b2t(2.40, 9.40)[1], floor="GF"))
 for d in DED:
     if not isinstance(d["c"], dict): d["c"] = {p: d["c"] for p in PLANS}
