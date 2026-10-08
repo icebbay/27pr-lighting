@@ -11,7 +11,7 @@ import json, os, re, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 TD = os.path.join(os.path.dirname(HERE), "trade_drawings")
 sys.path.insert(0, TD)
-os.environ["WB_VARIANT"] = "A"
+os.environ["WB_VARIANT"] = "B"
 import plumbing as P
 from plan_base import Frame
 
@@ -24,7 +24,7 @@ def r(v): return round(v)
 
 
 def main():
-    out = dict(rev="给排水施工图 Rev B · 2026-10-08（模型 v42）",
+    out = dict(rev="给排水施工图 Rev C · 2026-10-08（西卫按方案 B：走北墙）",
                style={k: dict(color=c, w=w, dash=d, label=t, short=P.SHORT[k], sys="supply" if k in SUPPLY else "drain")
                       for k, (c, w, d, t) in P.STYLE.items()},
                floors={})
@@ -62,10 +62,10 @@ def main():
             xx, ya, yb = P.CHANNEL
             marks.append(dict(kind="channel", name="地沟 CH 100 宽", pts=[T(xx - 0.05, ya), T(xx + 0.05, ya), T(xx + 0.05, yb), T(xx - 0.05, yb)]))
         else:
-            for nm, (a0, a1, b0, b1) in (("西卫淋浴段假墙 100 厚到天花（两个壁龛）", P.WB_SHOWER_WALL), ("西卫马桶段假墙 160 × 1100（顶面平台，内有 110 + AAV）", P.WB_WC_WALL)):
+            for nm, (a0, a1, b0, b1) in (("西卫淋浴段假墙到天花（尽量薄，能借原墙就借；两个壁龛）", P.WB_SHOWER_WALL), ("西卫马桶段假墙高 1100（顶面平台，110 横管起点 + AAV）", P.WB_WC_WALL)):
                 marks.append(dict(kind="wall", name=nm, pts=[T(a0, b0), T(a1, b0), T(a1, b1), T(a0, b1)]))
             for a0, a1 in P.WB_NICHES:
-                marks.append(dict(kind="niche", name="壁龛 300 宽 × 深 80，离地 850–1750", pts=[T(a0, 2.43), T(a1, 2.43), T(a1, 2.51), T(a0, 2.51)]))
+                marks.append(dict(kind="niche", name="壁龛 300 宽 × 深 80，离地 850–1750", pts=[T(a0, P.NICHE_Y[0]), T(a1, P.NICHE_Y[0]), T(a1, P.NICHE_Y[1]), T(a0, P.NICHE_Y[1])]))
         # view box: walls + everything drawn, with a margin
         near = [q for q in pipes if q["kind"] != "sw"]; pe = [e for e in pts_extra if e["id"] != "SA"]   # soakaway far down the lawn: pan to it
         xs = [p[0] for q in near for p in q["pts"]] + [f["p"][0] for f in fixtures] + [e["p"][0] for e in pe]

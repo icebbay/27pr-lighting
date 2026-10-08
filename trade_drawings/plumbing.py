@@ -7,8 +7,13 @@ combi boiler (Vaillant ecoTEC plus, G23) with the central softener (G24) right b
 no existing soil stack to reuse (stacks are designed here). Everything marked 现场确认 must be checked on site.
 """
 import html, math, os, re
-VARIANT = os.environ.get("WB_VARIANT", "A")   # 西卫马桶走法：A 落进本格搁栅直着往后；B 假墙内走到北墙角再沿北墙下往后
-from plan_base import Sheet, BASE_CSS, MM, wrap
+VARIANT = os.environ.get("WB_VARIANT", "B")   # 西卫马桶走法：B（2026-10-08 定为正式）假墙内走到北墙角再沿北墙下往后；A 落进本格搁栅直着往后（已弃用）
+from plan_base import Sheet as _Sheet, BASE_CSS, MM, wrap
+
+
+def Sheet(*a, **k):
+    k.setdefault("rev", "C"); k.setdefault("date", "2026-10-08")
+    return _Sheet(*a, **k)
 
 # ---------------- design data ----------------
 STYLE = {   # kind: (colour, width mm, dash, label)
@@ -119,11 +124,11 @@ PIPES = [
     ("FF", "waste", 40, [(-2.02, 6.64), (-2.02, 6.47), (-1.25, 6.47), (-1.25, 6.95), (-1.16, 7.00)], "40 台盆 → 落进楼板 → 接淋浴废水"),
     (("FF", "soil", 110, [(0.79, 2.18), (0.79, 2.45), (0.75, 2.62), (0.75, 7.80), (-0.70, 7.85), (-0.70, 8.16), (-0.76, 8.29)], "110 西卫马桶 → 马桶段假墙内下到楼板（完成面下约 150）→ 落进本格搁栅直着往后 1:40 → 后墙内侧借梁位横走到 S1 旁 → 出墙进 S1（墙外无横管；起点 AAV 在假墙内）")
      if VARIANT == "A" else
-     ("FF", "soil", 110, [(0.78, 2.20), (0.78, 2.45), (-0.31, 2.45), (-0.31, 2.62), (-0.31, 8.30), (-0.73, 8.30)], "110 西卫马桶 → 假墙内（地面以上）沿后墙到北墙角 → 落进北墙下那一格搁栅 → 直着往后约 5.7 m → 穿后墙 → S1 右口（起点 AAV）")),
-    ("FF", "waste", 40, [(-0.15, 2.44), (-0.15, 2.48), (0.70, 2.46), (0.79, 2.45)] if VARIANT == "A" else [(-0.15, 2.40), (-0.25, 2.43)], "40 淋浴墙排地漏 → 淋浴段假墙（100 厚）内、地面以上 → 马桶落管侧口 boss（不进地面、不抬地面）" if VARIANT == "A" else "40 淋浴墙排地漏 → 假墙内（地面以上）→ 马桶管侧口"),
+     ("FF", "soil", 110, [(0.78, 2.20), (0.78, 2.45), (-0.31, 2.45), (-0.31, 2.62), (-0.31, 8.30), (-0.73, 8.30)], "110 西卫马桶 → 假墙内（地面以上）沿后墙 1:40 到北墙角（约 1.1 m，起点 AAV 在马桶段检修口内）→ 下到楼板，落进北墙下那一格搁栅 → 直着往后约 5.7 m（1:40）→ 穿后墙 → S1 侧口")),
+    ("FF", "waste", 40, [(-0.15, 2.44), (-0.15, 2.48), (0.70, 2.46), (0.79, 2.45)] if VARIANT == "A" else [(-0.15, 2.38), (-0.25, 2.43), (-0.31, 2.45)], "40 淋浴墙排地漏 → 淋浴段假墙（100 厚）内、地面以上 → 马桶落管侧口 boss（不进地面、不抬地面）" if VARIANT == "A" else "40 淋浴墙排地漏 → 淋浴段假墙内、地面以上 → 北墙角 110 落管侧口 boss（不进地面、不抬地面）"),
     (("FF", "waste", 40, [(-0.32, 0.72), (-0.32, 2.40), (0.70, 2.42)], "40 盥洗室台盆 → 垂直落进楼板 → 楼板内往后 → 接马桶落管侧口（楼板内，在 110 弯头上方）")
      if VARIANT == "A" else
-     ("FF", "waste", 40, [(-0.32, 0.72), (-0.40, 0.72), (-0.40, 2.80), (-0.33, 2.90)], "40 盥洗室台盆 → 垂直落进楼板 → 同一格搁栅里往后 → 侧面接西卫马桶管")),
+     ("FF", "waste", 40, [(-0.32, 0.72), (-0.40, 0.72), (-0.40, 2.80), (-0.33, 2.90)], "40 盥洗室台盆 → 垂直落进楼板 → 北墙下同一格搁栅里往后 → 侧面接西卫马桶管（楼板内）")),
 ]
 
 # ---- rear-garden pond (Blender Pond_* / Rockery_*, v40): coping outer x -4.675..-2.765, y 14.745..17.155; water x -4.45..-2.99,
@@ -164,15 +169,15 @@ NOTES_SUPPLY = [
     "5. 管材：铜管或 PEX（WRAS 认证），主管 22 mm、支管 15 mm；热水管及外墙 / 楼板内冷水管全部保温。",
     "6. 每个用水点装检修隔离阀（service valve）；淋浴用恒温混水阀；户外龙头装 DCV、室内可关断，冬季可排空。",
     "[GF]7. 岛台水槽在地面中间：冷 / 热 / 净水管和排水管须在地坪浇筑前预埋（带套管），位置以厨房深化图为准（现场确认）。",
-    "[FF]8. 西卫（主卧卫生间）地面不抬高：冷 / 热水从衣帽间楼板内进西卫后墙假墙，在淋浴段假墙（100 厚）内竖上到明装恒温淋浴阀（离地约 1050），马桶给水在马桶段假墙内；不得为走管抬高地面。详见 P-08。",
+    "[FF]8. 西卫（主卧卫生间）地面不抬高：冷 / 热水从衣帽间楼板内进西卫后墙假墙，在淋浴段假墙内竖上到明装恒温淋浴阀（离地约 1050），马桶给水在马桶段假墙内；不得为走管抬高地面。详见 P-08。",
 ]
 NOTES_DRAIN = [
     "说明 Notes",
     "1. 新设 2 根 110 污水立管：S1 后墙外（伸顶通气；二层用 110 转角双支管（92.5°）：北卫马桶直穿后墙接正口、西卫接侧口，boss 口接北卫 40 废水）；S2 室内暗装（二层卧室 4 墙角箱封 → 一层厨房楼梯后墙角箱封 → 地坪下，顶部 AAV）。前面的 S3 已取消。",
     "[FF]2. 西卫马桶管（方案 A）：搁栅前后方向（业主确认）。马桶 110 出水口进马桶段假墙，在假墙内下到楼板（完成面下约 150），落进马桶下那一格搁栅直着往后，到后墙内侧借梁的位置横走到 S1 旁再出墙进 S1，墙外不走横管；全长约 7.6 m，坡度 1:40，起点 AAV 在假墙内。楼板约 590 深（二层前部完成面 3.208，一层天花顶 2.62），到后墙时管底仍高出一层天花约 190 mm，楼板里放得下。" if VARIANT == "A" else
-    "[FF]2. 西卫马桶管（方案 B，未采用）：马桶 110 先在后墙假墙里（地面以上）沿墙走到北墙角，再落进北墙下那一格搁栅往后到 S1；假墙全长须 160 厚（110 管放得下），淋浴段也是 160。盥洗室台盆废水在同一格搁栅里往后侧接马桶管；淋浴墙排地漏在假墙内接入。",
+    "[FF]2. 西卫马桶管（方案 B，2026-10-08 定为正式，取代方案 A）：马桶 110 后出水进后墙假墙，在假墙内、地面以上沿墙按 1:40 走到北墙角（约 1.1 m，起点 AAV 在马桶段检修口内），在北墙角下到楼板，落进北墙下那一格搁栅，在搁栅之间直着往后约 5.7 m（1:40），穿后墙进 S1 侧口；墙外不走长横管。后墙假墙尽量薄，能借后面原墙的位置就借，尽量保留卫生间内空（厚度由施工方现场定，本图只标点位和走向）。盥洗室台盆 40 在同一格搁栅里侧接马桶管；淋浴墙排地漏在假墙内接北墙角落管侧口。到后墙时管底仍高出一层天花约 180 mm。",
 
-    "[FF]3. ★ 西卫（主卧卫生间）地面一律不抬高：淋浴盘、马桶都直接坐在原楼板完成面上，不做台阶、不垫高。后墙做假墙：马桶段 160 厚 × 1100 高，顶面做置物平台（内放 110 落管 + AAV，留检修口）；淋浴段 100 厚、做到天花，多出的厚度做两个壁龛（宽 300，离地 850–1750，深 80，中间一块隔板），中间装明装恒温淋浴。淋浴墙排地漏装在假墙内，40 废水在假墙内、地面以上接马桶落管侧口。所有排水管只走假墙内或楼板内，不得为排水抬高地面。详见 P-08。",
+    "[FF]3. ★ 西卫（主卧卫生间）地面一律不抬高：淋浴盘、马桶都直接坐在原楼板完成面上，不做台阶、不垫高。后墙做假墙（尽量薄，能借后面原墙的位置就借，尽量保留卫生间内空）：马桶段 1100 高，顶面做置物平台（内放 110 横管起点 + AAV，留检修口）；淋浴段做到天花，内走 110 横管，墙面做两个壁龛（宽 300，离地 850–1750，深 80，中间一块隔板），中间装明装恒温淋浴。淋浴墙排地漏装在假墙内，40 废水在假墙内、地面以上接北墙角 110 落管侧口。所有排水管只走假墙内或楼板内，不得为排水抬高地面。详见 P-08。",
     "4. S2 箱封：一层厨房楼梯后墙角、二层卧室 4 墙角各一个 200 × 200 箱封（二层高 1200，顶部 AAV，带检修门）；一层箱封到天花，底部留检修口。",
     "5. 台盆 32 mm（≤ 1.7 m，否则 40）；淋浴 / 洗碗机 / 洗衣 40；废水单独接立管（strap-on boss），一层台盆接马桶支管。",
     "6. 存水弯水封 ≥ 75 mm；转弯处留清扫口。地下排水 110 PVC-U ≥ 1:40，碎石垫层；IC1 / IC2 / IC4 为 450 塑料检查井，只在检查井处转向。",
@@ -262,9 +267,13 @@ def valves(s, F):
 
 S2_BOX = (4.09, 4.29, 8.20, 8.40)          # 200 × 200 box-in round S2 (both floors, model v42)
 # 西卫后墙假墙 (model v42, FF front floor 3.208): shower part 100 thick to the ceiling, WC part 160 thick × 1100 with a shelf top
-WB_SHOWER_WALL = (-0.61, 0.50, 2.43, 2.53)
+# 方案 B: the 110 runs inside the shower part too, so the whole false wall is as thin as the 110 allows — drawn 160 (max), face y = 2.37
+WB_FACE = 2.37 if VARIANT == "B" else 2.43  # bathroom face of the shower-part false wall
+WB_SHOWER_WALL = (-0.61, 0.50, WB_FACE, 2.53)
 WB_WC_WALL = (0.50, 1.07, 2.37, 2.53)
-WB_NICHES = [(-0.52, -0.22), (0.08, 0.38)]  # x ranges, 80 deep (y 2.43–2.51), 850–1750 above floor, shelf at 1288–1312
+WB_NICHES = [(-0.52, -0.22), (0.08, 0.38)]  # x ranges, 80 deep, 850–1750 above floor, shelf at 1288–1312
+NICHE_Y = (WB_FACE, WB_FACE + 0.08)
+WB_DROP = (-0.31, 2.45)                     # 方案 B: 110 drops into the joist bay under the north wall here
 WB_DRAIN = (-0.45, 0.15)                    # wall-drain grate (x), 600 wide at the foot of the shower wall
 WB_AAV = (0.79, 2.45)
 
@@ -285,16 +294,13 @@ def leader(s, pts, txt=None, size=1.9, anchor="start", col="#b00020"):
 
 def west_bath_plan(s):
     """P-04: the west-bath false walls / niches / wall drain drawn to scale + the 'no raised floor' callout"""
-    if VARIANT == "A":
-        rect(s, *WB_SHOWER_WALL, "fill:#f3e3c3;stroke:#a07a3a;stroke-width:.25")
-        rect(s, *WB_WC_WALL, "fill:#e9d2a6;stroke:#a07a3a;stroke-width:.25")
-        for x0, x1 in WB_NICHES:
-            rect(s, x0, x1, 2.43, 2.51, "fill:#fff;stroke:#a07a3a;stroke-width:.18;stroke-dasharray:.6 .4")
-        s.poly([(WB_DRAIN[0], 2.42), (WB_DRAIN[1], 2.42)], style="stroke:#c77d1a;stroke-width:.7;fill:none")
-        px, py = s.P(*WB_AAV)
-        s.add(f'<circle cx="{px:.2f}" cy="{py:.2f}" r=".9" fill="#fff" stroke="#6b3e1e" stroke-width=".3"/>')
-    else:
-        rect(s, -0.59, 1.11, 2.37, 2.53, "fill:#f3e3c3;stroke:#a07a3a;stroke-width:.25;stroke-dasharray:1 .6")
+    rect(s, *WB_SHOWER_WALL, "fill:#f3e3c3;stroke:#a07a3a;stroke-width:.25")
+    rect(s, *WB_WC_WALL, "fill:#e9d2a6;stroke:#a07a3a;stroke-width:.25")
+    for x0, x1 in WB_NICHES:
+        rect(s, x0, x1, *NICHE_Y, "fill:#fff;stroke:#a07a3a;stroke-width:.18;stroke-dasharray:.6 .4")
+    s.poly([(WB_DRAIN[0], WB_FACE - 0.01), (WB_DRAIN[1], WB_FACE - 0.01)], style="stroke:#c77d1a;stroke-width:.7;fill:none")
+    px, py = s.P(*WB_AAV)
+    s.add(f'<circle cx="{px:.2f}" cy="{py:.2f}" r=".9" fill="#fff" stroke="#6b3e1e" stroke-width=".3"/>')
     # callout box in the (empty) master bedroom, leaders to the false walls
     bx, by, bw = 20.0, 70.0, 74.0
     lines = ["西卫（主卧卫生间）：地面不抬高 —— 详见 P-08",
@@ -304,15 +310,21 @@ def west_bath_plan(s):
              "• 淋浴后：假墙 100 厚到天花，两个壁龛 300 宽，",
              "　 离地 850–1750，深 80，中间隔板；中间明装恒温淋浴",
              "• 墙排地漏在假墙内；排水只走假墙内 / 楼板内"] if VARIANT == "A" else \
-            ["西卫方案 B：假墙全长 160 厚，马桶管在假墙里走到北墙角", "地面同样不抬高"]
+            ["西卫（主卧卫生间）：地面不抬高 —— 详见 P-08",
+             "• 淋浴盘、马桶直接坐原楼板完成面，不做台阶 / 不垫高",
+             "• 后墙假墙尽量薄，能借原墙就借：马桶段 1100 高，平台",
+             "　 （AAV + 检修口）；淋浴段到天花，两个壁龛 300 宽，",
+             "　 离地 850–1750，深 80，中间隔板；中间明装恒温淋浴",
+             "• 110 马桶管（方案 B）：假墙内、地面以上 1:40 走到",
+             "　 北墙角，下到楼板，沿北墙下那一格搁栅往后进 S1",
+             "• 墙排地漏在假墙内，接北墙角落管；排水只走假墙 / 楼板内"]
     h = 3.0 * len(lines) + 2.5
     s.add(f'<rect x="{bx}" y="{by}" width="{bw}" height="{h:.1f}" fill="#fff" stroke="#b00020" stroke-width=".35"/>')
     for i, t in enumerate(lines):
         s.add(f'<text x="{bx+1.5}" y="{by+3.6+i*3.0:.1f}" font-size="{2.1 if i == 0 else 1.85}" fill="{"#b00020" if i == 0 else "#222"}"{BOLD_ if i == 0 else ""}>{html.escape(t)}</text>')
-    if VARIANT == "A":
-        for x, y in ((0.78, 2.45), (-0.07, 2.48)):
-            a = s.P(x, y)
-            s.add(f'<path d="M{bx+bw:.2f} {by+h/2:.2f} L{a[0]:.2f} {a[1]:.2f}" stroke="#b00020" stroke-width=".22" fill="none"/><circle cx="{a[0]:.2f}" cy="{a[1]:.2f}" r=".45" fill="#b00020"/>')
+    for x, y in ((0.78, 2.45), WB_DROP if VARIANT == "B" else (-0.07, 2.48)):
+        a = s.P(x, y)
+        s.add(f'<path d="M{bx+bw:.2f} {by+h/2:.2f} L{a[0]:.2f} {a[1]:.2f}" stroke="#b00020" stroke-width=".22" fill="none"/><circle cx="{a[0]:.2f}" cy="{a[1]:.2f}" r=".45" fill="#b00020"/>')
 
 
 def drainage_marks(s, F):
@@ -352,7 +364,7 @@ def floor_notes(notes, F):
 def plan_sheet(F, which, number):
     from plan_base import table
     fl = "一层 GF" if F == "GF" else "二层 FF"
-    title = f"{fl} {'给水平面图 Water supply' if which == 'supply' else '排水平面图 Drainage'}" + ("（方案 B：西卫走北墙，未采用）" if VARIANT == "B" else "")
+    title = f"{fl} {'给水平面图 Water supply' if which == 'supply' else '排水平面图 Drainage'}"
     s = Sheet(title, number, F, bounds(F), discipline="给排水 Plumbing & drainage")
     s.base_plan(F)
     kinds = ["mdpe", "hard", "yard", "soft", "hot", "pure"] if which == "supply" else ["soil", "waste", "ug"]
@@ -471,7 +483,7 @@ def west_bath_sheet():
     """P-08: west bath (master en-suite) rear false wall — elevation, enlarged plan and section through the WC, 1:20.
     Geometry from model v42 (FF front finished floor 3.208, ceiling 5.70, GF ceiling top 2.62)."""
     from plan_base import walls
-    s = Sheet("西卫后墙详图 West bath rear wall：地面不抬高 · 马桶平台 · 淋浴壁龛", "P-08", "", ((0, 1), (0, 1)), scale_note="1:20",
+    s = Sheet("西卫后墙详图 West bath：地面不抬高 · 平台 · 壁龛 · 110 走北墙", "P-08", "", ((0, 1), (0, 1)), scale_note="1:20",
               discipline="给排水 Plumbing & drainage")
     A = s.add
     K = 50.0                                   # 1:20 -> 50 page mm per metre
@@ -530,8 +542,9 @@ def west_bath_sheet():
     A(f'<ellipse cx="{X(-0.07):.2f}" cy="{Z(FFL+1.975):.2f}" rx="{0.125*K:.2f}" ry="1.0" fill="#ddd" stroke="#333" stroke-width=".25"/>')
     R(X(-0.03), Z(FFL + 1.55), X(0.0), Z(FFL + 1.35), "fill:#888")
     R(X(WB_DRAIN[0]), Z(FFL + 0.06), X(WB_DRAIN[1]), Z(FFL + 0.005), "fill:#fff;stroke:" + OR + ";stroke-width:.4")
-    L([(X(-0.15), Z(FFL + 0.03)), (X(-0.15), Z(FFL + 0.12)), (X(0.70), Z(FFL + 0.095)), (X(0.79), Z(FFL + 0.095))], f"stroke:{OR};stroke-width:.6;stroke-dasharray:1.2 .6")
-    L([(X(0.79), Z(FFL + 0.96)), (X(0.79), Z(FFL - 0.15))], f"stroke:{BR};stroke-width:1.4;stroke-dasharray:2 .8")
+    dx = WB_DROP[0]                              # 方案 B: 110 runs along the wall (1:40) to the north corner and drops there
+    L([(X(-0.15), Z(FFL + 0.03)), (X(-0.15), Z(FFL + 0.06)), (X(dx), Z(FFL + 0.06))], f"stroke:{OR};stroke-width:.6;stroke-dasharray:1.2 .6")
+    L([(X(0.79), Z(FFL + 0.96)), (X(0.79), Z(FFL + 0.18)), (X(dx), Z(FFL + 0.153)), (X(dx), Z(FFL - 0.15))], f"stroke:{BR};stroke-width:1.4;stroke-dasharray:2 .8;stroke-linejoin:round")
     R(X(0.73), Z(FFL + 1.075), X(0.85), Z(FFL + 0.965), "fill:#fff;stroke:" + BR + ";stroke-width:.3")
     T(X(0.79), Z(FFL + 1.005), "AAV", 1.4, "middle", BR)
     R(X(0.64), Z(FFL + 1.09), X(0.94), Z(FFL + 0.79), "fill:none;stroke:#333;stroke-width:.25;stroke-dasharray:1 .5")
@@ -543,7 +556,7 @@ def west_bath_sheet():
     T(X(1.30), Z(CEIL) - 1, "天花（离地约 2490）", 1.9, "end")
     T(X(-0.72), ey + 11, "FFL ±0 = 原楼板完成面：淋浴盘、马桶都直接坐在上面", 2.1, "start", RED, True)
     T(X(-0.72), ey + 14.5, "地面不抬高、不做台阶、不垫高", 2.1, "start", RED, True)
-    dim_h(X(-0.61), X(0.50), Z(CEIL) - 6, "淋浴段假墙 1110（100 厚，到天花）")
+    dim_h(X(-0.61), X(0.50), Z(CEIL) - 6, "淋浴段假墙 1110（尽量薄，到天花）")
     dim_h(X(0.50), X(1.07), Z(CEIL) - 6, "马桶段 570")
     dim_h(X(-0.52), X(-0.22), Z(FFL + 1.75) - 2.5, "300"); dim_h(X(0.08), X(0.38), Z(FFL + 1.75) - 2.5, "300")
     dim_v(X(-0.72) - 5, Z(FFL + 0.85), ey, "850", -1); dim_v(X(-0.72) - 5, Z(FFL + 1.75), Z(FFL + 0.85), "900", -1)
@@ -555,46 +568,48 @@ def west_bath_sheet():
     lab(X(1.0), Z(FFL + 1.11), EL, Z(FFL + 1.58), "置物平台面 1100（深 180，挑出假墙 20）")
     lab(X(0.13), Z(FFL + 1.05), EL, Z(FFL + 1.42), "明装恒温淋浴杆阀，中心离地约 1050")
     lab(X(0.94), Z(FFL + 0.85), EL, Z(FFL + 0.98), "检修口 300×300（正对 AAV）")
-    lab(X(0.45), Z(FFL + 0.097), EL, Z(FFL + 0.42), "40 废水：假墙内、地面以上接 110 侧口", OR)
-    lab(X(0.12), Z(FFL + 0.04), EL, Z(FFL + 0.26), "墙排地漏 600 宽（装在淋浴段假墙底部）", OR)
-    lab(X(0.79), Z(FFL - 0.10), EL, Z(FFL + 0.06), "110 落管：假墙内下到楼板，落进本格搁栅", BR)
+    lab(X(0.30), Z(FFL + 0.175), EL, Z(FFL + 0.56), "110 横管：假墙内、地面以上沿墙 1:40 走到北墙角（约 1.1 m）", BR)
+    lab(X(-0.24), Z(FFL + 0.06), EL, Z(FFL + 0.42), "40 废水：假墙内、地面以上接北墙角落管侧口", OR)
+    lab(X(0.12), Z(FFL + 0.03), EL, Z(FFL + 0.26), "墙排地漏 600 宽（装在淋浴段假墙底部）", OR)
+    lab(X(dx), Z(FFL - 0.10), EL, Z(FFL + 0.06), "110 落管：北墙角下到楼板，落进北墙下那一格搁栅 → 往后进 S1", BR)
 
     # ---------- ③ section A-A through the WC (x = 0.79), y horizontal ----------
     sx, sy = 232.0, 150.0
     Y2 = lambda y: sx + (y - 1.50) * K
     Z2 = lambda z: sy - (z - FFL) * K
-    yR, zT = 3.30, 4.75                         # cut limits (break lines)
+    yR, zT = 3.30, 5.10                         # cut limits (break lines)
     SC = Y2(yR) + 13                           # label column
-    T(220, 30, "③ 剖面 A-A Section（经过马桶）1:20", 3.2, bold=True)
+    T(220, 30, "③ 剖面 A-A Section（经过北墙角落管，x 同②中 A-A）1:20", 3.2, bold=True)
     R(Y2(1.50), Z2(2.62), Y2(yR), Z2(2.588), "fill:#ddd;stroke:#555;stroke-width:.2")
     R(Y2(1.50), Z2(FFL), Y2(yR), Z2(3.18), "fill:#c9b28a;stroke:#6d5022;stroke-width:.2")
     R(Y2(1.50), Z2(3.18), Y2(yR), Z2(2.62), "fill:#fbf6ea;stroke:#b9a27a;stroke-width:.2;stroke-dasharray:1.5 .8")
-    T(Y2(1.95), Z2(2.80), "搁栅之间（马桶下那一格），搁栅不切、不开槽", 1.7, "middle", NI)
+    T(Y2(1.95), Z2(2.80), "搁栅之间（北墙下那一格），搁栅不切、不开槽", 1.7, "middle", NI)
     R(Y2(2.53), Z2(zT), Y2(2.65), Z2(FFL), WALL)
-    R(Y2(2.37), Z2(FFL + 1.10), Y2(2.53), Z2(FFL), FW_W)
-    R(Y2(2.35), Z2(FFL + 1.12), Y2(2.53), Z2(FFL + 1.10), SHELF)
-    L([(Y2(1.61), Z2(FFL)), (Y2(1.61), Z2(FFL + 0.40)), (Y2(2.25), Z2(FFL + 0.40)), (Y2(2.25), Z2(FFL))], "stroke:#333;stroke-width:.3")
-    T(Y2(1.85), Z2(FFL + 0.20), "马桶", 1.8, "middle")
+    R(Y2(2.37), Z2(zT), Y2(2.53), Z2(FFL), FW_S)
+    R(Y2(2.37), Z2(FFL + 1.75), Y2(2.45), Z2(FFL + 0.85), "fill:#fff;stroke:#a07a3a;stroke-width:.3")
+    R(Y2(2.37), Z2(FFL + 1.312), Y2(2.45), Z2(FFL + 1.288), "fill:#a07a3a")
+    R(Y2(1.50), Z2(FFL + 0.045), Y2(2.37), Z2(FFL), "fill:#e8f1f8;stroke:#2a7ab8;stroke-width:.25")
+    T(Y2(1.90), Z2(FFL + 0.10), "淋浴盘（坐原楼板）", 1.7, "middle", "#2a7ab8")
+    R(Y2(2.37), Z2(FFL + 0.06), Y2(2.42), Z2(FFL + 0.005), "fill:#fff;stroke:" + OR + ";stroke-width:.35")
+    L([(Y2(2.42), Z2(FFL + 0.04)), (Y2(2.395), Z2(FFL + 0.04))], f"stroke:{OR};stroke-width:.5")
     zb = 2.998 - (yR - 2.62) / 40
-    L([(Y2(2.18), Z2(3.388)), (Y2(2.45), Z2(3.383)), (Y2(2.45), Z2(3.058)), (Y2(2.62), Z2(2.998)), (Y2(yR), Z2(zb))], f"stroke:{BR};stroke-width:{0.11*K:.2f};stroke-linejoin:round;opacity:.85")
-    L([(Y2(2.45), Z2(3.383)), (Y2(2.45), Z2(4.168))], f"stroke:{BR};stroke-width:{0.11*K:.2f};opacity:.85")
-    R(Y2(2.39), Z2(4.283), Y2(2.51), Z2(4.168), "fill:#fff;stroke:" + BR + ";stroke-width:.35")
-    T(Y2(2.45), Z2(4.21), "AAV", 1.3, "middle", BR)
-    A(f'<circle cx="{Y2(2.45):.2f}" cy="{Z2(3.303):.2f}" r="{0.02*K:.2f}" fill="#fff" stroke="{OR}" stroke-width=".4"/>')
+    A(f'<circle cx="{Y2(2.45):.2f}" cy="{Z2(FFL + 0.153):.2f}" r="{0.055*K:.2f}" fill="#8a5a33" stroke="{BR}" stroke-width=".3" opacity=".85"/>')
+    L([(Y2(2.45), Z2(FFL + 0.153)), (Y2(2.45), Z2(3.058)), (Y2(2.62), Z2(2.998)), (Y2(yR), Z2(zb))], f"stroke:{BR};stroke-width:{0.11*K:.2f};stroke-linejoin:round;opacity:.85")
+    A(f'<circle cx="{Y2(2.45):.2f}" cy="{Z2(FFL + 0.04):.2f}" r="{0.02*K:.2f}" fill="#fff" stroke="{OR}" stroke-width=".4"/>')
     L([(Y2(yR), Z2(2.55)), (Y2(yR) - 1.5, Z2(2.75)), (Y2(yR) + 1.5, Z2(2.95)), (Y2(yR), Z2(3.30))], "stroke:#333;stroke-width:.25")
     L([(Y2(2.45), Z2(zT)), (Y2(2.55), Z2(zT) - 1.2), (Y2(2.63), Z2(zT) + 1.2), (Y2(2.72), Z2(zT))], "stroke:#333;stroke-width:.25")
     L([(Y2(1.40), Z2(FFL)), (Y2(yR) + 4, Z2(FFL))], f"stroke:{RED};stroke-width:.7")
     T(Y2(1.40), Z2(FFL) - 1.2, "FFL ±0 原楼板，不抬高", 2.0, "start", RED, True)
     dim_v(Y2(1.50) - 4, Z2(FFL), Z2(2.62), "楼板约 590", -1)
-    dim_h(Y2(2.37), Y2(2.53), Z2(FFL + 1.12) - 3, "160")
-    dim_v(Y2(2.65) + 3, Z2(FFL + 1.10), Z2(FFL), "1100")
-    zbw = 2.998 - (8.13 - 2.62) / 40 - 0.055     # pipe invert-bottom at the rear wall
+    dim_v(Y2(2.65) + 3, Z2(FFL + 0.153), Z2(FFL), "≈150")
+    dim_v(Y2(2.65) + 3, Z2(FFL + 1.75), Z2(FFL + 0.85), "壁龛 850–1750")
+    zbw = 2.998 - (8.30 - 2.62) / 40 - 0.055     # pipe invert-bottom at the rear wall
     T(Y2(1.50), Z2(2.588) + 4, "一层天花 GF ceiling（顶面 2.620）", 1.8)
-    lab(Y2(2.47), Z2(4.31), SC, Z2(4.62), "平台面 1100，深 180")
-    lab(Y2(2.51), Z2(4.22), SC, Z2(4.42), "AAV（在检修口内）", BR)
-    lab(Y2(2.30), Z2(3.385), SC, Z2(3.75), "马桶后出水 110，离地约 180，直接进假墙", BR)
-    lab(Y2(2.47), Z2(3.303), SC, Z2(3.50), "40 淋浴废水侧接（地面以上）", OR)
-    lab(Y2(3.0), Z2(2.998 - 0.38 / 40), SC, Z2(3.05), "110 · 1:40 → 往后约 5.2 m → 借梁位横走 → S1", BR)
+    lab(Y2(2.41), Z2(FFL + 1.50), SC, Z2(4.62), "假墙尽量薄，能借原墙就借（厚度现场定）；壁龛深 80", NI)
+    lab(Y2(2.47), Z2(FFL + 0.17), SC, Z2(3.85), "110 横管（自马桶，沿墙 1:40）到此转弯下落", BR)
+    lab(Y2(2.40), Z2(FFL + 0.04), SC, Z2(3.55), "墙排地漏 → 40 侧接落管（地面以上）", OR)
+    lab(Y2(3.0), Z2(2.998 - 0.38 / 40), SC, Z2(3.05), "110 · 1:40 → 北墙下那一格往后约 5.7 m → 穿后墙 → S1", BR)
+    T(SC, Z2(4.30), "AAV 在马桶端（横管起点）检修口内，见①", 1.85, col=BR)
     T(SC, Z2(2.80), f"到后墙处管底离一层天花约 {round((zbw - 2.62) * 1000, -1):.0f} mm", 1.85, col=BR)
 
     # ---------- ② enlarged plan (same x as the elevation, back wall at the top) ----------
@@ -609,33 +624,37 @@ def west_bath_sheet():
             L([(X(x), Y(y)) for x, y in pts] + ([(X(pts[0][0]), Y(pts[0][1]))] if closed else []),
               "fill:#cfcfcf;stroke:#555;stroke-width:.25;fill-rule:evenodd" if k == "wall" else "fill:#eee;stroke:#999;stroke-width:.2")
     A('</g>')
-    R(X(-0.61), Y(2.53), X(0.50), Y(2.43), FW_S); R(X(0.50), Y(2.53), X(1.07), Y(2.37), FW_W)
-    for x0, x1 in WB_NICHES: R(X(x0), Y(2.51), X(x1), Y(2.43), "fill:#fff;stroke:#a07a3a;stroke-width:.3;stroke-dasharray:.8 .4")
-    R(X(-0.55), Y(2.42), X(0.25), Y(1.42), "fill:none;stroke:#2a7ab8;stroke-width:.3;stroke-dasharray:1.5 .8")
+    R(X(-0.61), Y(2.53), X(0.50), Y(WB_FACE), FW_S); R(X(0.50), Y(2.53), X(1.07), Y(2.37), FW_W)
+    for x0, x1 in WB_NICHES: R(X(x0), Y(NICHE_Y[1]), X(x1), Y(NICHE_Y[0]), "fill:#fff;stroke:#a07a3a;stroke-width:.3;stroke-dasharray:.8 .4")
+    R(X(-0.55), Y(WB_FACE - 0.01), X(0.25), Y(1.42), "fill:none;stroke:#2a7ab8;stroke-width:.3;stroke-dasharray:1.5 .8")
     T(X(-0.15), Y(1.80), "淋浴区", 1.9, "middle", "#2a7ab8"); T(X(-0.15), Y(1.72), "（淋浴盘坐原楼板）", 1.7, "middle", "#2a7ab8")
-    R(X(WB_DRAIN[0]), Y(2.43), X(WB_DRAIN[1]), Y(2.41), f"fill:{OR}")
+    R(X(WB_DRAIN[0]), Y(WB_FACE), X(WB_DRAIN[1]), Y(WB_FACE - 0.02), f"fill:{OR}")
     A(f'<rect x="{X(0.585):.2f}" y="{Y(2.33):.2f}" width="{0.41*K:.2f}" height="{0.20*K:.2f}" fill="#fff" stroke="#333" stroke-width=".25"/>'
       f'<ellipse cx="{X(0.79):.2f}" cy="{Y(1.90):.2f}" rx="{0.19*K:.2f}" ry="{0.24*K:.2f}" fill="#fff" stroke="#333" stroke-width=".25"/>')
     T(X(0.79), Y(1.86), "马桶 WC1", 1.7, "middle")
-    L([(X(0.79), Y(2.18)), (X(0.79), Y(2.45))], f"stroke:{BR};stroke-width:1.2;stroke-dasharray:2 .8")
-    A(f'<circle cx="{X(0.79):.2f}" cy="{Y(2.45):.2f}" r="{0.055*K:.2f}" fill="#fff" stroke="{BR}" stroke-width=".5"/>')
-    L([(X(-0.15), Y(2.44)), (X(-0.15), Y(2.48)), (X(0.70), Y(2.46)), (X(0.79), Y(2.45))], f"stroke:{OR};stroke-width:.6;stroke-dasharray:1.2 .6")
-    ax = X(0.68)
+    L([(X(0.79), Y(2.18)), (X(0.79), Y(2.45)), (X(WB_DROP[0]), Y(2.45))], f"stroke:{BR};stroke-width:1.2;stroke-dasharray:2 .8;stroke-linejoin:round")
+    A(f'<circle cx="{X(0.79):.2f}" cy="{Y(2.45):.2f}" r="{0.03*K:.2f}" fill="#fff" stroke="{BR}" stroke-width=".4"/>')
+    A(f'<circle cx="{X(WB_DROP[0]):.2f}" cy="{Y(2.45):.2f}" r="{0.055*K:.2f}" fill="#fff" stroke="{BR}" stroke-width=".5"/>')
+    L([(X(WB_DROP[0]), Y(2.45) - 2.8), (X(WB_DROP[0]), Y(2.70))], f"stroke:{BR};stroke-width:1.2;stroke-dasharray:2 .8")
+    L([(X(-0.15), Y(2.38)), (X(-0.25), Y(2.43)), (X(WB_DROP[0]), Y(2.45))], f"stroke:{OR};stroke-width:.6;stroke-dasharray:1.2 .6")
+    ax = X(WB_DROP[0])
     L([(ax, Y(2.68)), (ax, Y(1.45))], "stroke:#000;stroke-width:.3;stroke-dasharray:4 1 1 1")
     T(ax + 2, Y(2.66), "A", 2.4, "middle", "#000", True); T(ax + 2, Y(1.47), "A", 2.4, "middle", "#000", True)
-    lab(X(-0.37), Y(2.47), X(-0.37) + 3, Y(2.82), "壁龛 300 × 深 80（淋浴段 100 厚到天花）", NI)
-    lab(X(0.79) + 2.8, Y(2.45), X(0.79) + 6, Y(2.92), "110 + AAV（马桶段假墙 160 × 1100）", BR)
+    lab(X(0.23), Y(2.41), X(0.23) + 3, Y(2.82), "壁龛 300 × 深 80（淋浴段到天花）", NI)
+    lab(X(0.79) + 2.8, Y(2.45), X(0.79) + 6, Y(2.92), "AAV + 检修口（马桶段假墙高 1100）", BR)
+    lab(X(WB_DROP[0]) - 2.8, Y(2.45), X(-0.85), Y(2.78), "110 下落点（北墙角）→ 楼板内往后 → S1", BR)
+    lab(X(0.40), Y(2.45), X(0.40) + 3, Y(2.20) + 1, "110 横管 1:40", BR)
     T(X(-0.85), Y(1.40) + 5, "FFL ±0 不抬高：整个卫生间地面保持原楼板标高，门口无台阶", 2.0, "start", RED, True)
 
     # ---------- ④ requirements + legend ----------
     nx, ny, nw = 166.0, 196.0, 242.0
     req = ["施工要求 Requirements（防止擅自抬高地面）",
            "1. 西卫（主卧卫生间）地面一律不抬高：保持原楼板完成面，淋浴盘、马桶直接坐在原楼板上；不做台阶、不垫高、不加找坡层。任何抬高地面的做法须业主书面同意。",
-           "2. 马桶段假墙 160 厚 × 1100 高（宽约 570），顶面做置物平台（深 180）；内放 110 落管 + AAV（AAV 顶离地约 1075，低于平台面），正对 AAV 留 300 × 300 检修口。",
-           "3. 淋浴段假墙 100 厚、做到天花（宽约 1110）；多出的厚度做两个壁龛：宽 300 × 高 900（离地 850–1750）× 深 80，中间一块隔板（离地约 1300），壁龛底面向外找坡 ≥ 2%。",
+           "2. 后墙假墙尽量薄，能借后面原墙的位置就借，尽量保留卫生间内空；厚度由施工方现场定，本图只标点位和走向（图中厚度仅示意）。马桶段 1100 高（宽约 570），顶面做置物平台（深 180）；内放 110 横管起点 + AAV（AAV 顶离地约 1075，低于平台面），正对 AAV 留 300 × 300 检修口。",
+           "3. 淋浴段假墙与马桶段同厚、做到天花（宽约 1110），110 横管从里面穿过；墙面做两个壁龛：宽 300 × 高 900（离地 850–1750）× 深 80，中间一块隔板（离地约 1300），壁龛底面向外找坡 ≥ 2%。",
            "4. 两个壁龛中间装明装恒温淋浴：杆阀中心离地约 1050，顶喷 Ø250 离地约 1975，带滑杆手持；冷热水在淋浴段假墙内竖上。",
-           "5. 淋浴用墙排地漏（600 宽）装在淋浴段假墙底部；40 废水在假墙内、地面以上接马桶落管侧口（boss）。",
-           "6. 110 马桶管在马桶段假墙内下到楼板，落进马桶下那一格搁栅，在搁栅之间按 1:40 直着往后（搁栅前后方向）；不得切断搁栅或开深槽。",
+           "5. 淋浴用墙排地漏（600 宽）装在淋浴段假墙底部；40 废水在假墙内、地面以上接北墙角 110 落管侧口（boss）。选定地漏型号后核对：地漏本体须在 110 横管下方（横管管底离地约 100）。",
+           "6. 110 马桶管（方案 B）：马桶后出水进假墙，在假墙内、地面以上沿后墙按 1:40 走到北墙角（约 1.1 m），在北墙角下到楼板，落进北墙下那一格搁栅，在搁栅之间按 1:40 直着往后约 5.7 m，穿后墙进 S1；不得切断搁栅或开深槽。盥洗室台盆 40 在同一格搁栅内侧接。",
            "7. 淋浴区整面墙（含壁龛内）做防水层（tanking）；假墙用防潮板 + 金属龙骨或等效做法，接缝加防水带。",
            "8. 尺寸以本图和模型 v42 为准。现场与图不符时先停工、拍照联系业主，不得自行改成抬高地面的做法。"]
     lines = [(i, l) for i, n in enumerate(req) for l in (wrap(n, 108) if i else [n])]
@@ -645,7 +664,7 @@ def west_bath_sheet():
     for j, (i, l) in enumerate(lines):
         T(nx, ny + j * lh, l, 2.4 if i == 0 else 2.05, "start", RED if i == 0 else "#222", i == 0)
     ly = ny + h + 2
-    items = [("r", FW_S, "淋浴段假墙 100 厚"), ("r", FW_W, "马桶段假墙 160 × 1100"), ("r", WALL, "原墙（剖切）"),
+    items = [("r", FW_S, "淋浴段假墙（尽量薄）到天花"), ("r", FW_W, "马桶段假墙 高 1100"), ("r", WALL, "原墙（剖切）"),
              ("r", "fill:url(#slab);stroke:#555;stroke-width:.25", "原楼板（不动）"),
              ("l", f"stroke:{BR};stroke-width:1.2", "110 污水"), ("l", f"stroke:{OR};stroke-width:.6;stroke-dasharray:1.2 .6", "40 废水"),
              ("l", f"stroke:{RED};stroke-width:.7", "FFL ±0（不抬高）")]
@@ -666,8 +685,8 @@ def cover_sheet():
     A = s.add
     A('<text x="16" y="34" font-size="3.4" font-weight="bold">图纸目录 Drawing list</text>')
     for i, t in enumerate(["P-00 目录 + 设计说明", "P-01 一层给水平面图", "P-02 二层给水平面图", "P-03 一层排水平面图（含地下排水）",
-                           "P-04 二层排水平面图（P-04B 方案 B 另附，未采用）", "P-05 给水系统图 + 排水系统图", "P-06 设备详图：锅炉 + 软水机、水槽下净水器", "P-07 后花园水池：补水 + 地沟 + 渗水井",
-                           "P-08 西卫后墙详图：地面不抬高 · 马桶平台 · 淋浴壁龛"]):
+                           "P-04 二层排水平面图（西卫马桶管：方案 B 走北墙）", "P-05 给水系统图 + 排水系统图", "P-06 设备详图：锅炉 + 软水机、水槽下净水器", "P-07 后花园水池：补水 + 地沟 + 渗水井",
+                           "P-08 西卫后墙详图：地面不抬高 · 马桶平台 · 淋浴壁龛 · 110 走北墙（方案 B）"]):
         A(f'<text x="20" y="{40+i*4.6}" font-size="2.5">{html.escape(t)}</text>')
     A('<text x="16" y="86" font-size="3.4" font-weight="bold">设计依据与条件 Basis</text>')
     basis = ["• UK Water Supply (Water Fittings) Regulations 1999、WRAS 认证产品；Building Regulations Part G（卫生与热水）、Part H（排水）、Part L（保温）。",
@@ -689,10 +708,12 @@ def cover_sheet():
         col, row = i // 8, i % 8
         A(f'<text x="{20+col*150}" y="{184+row*5}" font-size="2.3">{"一层" if fl=="GF" else "二层"} · {html.escape(name)} · 给水 {sup} · 排水 {str(ds) + " mm" if ds else "车道地面"}</text>')
     A('<text x="16" y="232" font-size="3.4" font-weight="bold">施工前须确认 Site checks</text>')
-    checks = ["① 进户管实际位置、水压与流量（combi 需 ≥ 1.5 bar / 15 L/min）；② 二层搁栅方向（业主已确认前后方向）与间距：西卫马桶管落进马桶下那一格，按 1:40 往后约 5.2 m；",
+    checks = ["① 进户管实际位置、水压与流量（combi 需 ≥ 1.5 bar / 15 L/min）；② 二层搁栅方向（业主已确认前后方向）与间距：西卫马桶管在假墙内走到北墙角，落进北墙下那一格，按 1:40 往后约 5.7 m；",
               "③ 后院 MH 的管底标高与管径；④ 西卫地面不抬高（见 P-08），假墙尺寸以 P-08 为准；⑤ 岛台位置定版后再预埋地坪管线；⑥ S2 两处 200×200 箱封位置。"]
     for i, t in enumerate(checks):
         A(f'<text x="20" y="{240+i*5}" font-size="2.4">{html.escape(t)}</text>')
+    A('<text x="16" y="260" font-size="3.0" font-weight="bold" fill="#b00020">修订 Revisions</text>')
+    A('<text x="20" y="266" font-size="2.4" fill="#b00020">Rev C · 2026-10-08：西卫马桶管改用方案 B（假墙内走到北墙角，沿北墙下那一格搁栅往后进 S1），取代方案 A；后墙假墙尽量薄，能借后面原墙的位置就借，尽量保留卫生间内空；P-04 / P-08 / 说明同步更新，单张 P-04B 作废。</text>')
     s.frame()
     return s
 

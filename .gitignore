@@ -16,7 +16,7 @@
 /lighting_tool/out/
 __pycache__/
 *.pyc
-# trade drawings (施工图): scripts + the current Rev B PDFs + sheet previews only
+# trade drawings (施工图): scripts + the current PDFs (给排水 Rev C, 照明 / 插座 Rev B) + sheet previews only
 !/trade_drawings/
 /trade_drawings/*
 !/trade_drawings/*.py
@@ -24,7 +24,7 @@ __pycache__/
 !/trade_drawings/out/
 /trade_drawings/out/*
 !/trade_drawings/out/*RevB.pdf
-!/trade_drawings/out/27PR_给排水_P-04B_方案B_西卫走北墙.pdf
+!/trade_drawings/out/*RevC.pdf
 !/trade_drawings/out/png/
 /trade_drawings/out/png/*
 !/trade_drawings/out/png/P-*.png

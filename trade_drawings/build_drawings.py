@@ -40,7 +40,7 @@ def build(name, mod):
 if __name__ == "__main__":
     want = sys.argv[1:] or ["plumbing", "electrical", "power"]
     if "plumbing" in want:
-        import plumbing; build("27PR_给排水施工图_RevB", plumbing)
+        import plumbing; build("27PR_给排水施工图_RevC", plumbing)
     if "electrical" in want and os.path.exists(os.path.join(HERE, "electrical.py")):
         import electrical; build("27PR_照明布线施工图_RevB", electrical)
     if "power" in want:
