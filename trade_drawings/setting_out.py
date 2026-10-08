@@ -210,7 +210,16 @@ def collect(F):
         add(cat="socket", id=f"C{i:02d}", name=KIND_CN[s["kind"]], room=s["room"], circ=circ, p=p, h=h, why=why, mount="wall", kind=s["kind"])
     for i, it in enumerate(P["items"], 1):
         p = fr.t2b(it["x"], it["y"]); lab = it["label"].split("（")[0]
-        if it.get("fcu"):
+        mount = "wall"
+        if it.get("alarm"):
+            h, why, nm, mount = ceil_h(F, *p), "厨房天花，市电，接一层照明回路；距锅炉水平 1–3 m", "温感 + 一氧化碳报警器", "ceiling"
+        elif "锅炉" in it["label"]:
+            h, why, nm = 700, "软水机旁，一块双联面板：锅炉 FCU 3A（固定接线）+ 软水机 13A 插座", "锅炉 FCU 3A + 软水机插座（双联）"
+        elif "抽油烟机" in it["label"]:
+            h, why, nm = 2200, "烟机罩内高位插座", "抽油烟机高位插座"
+        elif "地暖分水器" in it["label"]:
+            h, why, nm = H["fcu"], "分水器旁，给接线中心 + 混水泵供电", "FCU 3A · 地暖分水器 UF1"
+        elif it.get("fcu"):
             h, why, nm = H["fcu"], "FCU 装在台面上方 / 相邻柜内可触及处", f"FCU 13A · {lab}"
         elif "控制开关" in it["label"]:
             h, why, nm = H["dp"], "40A 双极隔离开关（充电桩室内总控）", "DP 40A · 充电桩总控"
@@ -218,7 +227,7 @@ def collect(F):
             h, why, nm = H["ev"], "充电桩底座约 1000（按产品说明书）", "EV 充电桩（外墙）"
         else:
             h, why, nm = H["lift_dp"], "电梯隔离开关，位置 / 高度以厂家为准", "DP · 电梯"
-        add(cat="power", id=f"D{i:02d}", name=nm, room="", circ=it["c"]["A"], p=p, h=h, why=why, mount="wall")
+        add(cat="power", id=f"D{i:02d}", name=nm, room="", circ=it["c"].get("B", it["c"].get("A")), p=p, h=h, why=why, mount=mount)
     for s in J["plates"]:
         p = fr.t2b(s["x"], s["y"])
         add(cat="switch", id=s["id"], name=f"{s['gangs']} 联开关 · 键 {'/'.join(s['keys'])}" + (f"（叠在 {s['stack_above']} 正上方）" if s.get("stack_above") else ""), room="", circ="", p=p,
@@ -268,7 +277,7 @@ def collect(F):
 POS_FIX = {"GF": {"C02": (2.33, 4.354), "C15": (-0.607, 7.141), "C21": (1.04, 12.256), "C25": (2.564, 14.714), "C27": (4.29, 8.752),
                   "C28": (-4.29, 3.185), "C34": (-4.285, 1.074), "S3": (2.358, 4.234),
                   "D08": (-3.765, 1.65),    # EV 40A isolator: 550 from the door edge, clear of S9 (was on top of it)
-                  "D06": (-0.825, 5.823)},  # lift isolator: off the 120 mm stub by the lift onto the straight wall beside C11
+                  "D06": (-0.89, 5.823)},  # lift isolator: off the 120 mm stub by the lift onto the straight wall beside C11
            "FF": {"S3": (-0.76, 3.86)}}
 H_FIX = {"FF": {"S3": (700, "床头柜上方 700（与门口 S4 双控），避开床头板")}}
 
@@ -279,7 +288,9 @@ def fix_points(F, items):
     for it in items:
         if it["id"] in POS_FIX.get(F, {}):
             it["p"] = POS_FIX[F][it["id"]]
-            if F == "GF": it["why"] = it.get("why", "") + "；位置按模型（业主现场定）"
+            if it["id"] == "D08": it["why"] = "40A 双极隔离开关（充电桩室内总控）；离门洞边 550，与 S9 错开"
+            elif it["id"] == "D06": it["why"] = "电梯隔离开关：挪到 C11 旁直墙上（原位置在电梯旁 120 宽墙头）；高度以厂家为准"
+            elif F == "GF": it["why"] = it.get("why", "") + "；位置按模型（业主现场定）"
         elif it["id"] in clash and it["cat"] == "socket":
             q = clash[it["id"]]["new"]; it["p"] = (q["x"] + q["n"][0] * 0.05, q["y"] + q["n"][1] * 0.05)
             if "TV" in clash[it["id"]].get("rule", ""): it["h"] = 600; it["why"] = "电视柜上方 600（原位置被电视柜挡住）"
