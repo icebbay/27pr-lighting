@@ -212,7 +212,7 @@ DED.append(dict(c="WP5", label="充电桩室内控制开关（40A 双极隔离�
 for d in DED:
     if not isinstance(d["c"], dict): d["c"] = {p: d["c"] for p in PLANS}
 data = {F: dict(sockets=OUT[F]["pts"], items=[d for d in DED if d["floor"] == F]) for F in ("GF", "FF")}
-data["plans"] = PLANS; data["default"] = "A"; data["rev"] = "2026-10-06 · 方案 A / B 对比（Rev I：后房间改卧室 4，卧室 2 进门西移）"
+data["plans"] = {"B": PLANS["B"]}; data["default"] = "B"; data["rev"] = "2026-10-08 · 方案 B（精简 17 路）"   # owner 2026-10-08: plan A dropped from the web pages
 for F in ("GF", "FF"):
     json.dump(data[F], open(os.path.join(HERE, f"power_{F}.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 json.dump(PLANS, open(os.path.join(HERE, "power_plans.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)

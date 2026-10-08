@@ -42,7 +42,7 @@
   <div id="slides"></div>
 </main>
 <div id="zoom"><button class="close">关闭</button><img alt=""></div>
-<script src="power_data.js?v=p15"></script>
+<script src="power_data.js?v=p16"></script>
 <script>
 (function () {
   const P = window.POWER_DEFAULT.plans;
@@ -50,7 +50,7 @@
   const $ = s => document.querySelector(s), zoom = $('#zoom');
   function pick() {   // #A-GF-cn
     const [p, f, st] = (location.hash || '').replace('#', '').split('-');
-    const plan = P[(p || '').toUpperCase()] ? p.toUpperCase() : 'A';
+    const plan = P[(p || '').toUpperCase()] ? p.toUpperCase() : 'B';
     const set = SETS.find(x => x[0] === `${f}-${st}`) || SETS[0];
     return { plan, set };
   }

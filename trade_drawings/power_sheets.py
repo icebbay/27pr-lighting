@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """27PR 插座 / 动力施工图 (sockets + dedicated circuits, for the electrician) — generated from the power tool data
-(lighting_tool/power_<F>.json + power_plans.json, plan A 专业 18 路, the default).
+(lighting_tool/power_<F>.json + power_plans.json, plan B 精简 17 路 — chosen by the owner 2026-10-08).
 
 Ring finals (2.5 mm² 6242Y, B32 RCBO 30 mA): AL1 -> sockets in nearest-neighbour order -> back to AL1 (return leg dashed);
-radials (4 mm², WX4 laundry, WX9 outdoor) stop at the last outlet. Dedicated points (WP) are home runs from AL1.
+radials (cable marked 径向 in the plan) stop at the last outlet. Dedicated points (WP) are home runs from AL1.
 Routes are orthogonal schematic runs (in practice: down the wall from the ceiling void / along the floor void, safe zones only).
 """
 import html, json, math, os
@@ -14,12 +14,13 @@ def Sheet(*a, **k):
     k.setdefault("rev", "C"); k.setdefault("date", "2026-10-08")
     return _Sheet(*a, **k)
 
-PLAN = "A"
+PLAN = "B"      # 2026-10-08: owner chose plan B (精简 17 路)
 PL = json.load(open(os.path.join(TOOL, "power_plans.json"), encoding="utf-8"))[PLAN]
 CIRC = {c["id"]: c for c in PL["WX"] + PL["WP"]}
 COL = {"WX1": "#1f77b4", "WX2": "#7b2cbf", "WX3": "#e67e22", "WX4": "#0b8a6f", "WX5": "#1f77b4", "WX6": "#c0392b", "WX7": "#7b2cbf",
        "WX8": "#0b8a6f", "WX9": "#2e7d32", "WP1": "#a0522d", "WP2": "#555555", "WP3": "#d81b60", "WP4": "#d81b60", "WP5": "#006d77", "WP6": "#e67e22"}
-RADIAL = {"WX4", "WX9"}
+RADIAL = {c["id"] for c in PL["WX"] if "径向" in c["cable"]}
+COL[PL["outdoor"]] = "#2e7d32"
 KIND = {"double": ("双联插座 13A", "450"), "single": ("单联插座 13A", "450"), "outdoor": ("户外防水插座 IP66", "600"), "high": ("空调高位插座", "2000")}
 # the high sockets are the air-conditioner points: their own WP circuits (power_plans notes "见二层插座图「高」")
 HIGH_CIRC = {"卧室 3": "WP3", "卧室 4": "WP4"}
@@ -126,7 +127,7 @@ def plan_sheet(F, number):
         yy = y0 + 4.6 * (i + 1)
         A(f'<line x1="{x0}" y1="{yy}" x2="{x0+12}" y2="{yy}" stroke="{c}" stroke-width="{w}" stroke-dasharray="{d}"/><text x="{x0+15}" y="{yy+0.8}" font-size="2">{html.escape(t)}</text>')
     syms = [("2", "双联插座 13A（带开关），中心离地 450"), ("1", "单联插座 13A，离地 450"), ("高", "空调高位插座，离地 2000（专线 WP3 / WP4）"),
-            ("外", "户外防水插座 IP66，离地 600（WX9，出户段 SWA）"), ("FCU", "带保险开关接线盒 FCU 13A（电器专用，装在可触及处）"),
+            ("外", f"户外防水插座 IP66，离地 600（{PL['outdoor']}，出户段 SWA）"), ("FCU", "带保险开关接线盒 FCU 13A（电器专用，装在可触及处）"),
             ("DP", "双极隔离开关（电梯 / 充电桩室内总控 40A）")]
     for i, (k, t) in enumerate(syms):
         yy = y0 + 4.6 * (len(L) + 1) + i * 4.2
@@ -188,17 +189,17 @@ def ac_overlay(s):
 NOTES = [
     "说明 Notes",
     "1. 依据 BS 7671:2018+A2、IET On-Site Guide；Part P 须由注册电工施工、测试并出具 EIC；全部回路 RCBO 30 mA（Type A）。",
-    "2. 插座环路 2.5 mm² 6242Y，B32；单个环路服务面积 ≤ 100 m²；洗衣房 WX4、户外 WX9 为 4 mm² 32A 径向。",
+    "2. 方案 B：一层插座 WX1–WX3 为 2.5 mm² 6242Y 环路 B32（单个环路 ≤ 100 m²）；洗衣房 WX4 为 4 mm² 32A 径向；户外 WX5、二层 WX6–WX8 为 2.5 mm² 20A 径向（B20）；冰箱 WP6 单独一路。",
     "3. 插座中心离地 450（Part M），厨房台面插座离台面 150；FCU 装在台面上方或相邻柜内可触及处，电器插头不藏在电器背后。",
     "4. 墙内线缆只走安全区（插座 / 开关正上下方及距墙角 150 mm 内），否则用金属保护或 RCD（已全 RCD）。",
-    "5. 卫生间 0 / 1 区内不得装插座；电热毛巾架用 FCU 接 WX6。户外插座 IP66，出户段 SWA 铠装电缆。",
+    "5. 卫生间 0 / 1 区内不得装插座；电热毛巾架用 FCU 接 WX8。户外插座 IP66，出户段 SWA 铠装电缆。",
     "6. 充电桩 WP5：AL1 → 客厅内 40A 双极隔离开关（离地 1.2 m）→ 穿墙 → 副客厅前门西侧凹进处的充电桩（离地约 1.0 m）。B32/B40 Type A RCBO + 6 mA 直流检测（充电桩自带或另装）；6–10 mm² 按长度复核；建议带负载管理（CT 互感器）；安装前通知 DNO。",
     "7. 电梯 WP2 按厂家要求设独立隔离开关。空调一拖一 ×2：内机高位插座接 WP3 / WP4；外机在副楼平屋顶，电源由内机侧按机型接线（或 WP3 / WP4 直接到屋面隔离开关），外机旁装 IP65 双极隔离开关；冷媒管 / 冷凝水 / 信号线经阁楼走，穿屋面用防水套管；冷凝水接屋面雨水口或带存水弯接污水。",
 ]
 
 
 def board_sheet():
-    """E-13: consumer-unit schedule (plan A) — every final circuit with breaker, cable and what it feeds."""
+    """E-13: consumer-unit schedule (plan B) — every final circuit with breaker, cable and what it feeds."""
     s = Sheet(f"配电箱回路表 Consumer unit schedule（方案 {PLAN}）", "E-13", "", ((0, 1), (0, 1)), scale_note="NTS", discipline="电气 Electrical (power)")
     b = PL["board"]
     rows = [[c["id"], c["name"], c["br"], c.get("cable", "1.5 mm² 6242Y"), c.get("note", "")] for c in PL["lighting"]]
@@ -206,7 +207,7 @@ def board_sheet():
     rows += [["备用", b.get("reserve", ""), "", "", ""]]
     y = table(s, 16, 34, [("回路", 12), ("名称", 92), ("保护", 66), ("线缆", 60), ("备注", 150)], rows, fs=2.1, title=f"AL1 配电箱（楼梯下）· {b['model']} · {b['ways']} 位")
     info = [f"总闸 {b['main']}；浪涌保护 {b['spd']}；尺寸 {b['size']}", f"RCBO：{b['rcbo']}",
-            "照明 B6、插座环路 B32、径向按线径；全部 30 mA RCBO，单回路故障不影响其它回路。", "完工后贴回路标签（与本表编号一致），出具 EIC 与测试记录。"]
+            "照明 B6 / B10（一层室内照明合一路）、插座环路 B32、径向 B20 / B32 按线径；全部 30 mA RCBO，单回路故障不影响其它回路。", "完工后贴回路标签（与本表编号一致），出具 EIC 与测试记录。"]
     for i, t in enumerate(info):
         s.add(f'<text x="16" y="{y + 10 + i * 6:.1f}" font-size="2.6">{html.escape(t)}</text>')
     s.frame()

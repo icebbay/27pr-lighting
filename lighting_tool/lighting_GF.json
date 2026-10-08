@@ -544,7 +544,9 @@
    "y": 5791200,
    "location": "门厅 · 前储物间旁",
    "sheet": 1,
-   "middle_keys": []
+   "middle_keys": [],
+   "panel_out": 0.95,
+   "panel_note": "储物间门口的开关"
   },
   {
    "id": "S3",

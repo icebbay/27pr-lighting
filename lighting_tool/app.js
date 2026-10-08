@@ -633,10 +633,10 @@ function layoutPanels(F) {   // panel boxes beside their mounting dots, slid alo
     let best = null;
     for (const side of [1, -1]) for (const k of [0, 1, -1, 2, -2, 3, -3, 4, -4]) {
       const d = mul(dir, side), along = [Math.abs(d[1]), Math.abs(d[0])];
-      const gap = 0.2 * m + 0.04 * m * Math.abs(k);
+      const gap = 0.2 * m + 0.04 * m * Math.abs(k) + (p.panel_out || 0) * m;   // panel_out (m): pull the panel further off the wall
       const cx = p.x + d[0] * (pw / 2 + gap) + along[0] * k * 0.45 * m, cy = p.y + d[1] * (ph / 2 + gap) + along[1] * k * 0.45 * m;
       const box = [cx - pw / 2 - 0.02 * m, cy - ph / 2 - 0.02 * m, cx + pw / 2 + 0.02 * m, cy + ph / 2 + 0.02 * m];
-      const cost = placed.filter(b => hit(b, box)).length * 10 + lampBox.filter(b => hit(b, box)).length + Math.abs(k) * 0.8 +(side < 0 ? 0.5 : 0);
+      const cost = placed.filter(b => hit(b, box)).length * 10 + lampBox.filter(b => hit(b, box)).length * 6 + Math.abs(k) * 0.8 +(side < 0 ? 0.5 : 0);   // a panel must not hide a lamp
       if (!best || cost < best.cost) best = { cost, cx, cy, box, dir: d };
       if (cost < 0.01) break;
     }
@@ -724,6 +724,7 @@ function planOverlay(F) {
         ${mid ? txt(x + kw / 2, y - 0.05 * m, '中途', 0.13 * m, 'text-anchor="middle" fill="#c62828"') : ''}</g>`);
     });
     out.push(txt(cx, cy - dir[1] * 0 + (dir[1] > 0 ? ph / 2 + 0.28 * m : -ph / 2 - 0.1 * m), p.id, 0.26 * m, `text-anchor="middle" font-weight="bold" fill="#c00000" data-k="plate" data-id="${p.id}"`));
+    if (p.panel_note) out.push(txt(cx + pw / 2 + 0.1 * m, cy + 0.08 * m, p.panel_note, 0.2 * m, `fill="#c00000"`));   // e.g. which door this switch is at
     if (p.gangs === 0 && d.fan[p.id]) {
       const run = sim.key[kid(F, p.id, p.keys[0])] && circuitOn(F, d.C[d.fan[p.id]]);
       const fx = cx + pw / 2 + 0.22 * m, fy = cy;

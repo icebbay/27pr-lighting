@@ -5,7 +5,7 @@ UK loop-in with ceiling junction boxes: AL1 -> JB -> JB ... per final circuit (W
 each switched group (circuit letter) has one JB: lamps from the JB (2C+E switched line), switch drop from the JB (2C+E one-way /
 first two-way switch), 3C+E strappers between two-way switches and through intermediates. Routes are orthogonal ceiling runs
 (through joists / over the plasterboard), drops run vertically in the safe zone above each switch.
-Plan A (专业 18 路) lighting groups; plan B only joins WL1 + WL2 at the board (same cables).
+Plan B (精简 17 路, chosen 2026-10-08): the GF indoor lighting groups (plan A WL1 + WL2) are one circuit WL1 (B10); same cables.
 """
 import html, math
 from plan_base import Sheet as _Sheet, BASE_CSS, MM, load_tool, Frame, table
@@ -26,6 +26,14 @@ CSS = BASE_CSS + """
 
 def floor_data(F):
     J = load_tool(F); fr = Frame(F)
+    # plan B (2026-10-08): circuits regrouped per power_plans.json (GF WL1 + WL2 -> WL1)
+    import json, os
+    from plan_base import TOOL
+    PB = json.load(open(os.path.join(TOOL, "power_plans.json"), encoding="utf-8"))["B"]
+    for w in PB["lighting"]:
+        if w["floor"] != F: continue
+        for c in J["circuits"]:
+            if c["id"] in w["circ"]: c["wl"] = w["id"]
     lights = {l["id"]: dict(l, b=fr.t2b(l["x"], l["y"])) for l in J["lights"]}
     plates = {}
     for p in J["plates"]:
@@ -188,7 +196,7 @@ def draw_plan(F, number):
     A(f'<rect x="{bx-2.6:.2f}" y="{by-1.6:.2f}" width="5.2" height="3.2" class="cu"/><text x="{bx:.2f}" y="{by+5:.2f}" font-size="2.1" text-anchor="middle" font-weight="bold">'
       + ("AL1 配电箱 CU（楼梯下）" if F == "GF" else "↑ WL4 自一层 AL1 沿楼梯井引上") + '</text>')
     # legend + schedules
-    L = [("#c0392b", 0.75, "", "WL1 一层前区 feed 1.5 mm² 2C+E（B6 RCBO 30 mA）"), ("#d35400", 0.75, "", "WL2 一层后区 feed"),
+    L = [("#c0392b", 0.75, "", "WL1 一层室内照明 feed 1.5 mm² 2C+E（B10 RCBO 30 mA，方案 B）"),
          ("#16a085", 0.75, "", "WL3 户外 feed（户外段 SWA / 套管）"), ("#2c3e8f", 0.75, "", "WL4 二层 feed"),
          ("#555", 0.35, "", "JB → 灯 2C+E 1.5（开关线 L 套棕色套管）"), ("#111", 0.35, "1.6 0.8", "JB → 开关 下线 2C+E 1.5（竖直下到开关）"),
          ("#7a2fb5", 0.45, "3 1", "双控 / 中途联络线 3C+E 1.5（L1 / L2）")]
@@ -213,7 +221,7 @@ def draw_plan(F, number):
 NOTES_PLAN = [
     "说明 Notes",
     "1. 依据 BS 7671:2018+A2、IET On-Site Guide；属 Part P 须由注册电工施工、测试并出具 EIC。",
-    "2. 照明回路 1.5 mm² 6242Y（2C+E）/ 6243Y（3C+E），B6 RCBO 30 mA（方案 B 一层室内合 B10，接线不变）。",
+    "2. 方案 B：照明 3 路——WL1 一层室内 B10、WL3 户外 B6、WL4 二层 B6（RCBO 30 mA）；线缆 1.5 mm² 6242Y（2C+E）/ 6243Y（3C+E）。",
     "3. 灯具接法：每个回路字母一个吊顶接线盒 JB，灯与开关下线都回到 JB；JB 用维护式接线端子（Wago 221 / 维护可达）。",
     "4. 双控：JB→第一个开关 2C+E（COM），开关之间 3C+E（L1/L2）；三处控制中间为中途开关；所有开关线（蓝 / 灰芯作火线用）套棕色套管。",
     "5. 线路走向：吊顶内沿最短正交路线，穿搁栅中线打孔（≥ 50 mm 距上下缘）；墙内只在开关正上方竖直走（安全区），埋深 < 50 mm 时须 RCD 保护（已满足）。",

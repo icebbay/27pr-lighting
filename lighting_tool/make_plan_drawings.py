@@ -13,7 +13,7 @@ OUT, DWG = os.path.join(HERE, "out"), os.path.join(HERE, "drawings")
 FCN = {"GF": "一层", "FF": "二层"}
 SCRIPTS = (("make_lighting_drawings.py", "英式"), ("make_lighting_drawings_cn.py", "国标"))
 LJ = {F: json.load(open(os.path.join(HERE, f"lighting_{F}.json"), encoding="utf-8")) for F in ("GF", "FF")}
-PLANS = json.load(open(os.path.join(HERE, "power_plans.json"), encoding="utf-8"))
+PLANS = {"B": json.load(open(os.path.join(HERE, "power_plans.json"), encoding="utf-8"))["B"]}   # 2026-10-08: plan B only
 REV = "Rev" + LJ["GF"]["meta"]["rev_cn"].split(" ")[1]          # "Rev H 2026-10-06" -> "RevH"
 os.makedirs(OUT, exist_ok=True)
 

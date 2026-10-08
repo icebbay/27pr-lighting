@@ -2,7 +2,7 @@
 
 27PR 住宅改造的灯具、开关、回路资料，以及一个网页工具。在网页上可以直接按开关试灯、看每盏灯的线路从配电箱 AL1 怎么接到开关、再接到灯；也可以看给排水管线。
 
-**在线打开（不用安装）：https://icebbay.github.io/27pr-lighting/** —— 首页是**总览**，从这里进照明、插座 / 动力、给排水、配电箱（方案 A / B）、施工图和 3D 漫游；每个页面顶部也能互相跳转。
+**在线打开（不用安装）：https://icebbay.github.io/27pr-lighting/** —— 首页是**总览**，从这里进照明、插座 / 动力、给排水、配电箱（方案 B）、施工图和 3D 漫游；每个页面顶部也能互相跳转。
 
 ## 施工图 PDF（Rev C · 2026-10-08，给施工队）
 
@@ -18,24 +18,23 @@
 
 网页版：
 - **给排水**：https://icebbay.github.io/27pr-lighting/lighting_tool/plumbing.html —— 水管叠在平面图上，可切换一层 / 二层 / 两层、给水 / 排水；点管段看走向说明，编号与 PDF 上的圆圈一致。链接加 `#GF`、`#FF`、`#FF-drain` 等可直接打开某一层 / 某一系统。
-- **施工图**：https://icebbay.github.io/27pr-lighting/lighting_tool/drawings.html —— 上面是三套 PDF 下载和单页预览，下面是照明 PPT 施工图（方案 A / B）。
+- **施工图**：https://icebbay.github.io/27pr-lighting/lighting_tool/drawings.html —— 上面是三套 PDF 下载和单页预览，下面是照明 PPT 施工图（方案 B）。
 
-另外两页（照明页不变），都有 **方案 A / 方案 B** 切换，链接末尾加 `#A` 或 `#B` 可以直接打开某个方案，方便发给别人讨论：
-- **配电箱 AL1（两个方案对比）**：https://icebbay.github.io/27pr-lighting/lighting_tool/board.html （A 专业 18 路 vs B 精简 15 路：路数、配电箱、备用位、材料估算、优缺点，以及各自的单线图和回路表）
-- **插座 / 动力**：https://icebbay.github.io/27pr-lighting/lighting_tool/power.html#A 、[#B](https://icebbay.github.io/27pr-lighting/lighting_tool/power.html#B) （每个插座、电器属于哪一路，点一路只看这一路）
+全屋回路已定 **方案 B（精简 17 路）**（2026-10-08，方案 A 已从网页去掉）：
+- **配电箱 AL1**：https://icebbay.github.io/27pr-lighting/lighting_tool/board.html （BG CF22MS19-01 19 位单排，单线图、回路表、采购清单）
+- **插座 / 动力**：https://icebbay.github.io/27pr-lighting/lighting_tool/power.html （每个插座、电器属于哪一路，点一路只看这一路）
 
-3D 漫游（可以在房子里走、开门；与本照明图同一版户型 v40，2026-10-06）：https://icebbay.github.io/27pr-cgi/walkthrough/
+3D 漫游（可以在房子里走、开门）：https://icebbay.github.io/27pr-cgi/walkthrough/
 
-> 状态：灯、开关、联动已定（Rev G）。全屋回路有两个方案供讨论：**A 专业 18 路**（照明 4 + 插座 9 + 专线 5，BG CF236MS31 31 位，配电箱 + RCBO 约 £347）和 **B 精简 17 路**（照明 3 + 插座 8 + 专线 6，冰箱单独，BG CF22MS19-01 19 位，约 £228）。照明、插座、配电箱、施工图各页都能切换 A / B。规格为建议值，需要电工按 BS 7671 / Part P 复核。
+> 状态（2026-10-08）：灯、开关、联动已定（照明 Rev K）。全屋回路按 **方案 B 精简 17 路**（照明 3 + 插座 8 + 专线 6，冰箱单独，BG CF22MS19-01 19 位，约 £228）。规格为建议值，需要电工按 BS 7671 / Part P 复核。
 
-## 施工图（Rev G，方案 A / B 各一套）
+## 照明 PPT 施工图（Rev K，方案 B）
 
 | 文件 | 内容 |
 |---|---|
-| 方案 A（照明 4 路） | [一层英式](lighting_tool/drawings/27PR_一层照明施工图_RevG-A_英式.pptx) · [一层国标](lighting_tool/drawings/27PR_一层照明施工图_RevG-A_国标.pptx) · [二层英式](lighting_tool/drawings/27PR_二层照明施工图_RevG-A_英式.pptx) · [二层国标](lighting_tool/drawings/27PR_二层照明施工图_RevG-A_国标.pptx) |
-| 方案 B（照明 3 路） | [一层英式](lighting_tool/drawings/27PR_一层照明施工图_RevG-B_英式.pptx) · [一层国标](lighting_tool/drawings/27PR_一层照明施工图_RevG-B_国标.pptx) · [二层英式](lighting_tool/drawings/27PR_二层照明施工图_RevG-B_英式.pptx) · [二层国标](lighting_tool/drawings/27PR_二层照明施工图_RevG-B_国标.pptx) |
+| 方案 B（照明 3 路） | [一层英式](lighting_tool/drawings/27PR_一层照明施工图_RevK-B_英式.pptx) · [一层国标](lighting_tool/drawings/27PR_一层照明施工图_RevK-B_国标.pptx) · [二层英式](lighting_tool/drawings/27PR_二层照明施工图_RevK-B_英式.pptx) · [二层国标](lighting_tool/drawings/27PR_二层照明施工图_RevK-B_国标.pptx) |
 
-不想下载 PPT：网页上的「施工图」页（https://icebbay.github.io/27pr-lighting/lighting_tool/drawings.html）逐页显示，可切换方案。
+不想下载 PPT：网页上的「施工图」页（https://icebbay.github.io/27pr-lighting/lighting_tool/drawings.html）逐页显示。
 
 **Rev G：全屋按专业方案定为 18 路，照明合为 4 路**
 - 照明：一层前区 WL1（22 盏）、一层后区 WL2（14 盏，原 WL2 + WL6）、户外 WL3（7 盏）、二层 WL4（16 盏，原 WL4/5/7）。按已购灯具估算一层室内约 680 W、二层约 320 W，LED 负载很小；分路是为了跳闸时不整屋黑（BS 7671 314.1），楼梯壁灯和吊灯在不同回路。

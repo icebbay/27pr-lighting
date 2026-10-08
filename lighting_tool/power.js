@@ -186,7 +186,7 @@ function side() {
   };
   const xs = C.list.filter(c => c.kind === 'WX'), ps = C.list.filter(c => c.kind === 'WP'), ls = C.list.filter(c => c.kind === 'WL'), pl = C.plan;
   if (!ui.trace) h.push(`<p class="hint">👆 点图上任意一个插座或电器，看它的电从配电箱哪一路、经过哪些地方过来。</p>`);
-  h.push(`<h3>${esc(pl.name)}</h3><div class="muted">共 ${C.list.length} 路：照明 ${C.list.filter(c => c.kind === 'WL').length} + 插座 ${xs.length} + 专线 ${ps.length} · 配电箱 ${esc(pl.board.model)}（${pl.board.ways} 位）· <a href="board.html#${ui.plan}">看 A / B 对比</a></div>`);
+  h.push(`<h3>${esc(pl.name)}</h3><div class="muted">共 ${C.list.length} 路：照明 ${C.list.filter(c => c.kind === 'WL').length} + 插座 ${xs.length} + 专线 ${ps.length} · 配电箱 ${esc(pl.board.model)}（${pl.board.ways} 位）· <a href="board.html#${ui.plan}">配电箱</a></div>`);
   h.push(`<h3>照明回路（${ls.length} 路，图上菱形 = 灯）</h3>`, ...ls.map(row));
   h.push(`<h3>插座回路（${xs.length} 路）</h3>`, ...xs.map(row));
   h.push(`<h3>专线（${ps.length} 路，一样电器一路）</h3>`, ...ps.map(row));
@@ -196,7 +196,7 @@ function side() {
     `<svg viewBox="-12 -12 24 24" width="20" height="20"><rect x="-7" y="-7" width="14" height="14" transform="rotate(45)" fill="#fff" stroke="#666" stroke-width="3"/></svg><div>灯（颜色 = 照明回路；开关和联动见「照明」页）</div>`,
     `<svg viewBox="0 -4 28 8" width="24" height="8"><path d="M0 0H28" stroke="#666" stroke-width="4"/></svg><div>粗线 = AL1 引出（每路一根）</div>`,
     `<svg viewBox="0 -4 28 8" width="24" height="8"><path d="M0 0H28" stroke="#666" stroke-width="2" stroke-dasharray="5 3"/></svg><div>虚线 = 同一路的插座串在一起</div></div>`);
-  h.push(`<p class="muted">插座点位来自 v10 PPT 插座页（你标的圆点；2026-10-06 按 v7 / v9 更新），两个方案点位相同，只是分路不同。线路只表示属于哪一路，实际走线现场定。开关和联动见「照明」页（也能切换 A / B），全部回路、两个方案的对比和采购清单见「配电箱」页。</p>`);
+  h.push(`<p class="muted">插座点位来自 v10 PPT 插座页（你标的圆点；2026-10-06 按 v7 / v9 更新）。线路只表示属于哪一路，实际走线现场定。开关和联动见「照明」页，全部回路、采购清单见「配电箱」页。</p>`);
   $('#side').innerHTML = h.join('');
   $('#side').querySelectorAll('[data-sel]').forEach(e => e.onclick = () => select(e.dataset.sel));
 }
