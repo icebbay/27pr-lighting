@@ -56,7 +56,7 @@
     return { plan, set };
   }
   function render() {
-    const { plan, set } = pick(), pl = P[plan], file = `27PR_${set[2]}照明施工图_RevK-${plan}_${set[3]}`;
+    const { plan, set } = pick(), pl = P[plan], file = `27PR_${set[2]}照明施工图_RevL-${plan}_${set[3]}`;
     $('#ver').textContent = 'Rev K · ' + pl.short;
     $('#plans').innerHTML = Object.keys(P).map(k => `<button data-go="${k}-${set[0]}" class="${k === plan ? 'on' : ''}">${P[k].name}</button>`).join('');
     $('#sets').innerHTML = SETS.map(x => `<button data-go="${plan}-${x[0]}" class="${x === set ? 'on' : ''}">${x[1]}</button>`).join('');
