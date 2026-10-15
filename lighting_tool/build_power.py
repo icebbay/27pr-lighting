@@ -114,7 +114,8 @@ PLANS = {
 def fit(slide, F):
     """affine from this slide's coordinates to the floor frame, fitted on shared wall shapes"""
     sv = collections.defaultdict(list)
-    for n, p in re.findall(r'data-name="([^"]+)" d="([^"]+)"', open(os.path.join(HERE, f"walls_{F}.svg"), encoding="utf-8").read()):
+    src = os.path.join(HERE, f"walls_{F}_ppt.svg")          # the PPT original (patch_walls_* move pieces in walls_<F>.svg; the PPT slides match this one)
+    for n, p in re.findall(r'data-name="([^"]+)" d="([^"]+)"', open(src if os.path.exists(src) else os.path.join(HERE, f"walls_{F}.svg"), encoding="utf-8").read()):
         a = np.array(list(map(float, re.sub('[MLZ]', ' ', p).split()))).reshape(-1, 2); sv[n].append((a.min(0) + a.max(0)) / 2)
     walls = collections.defaultdict(list)
     for x, T, par in _ns["walk"](slide.shapes, lambda a, b: (a, b)):
@@ -222,11 +223,57 @@ DED.append(dict(c="WL1", label="温感 + 一氧化碳报警器（厨房天花，
 for d in DED:
     if not isinstance(d["c"], dict): d["c"] = {p: d["c"] for p in PLANS}
 data = {F: dict(sockets=OUT[F]["pts"], items=[d for d in DED if d["floor"] == F]) for F in ("GF", "FF")}
+
+# ---------------- 2026-10-15: the point plan is the truth (trade_drawings/_points_final.json = finished wall elevations, model v47) ----------------
+# setting_out.py numbers the sockets C01.. by their order in the PPT list, so that list is kept as "sockets_base" (and the old dedicated
+# list as "items_base"); "sockets" / "items" (power page, board page, power drawings) are the final points: positions and kinds from the
+# point plan, cancelled ones left out (C06 -> the laundry fused switches, C41), the elevation-only ones (C36-C43, ...) added.
+PF_PATH = os.path.join(HERE, "..", "trade_drawings", "_points_final.json")
+if os.path.exists(PF_PATH):
+    PF = json.load(open(PF_PATH, encoding="utf-8"))
+    PTS = {(r["F"], r["id"]): r for r in PF["wall"] + PF["other"] if r["cat"] in ("socket", "new")}
+    _bt = {"GF": _b2t, "FF": _b2tF}
+    ALL_C = {c["id"] for pl in PLANS.values() for c in pl["WX"] + pl["WP"] + pl["lighting"]}
+    ROOM_C = {"GF": {"厨房": "WX3", "早餐区": "WX3", "厨房（吧台区）": "WX3", "洗衣房": "WX4"},
+              "FF": {"二楼走廊": "WX6", "中间书房": "WX6", "后书房": "WX6", "后房窄卫浴": "WX6",
+                     "次卧": "WX7", "次卧卫浴": "WX7", "主卧": "WX8", "主卫": "WX8", "衣帽间": "WX8"}}
+    KINDS = ("double", "single", "outdoor", "high")
+    for F in ("GF", "FF"):
+        base, final = data[F]["sockets"], []
+        for i, s in enumerate(base):
+            s["id"] = f"C{i + 1:02d}"
+            r = PTS.get((F, s["id"]))
+            if r is None: s["drop"] = True; continue
+            q = dict(s); q["x"], q["y"] = _bt[F](*r["p"]); q["kind"] = r.get("kind") if r.get("kind") in KINDS else "single"
+            if F == "GF" and s["id"] == "C25": q["c"] = {p: PLANS[p]["fridge"] for p in PLANS}      # fridge socket on its own circuit
+            final.append(q)
+        have = {s["id"] for s in base}
+        for (fl, pid), r in sorted(PTS.items()):
+            if fl != F or r["cat"] != "socket" or pid in have: continue
+            if r.get("kind") == "outdoor": c = None
+            else: c = r.get("circ") if r.get("circ") in ALL_C else ROOM_C[F].get(r["room"])
+            assert c or r.get("kind") == "outdoor", f"{F} {pid}: no circuit for room {r['room']}"
+            x, y = _bt[F](*r["p"])
+            final.append(dict(id=pid, kind=r.get("kind") if r.get("kind") in KINDS else "single", x=x, y=y, room=r["room"], extra=True,
+                              c={p: (PLANS[p]["outdoor"] if c is None else c) for p in PLANS}))
+        data[F]["sockets_base"], data[F]["sockets"] = base, final
+    # dedicated points: every appliance FCU is now a single fused switch in the laundry (FU1-FU4) or inside the under-stair cupboard (FD / FO1-FO3);
+    # the old kitchen / laundry FCUs, the boiler + softener plate (C06 position), the hood item (now socket C40) and the UF1 FCU are gone
+    OLD = ("洗碗机", "烤箱", "冰箱", "洗衣机", "烘干机", "锅炉 + 软水机", "抽油烟机高位插座", "地暖分水器")
+    data["GF"]["items_base"] = data["GF"]["items"]
+    keep = [d for d in data["GF"]["items"] if not d["label"].startswith(OLD)]
+    FCU = [("FD", "WX3", "洗碗机"), ("FO1", "WP1", "烤箱"), ("FO2", "WX3", "灶（点火）"), ("FO3", "WX3", "烟机"),
+           ("FU1", "WX4", "洗衣机"), ("FU2", "WX4", "烘干机"), ("FU3", "WX4", "锅炉"), ("FU4", "WX4", "地暖电子控制")]
+    for pid, c, lab in FCU:
+        r = PTS[("GF", pid)]; x, y = _b2t(*r["p"])
+        where = "楼梯下柜内" if pid[1] in "DO" else "洗衣房锅炉下"
+        keep.append(dict(c={p: c for p in PLANS}, label=f"{lab}（单联 fused switch {pid}，{where}，白色）", fcu=pid, x=x, y=y, floor="GF"))
+    data["GF"]["items"] = keep
 # owner 2026-10-08: just leave a cable for the future garden-end building, brought out at the laundry rear-east corner
 RESERVE_PATH = [(4.12, 6.98), (4.05, 6.98), (4.05, 16.80)]   # Blender m: AL1 -> along the kitchen / laundry east wall -> out at the rear corner
 data["GF"]["reserved"] = [dict(label="预留线 10 mm² SWA（以后接到院子尽头小房子）", note="预留：配电箱拉一根 10 mm² 三芯 SWA 到洗衣房后墙外角，出墙留约 2 m、端头封好，暂不接；以后建院子尽头的小房子时从这里接线延长过去。", pts=[list(_b2t(x, y)) for x, y in RESERVE_PATH])]
 data["FF"]["reserved"] = []
-data["plans"] = {"B": PLANS["B"]}; data["default"] = "B"; data["rev"] = "2026-10-08 · 方案 B（精简 17 路）"   # owner 2026-10-08: plan A dropped from the web pages
+data["plans"] = {"B": PLANS["B"]}; data["default"] = "B"; data["rev"] = "2026-10-15 · 方案 B（精简 17 路）· 点位按点位定位图 Rev C（模型 v47）"   # owner 2026-10-08: plan A dropped from the web pages
 for F in ("GF", "FF"):
     json.dump(data[F], open(os.path.join(HERE, f"power_{F}.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 json.dump(PLANS, open(os.path.join(HERE, "power_plans.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)

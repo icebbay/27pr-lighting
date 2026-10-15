@@ -12,7 +12,7 @@ from plan_base import Sheet as _Sheet, BASE_CSS, MM, load_tool, Frame, table
 
 
 def Sheet(*a, **k):
-    k.setdefault("rev", "D"); k.setdefault("date", "2026-10-13")
+    k.setdefault("rev", "E"); k.setdefault("date", "2026-10-15")
     return _Sheet(*a, **k)
 
 # positions agreed with the user after Rev I (to be written back to the tool / model): Blender metres

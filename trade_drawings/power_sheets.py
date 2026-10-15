@@ -11,7 +11,7 @@ from plan_base import Sheet as _Sheet, BASE_CSS, MM, load_tool, Frame, table, TO
 
 
 def Sheet(*a, **k):
-    k.setdefault("rev", "C"); k.setdefault("date", "2026-10-08")
+    k.setdefault("rev", "D"); k.setdefault("date", "2026-10-15")
     return _Sheet(*a, **k)
 
 PLAN = "B"      # 2026-10-08: owner chose plan B (精简 17 路)

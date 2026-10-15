@@ -199,7 +199,7 @@ def collect(F):
     items = []
 
     def add(**k): items.append(k)
-    for i, s in enumerate(P["sockets"], 1):
+    for i, s in enumerate(P.get("sockets_base", P["sockets"]), 1):     # C01.. numbering = the original PPT list (build_power.py keeps it)
         p = fr.t2b(s["x"], s["y"]); fz = floor_z(F, *p); h = H["socket"]; why = "450（英国规格，业主 2026-10-08；原定 300）"
         circ = hi.get(s["room"], s["c"]["A"]) if s["kind"] == "high" else s["c"]["A"]
         if s["kind"] == "outdoor":
@@ -208,7 +208,7 @@ def collect(F):
             u = min(AC.get(F, []), key=lambda u: math.dist(p, ((u[0] + u[1]) / 2, (u[2] + u[3]) / 2)))
             h = r10(((u[4] + u[5]) / 2 - fz) * 1000); why = f"空调内机侧面，与机身中高齐平（内机底 {r10((u[4] - fz) * 1000)}）"
         add(cat="socket", id=f"C{i:02d}", name=KIND_CN[s["kind"]], room=s["room"], circ=circ, p=p, h=h, why=why, mount="wall", kind=s["kind"])
-    for i, it in enumerate(P["items"], 1):
+    for i, it in enumerate(P.get("items_base", P["items"]), 1):
         p = fr.t2b(it["x"], it["y"]); lab = it["label"].split("（")[0]
         mount = "wall"
         if it.get("alarm"):
