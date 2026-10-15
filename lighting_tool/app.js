@@ -219,7 +219,7 @@ function wires(F) {
     }
     for (let i = 0; i + 1 < xs.length; i++) if (xs[i].plate !== xs[i + 1].plate) {
       const a = d.P[xs[i].plate], b = d.P[xs[i + 1].plate];
-      W.push({ kind: 'strap', c: c.id, wl: c.wl, pts: [[a.x, a.y], [b.x, b.y]], n: xs.length });
+      W.push({ kind: 'strap', c: c.id, wl: c.wl, pts: [[a.x, a.y], [b.x, b.y]], n: d.ctrls[c.id].length });   // all floors: FF k is 3-way with GF S6
     }
     for (const ds of J.door_switches.filter(ds => ds.circuit === c.id)) if (pts.length) {
       const t = pts.reduce((a, n) => dist(n.p, [ds.x, ds.y]) < dist(a.p, [ds.x, ds.y]) ? n : a);

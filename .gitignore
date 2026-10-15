@@ -21,6 +21,8 @@ __pycache__/
 /trade_drawings/*
 !/trade_drawings/*.py
 !/trade_drawings/_v42_section.json
+!/trade_drawings/_v46_section.json
+!/trade_drawings/_v47_section.json
 !/trade_drawings/out/
 /trade_drawings/out/*
 !/trade_drawings/out/*RevC.pdf

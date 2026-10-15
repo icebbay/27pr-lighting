@@ -7,6 +7,9 @@ Same method as patch_walls_v42.py, but every zone now takes its walls / doors fr
               and its windows would come out as bare gaps);
               主卫 一门两用 partition 1.150-1.250 + 衣帽间 partition 2.429-2.549; 主客厅 sofa wall face -0.600;
               kitchen / laundry opening 2.12 (new 300 pier V47_Kitchen_Pier_300_L); laundry corner fill.
+  v47 zones   (2026-10-14, model v47 = owner keyplan screenshot, section now _v47_section.json): 300 pier removed again
+              (opening 2.42); laundry rear door moved to x 2.650-3.530 (old door walled up, rear window gone); laundry -> kitchen
+              door replaced by a plain opening 2.070-2.830; breakfast French door moved 91 (frame 8.764-10.405, 600 from the wall).
 Always patches from walls_<F>_ppt.svg (the PPT original), so it is idempotent and replaces patch_walls_v42.py.
 
     python products/trade_drawings/patch_walls_v46.py      (then lighting_tool/build_data_js.py for the web tool)
@@ -20,6 +23,9 @@ from patch_walls_v42 import WALLISH, DOORISH, evenodd, to_d, from_d
 HERE = os.path.dirname(os.path.abspath(__file__))
 WALLISH = re.compile(WALLISH.pattern + r"|Pier|CornerFill|PreWall")
 NONE = (0, 0, 0, 0)
+# named door paths redrawn as a box (x0, x1, y0, y1): 后书房 bath door hinge at the alcove end (y 9.264, owner plan / 后书房 Rev F),
+# open leaf 690 into the study — model v47 flipped to match (owner 2026-10-15: "方向开错了，朝外开")
+DOOR_BOX = {"FF": {"墙_V39_DoorLeaf_Bath": (2.590, 3.280, 9.264, 9.304)}}
 # floor: [(name, wall zone (x0, x1, y0, y1), door zone)] in Blender metres
 ZONES = {
     "FF": [("北卫门", (-2.95, -2.45, 6.45, 7.70), (-3.60, -2.45, 6.45, 7.70)),
@@ -29,7 +35,10 @@ ZONES = {
     "GF": [("厨房门", (2.30, 3.50, 7.85, 8.30), (2.30, 3.50, 7.85, 9.00)),
            ("主客厅沙发墙（墙面 -0.600）", (-0.80, -0.58, 0.80, 4.30), NONE),
            ("厨房 / 洗衣房洞口 300 墙垛", (1.20, 1.65, 11.80, 12.15), NONE),
-           ("洗衣房角补墙", (4.25, 4.45, 15.85, 16.10), NONE)],
+           ("洗衣房角补墙", (4.25, 4.45, 15.85, 16.10), NONE),
+           ("v47 洗衣房后门挪位 + 补墙", (1.03, 4.42, 15.98, 16.30), (1.15, 4.42, 15.90, 16.30)),
+           ("v47 洗衣房 / 厨房无门洞口", (1.20, 4.30, 14.65, 14.90), (1.15, 2.95, 14.60, 15.70)),
+           ("v47 早餐区法式门挪 91", (1.00, 1.30, 8.55, 10.50), (0.30, 1.30, 8.55, 10.50))],
 }
 
 
@@ -68,7 +77,7 @@ def patch(F):
     fr = Frame(F)
     src = os.path.join(TOOL, f"walls_{F}_ppt.svg"); dst = os.path.join(TOOL, f"walls_{F}.svg")
     svg = open(src, encoding="utf-8").read()
-    sec = json.load(open(os.path.join(HERE, "_v46_section.json"), encoding="utf-8"))[F]
+    sec = json.load(open(os.path.join(HERE, "_v47_section.json"), encoding="utf-8"))[F]
     by = {}
     for n, a, b, c, d in sec: by.setdefault(n, []).append((a, b, c, d))
     v46 = {n: closed(s) for n, s in by.items()}
@@ -101,6 +110,8 @@ def patch(F):
         return f'<g class="{cls}"{attrs}>\n' + "\n".join(out) + "\n</g>"
 
     svg = re.sub(r'<g class="(\w+)"([^>]*)>(.*?)</g>', fix_group, svg, flags=re.S)
+    for nm, (x0, x1, y0, y1) in DOOR_BOX.get(F, {}).items():
+        svg = re.sub(rf'<path data-name="{re.escape(nm)}" d="[^"]+"/>', f'<path data-name="{nm}" d="{to_d(box(x0, y0, x1, y1), fr)}"/>', svg)
     open(dst, "w", encoding="utf-8").write(svg)
     print(F, "patched ->", dst)
 

@@ -18,7 +18,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OBJ = json.load(open(os.path.join(HERE, "_v42_objects.json"), encoding="utf-8"))
 
 # ---------------- height rules (mm, to the centre of the box, above the room's finished floor) ----------------
-H = dict(switch=1200, socket=300, outdoor=600, bedside_over=150, worktop_over=200, fcu=1100, dp=1200, ev=1000, lift_dp=1200)
+H = dict(switch=1200, socket=450, outdoor=600, bedside_over=150, worktop_over=200, fcu=1100, dp=1200, ev=1000, lift_dp=1200)
 CEIL = {"GF": 2600, "FF_front": 2500, "FF_rear": 2856}
 
 
@@ -200,7 +200,7 @@ def collect(F):
 
     def add(**k): items.append(k)
     for i, s in enumerate(P["sockets"], 1):
-        p = fr.t2b(s["x"], s["y"]); fz = floor_z(F, *p); h = H["socket"]; why = "300（业主原定，与模型一致）"
+        p = fr.t2b(s["x"], s["y"]); fz = floor_z(F, *p); h = H["socket"]; why = "450（英国规格，业主 2026-10-08；原定 300）"
         circ = hi.get(s["room"], s["c"]["A"]) if s["kind"] == "high" else s["c"]["A"]
         if s["kind"] == "outdoor":
             h, why = H["outdoor"], "户外 600，防水盖朝下"
@@ -275,7 +275,9 @@ def collect(F):
 #  * GF points that differed from the model: use the model (owner's site points of 2026-10-01)
 #  * FF S3: above the nightstand on the C19 side, 700 (two-way with S4 at the door) — the wall middle is behind the F01 headboard
 #  * sockets blocked by furniture: the proposals of _points_review_v44.json (TV cabinets -> 600, others slid past the furniture)
-POS_FIX = {"GF": {"C02": (2.33, 4.354), "C15": (-0.607, 7.141), "C21": (1.04, 12.256), "C25": (2.564, 14.714), "C27": (4.29, 8.752),
+POS_FIX = {"GF": {"C02": (2.33, 4.354), "C15": (-0.607, 7.141), "C21": (1.04, 12.256), "C25": (2.100, 8.164),   # v47 2026-10-14: fridge moved to the old boiler corner
+                  "C12": (1.270, 15.478), "C13": (3.028, 14.834),   # v47: washer cabinet at the laundry west end; C13 on the laundry partition
+                  "C27": (4.29, 8.752),
                   "C28": (-4.29, 3.185), "C34": (-4.285, 1.074), "S3": (2.358, 4.234),
                   "D08": (-3.765, 1.65),    # EV 40A isolator: 550 from the door edge, clear of S9 (was on top of it)
                   "D06": (-0.89, 5.823)},  # lift isolator: off the 120 mm stub by the lift onto the straight wall beside C11
@@ -283,7 +285,13 @@ POS_FIX = {"GF": {"C02": (2.33, 4.354), "C15": (-0.607, 7.141), "C21": (1.04, 12
 H_FIX = {"FF": {"S3": (700, "床头柜上方 700（与门口 S4 双控），避开床头板")}}
 
 
+KIND_FIX = {"GF": {"C01": "double", "C02": "double"}}     # owner 2026-10-12 / 10-14: single -> double (model v47 too)
+
+
 def fix_points(F, items):
+    for it in items:
+        if it.get("kind") and it["id"] in KIND_FIX.get(F, {}):
+            it["kind"] = KIND_FIX[F][it["id"]]; it["name"] = KIND_CN[it["kind"]]
     rev = json.load(open(os.path.join(HERE, "_points_review_v44.json"), encoding="utf-8")) if os.path.exists(os.path.join(HERE, "_points_review_v44.json")) else []
     clash = {o["id"]: o for o in rev if o["F"] == F and o.get("new") and not o["id"].startswith(("S3", "N-"))}
     for it in items:
@@ -307,7 +315,7 @@ def locate(F):
         f = PLN.face(p) if it["mount"] == "wall" else None
         if it["mount"] == "wall":
             if f is None and any(near_box(p, t, 0.3) for t in TOPS.get(F, [])):
-                it = dict(it, mount="island"); r.update(mount="island", h=800, why="岛台端板插座 h 800（或改台面弹起插座）")
+                it = dict(it, mount="island"); r.update(mount="island", h=800, why="半岛台柜内插座 h 800（白色，业主 2026-10-14）")
             elif f is None:
                 r.update(wall="—", flag="离墙 > 0.6 m，现场确认", room=r["room"] or PLN.room_at(p))
             if f is not None:
